@@ -1839,6 +1839,34 @@ class Alg:
     #
     # end of method
 
+    def get_info(self):
+        """
+        method: get_info
+
+        arguments:
+         none
+
+        return:
+         a dictionary containing the algorithm information
+
+        description:
+         this method returns the information of the current algorithm.
+        """
+
+        # get the algorithm parameters
+        #
+        if hasattr(self.alg_d, 'get_info'):
+            parameter_outcomes = self.alg_d.get_info()
+        else:
+            parameter_outcomes = None
+
+        # exit gracefully
+        # return the parameter outcomes
+        #
+        return parameter_outcomes
+    #
+    # end of method
+
 #
 # end of Alg
 
@@ -2234,6 +2262,33 @@ class PCA:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+
+        arguments:
+         none
+
+        return:
+         a dictionary containing the algorithm information
+
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+
+        # get the algorithm means and covariances
+        #
+        info = {
+            "means": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_MEANS],
+            "covariances": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_COV]
+        }
+
+        # exit gracefully
+        #
+        return info
     #
     # end of method
 #

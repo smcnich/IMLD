@@ -305,6 +305,7 @@ class ProcessLog extends HTMLElement {
     // end of method
 
     // Function to write data parameters to the log
+    //
     writeDataParams(paramValues, param_names) {
         /*
         method: ProcessLog::writeDataParams
@@ -332,18 +333,62 @@ class ProcessLog extends HTMLElement {
                 this.writeSingleValue(`Class ${class_index}`, `${name}: ${paramValues[index]}`);
                 class_index = class_index + 1;
             } else {
-                class_padding = `<span style="color: white">Classs ${class_index}:</span>`;
+                class_padding = `<span style="color: white; user-select: none;">Classs ${class_index}:</span>`;
                 
                 if (paramValues[index].includes('[')) {
                     var matrix = this.parseMatrix(paramValues[index]);
                     this.writePlain(`${class_padding}${name}: [${matrix[0]}]`);
 
                     for (let i = 1; i < matrix.length; i++) {
-                        name_padding = `<span style="color: white">${name}:</span>`;
+                        name_padding = `<span style="color: white; user-select: none;">${name}:</span>`;
                         this.writePlain(`${class_padding}${name_padding} [${matrix[i]}]`);
                     }
                 } else {
                     this.writePlain(`${class_padding}${name}: ${paramValues[index]}`);
+                }
+            }
+        });
+    }
+    //
+    // end of method
+
+    // Function to write estimated parameters to process log
+    //
+    writeEstimatedParams(paramValues, param_names) {
+        /*
+        method: ProcessLog::writeEstimatedParams
+
+        args:
+        paramValues (Array): The values of the parameters to be logged.
+        param_names (Array): The names of the parameters corresponding to the values.
+
+        return:
+        None
+
+        description:
+        This method iterates over parameter names and their corresponding values, formatting and logging them.  
+        If a parameter represents a matrix (e.g., 'covariances'), it is parsed and logged row by row.  
+        Other parameters (e.g., 'means') are logged with an incrementing class index.
+        */
+        var class_index = 0;
+
+        param_names.forEach((name, index) => {
+            let name_padding;
+
+            if (name === 'covariances') {
+                var matrix = this.parseMatrix(paramValues[index]);
+                this.writeSingleValue(`Covariances`, `[${matrix[0]}]`);
+
+                for (let i = 1; i < matrix.length; i++) {
+                    name_padding = `<span style="color: white; user-select: none;">Covariancess:</span>`;
+                    this.writePlain(`${name_padding} [${matrix[i]}]`);
+                }
+            } else {
+                var matrix = this.parseMatrix(paramValues[index]); // Access value directly
+                
+                for (let i = 0; i < matrix.length; i++) {
+                    this.writeSingleValue(`Class ${class_index}`, `Means: [${matrix[i]}]`);
+                    class_index = class_index + 1;
                 }
             }
         });
@@ -376,7 +421,7 @@ class ProcessLog extends HTMLElement {
                 this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name}`, `[${matrix[0]}]`);
 
                 for (let i = 1; i < matrix.length; i++) {
-                    name_padding = `<span style="color: white">${name}:<span>`;
+                    name_padding = `<span style="color: white; user-select: none;">${name}:<span>`;
                     this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name_padding}`, `[${matrix[i]}]`);
                 }
             } else {

@@ -78,10 +78,6 @@ EventBus.addEventListener('train', (event) => {
     // Add a full-width separator
     processLog.addFullWidthSeparator();
 
-    // write to the process log
-    //
-    processLog.writeSingleValue('Process', 'Train');
-
     // get the data from the event
     //
     const params = event.detail.params;
@@ -90,7 +86,7 @@ EventBus.addEventListener('train', (event) => {
     const userID = event.detail.userID;
 
     // display the selected algorithm name to the process log
-    processLog.writePlain('');
+    //
     processLog.writeSingleValue('Selected Algorithm', algo_name);
 
     // get the param values and corresponding param names
@@ -101,6 +97,11 @@ EventBus.addEventListener('train', (event) => {
     // write the process log for train
     //
     processLog.writeAlgorithmParams(paramValues, param_names);
+
+    // write to the process log
+    //
+    processLog.writePlain('');
+    processLog.writeSingleValue('Process', 'Train');
 
     // get the training data from the training plot
     //
@@ -152,6 +153,16 @@ EventBus.addEventListener('train', (event) => {
         //
         trainPlot.decision_surface(data.decision_surface, 
                                    labelManager.getLabels());
+
+        // get the param values and corresponding param names
+        //
+        const paramValues = Object.values(data.parameter_outcomes).map(value => JSON.stringify(value));
+        const param_names = Object.keys(data.parameter_outcomes);
+
+        //  write the estimated parameters to the process log
+        //
+        processLog.writePlain('');
+        processLog.writeEstimatedParams(paramValues, param_names);
 
         // write the metrics to the process log
         //
@@ -267,9 +278,19 @@ EventBus.addEventListener('eval', (event) => {
     //
     .then((data) => {
 
+        // get the param values and corresponding param names
+        //
+        const paramValues = Object.values(data.parameter_outcomes).map(value => JSON.stringify(value));
+        const param_names = Object.keys(data.parameter_outcomes);
+
+        //  write the estimated parameters to the process log
+        //
+        processLog.writePlain('');
+        processLog.writeEstimatedParams(paramValues, param_names);
+
         // write the metrics to the process log
         //
-        processLog.writeMetrics('Eval', data);
+        processLog.writeMetrics('Eval', data.metrics);
 
         // capture the time for benchmarking purposes
         //
@@ -622,7 +643,7 @@ EventBus.addEventListener('dataGen', (event) => {
             const paramValues = Object.values(event.detail.params).map(value => JSON.stringify(value));
             const param_names = event.detail.param_names;
 
-            // write the process log for data gen
+            // write the data params to the process log
             //
             processLog.writeDataParams(paramValues, param_names);
 

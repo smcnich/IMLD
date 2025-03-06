@@ -229,11 +229,11 @@ def train(model:mlt.Alg, data:mltd.MLToolsData):
 
     # get the performance metrics of the model on the test data
     #
-    metrics = predict(model, data)
+    metrics, parameter_outcomes = predict(model, data)
 
     # return the trained model and the performance metrics
     #
-    return model, metrics
+    return model, metrics, parameter_outcomes
 #
 # end of function
 
@@ -269,9 +269,13 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
     #
     metrics = score(model, data, hyp_labels)
 
+    # get the parameter outcomes
+    #
+    parameter_outcomes = model.get_info()
+
     # exit gracefully
     #
-    return metrics
+    return metrics, parameter_outcomes
 #
 # end of function
 

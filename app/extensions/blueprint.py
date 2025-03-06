@@ -5,6 +5,7 @@ import pickle
 from collections import OrderedDict
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
+import numpy as np
 
 import nedc_ml_tools_data as mltd
 import nedc_imld_tools as imld
@@ -17,6 +18,16 @@ main = Blueprint('main', __name__)
 # create a global variable to hold the models
 #
 model_cache = {}
+
+def convert_numpy(obj):
+    """Recursively converts NumPy arrays to lists for JSON serialization."""
+    if isinstance(obj, np.ndarray):
+        return obj.tolist()
+    elif isinstance(obj, list):
+        return [convert_numpy(item) for item in obj]
+    elif isinstance(obj, dict):
+        return {key: convert_numpy(value) for key, value in obj.items()}
+    return obj  # Return the object as-is if it's not a NumPy array
 
 def clean_cache():
 
@@ -190,7 +201,6 @@ def train():
     xrange = data['xrange']
     yrange = data['yrange']
 
-
     try:
 
         # create the model given the parameters
@@ -203,7 +213,7 @@ def train():
 
         # train the model
         #
-        model, metrics = imld.train(model, data)
+        model, metrics, parameter_outcomes = imld.train(model, data)
 
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
@@ -223,7 +233,8 @@ def train():
             # opposed to {numeric value : label name} because that is easier
             # to work with on the front end
             # 'mapping_label': {value: key for key, value in data.mapping_label.items()},
-            'metrics': metrics
+            'metrics': metrics,
+            'parameter_outcomes': convert_numpy(parameter_outcomes)
         }
 
         # save the model in the cache
@@ -270,11 +281,18 @@ def eval():
 
         # evaluate the model
         #
-        metrics = imld.predict(model, data)
+        metrics, parameter_outcomes = imld.predict(model, data)
+
+        # format the response
+        #
+        response = {
+            'metrics': metrics,
+            'parameter_outcomes': convert_numpy(parameter_outcomes)
+        }
 
         # return the jsonified response
         #
-        return jsonify(metrics)
+        return jsonify(response)
     
     except Exception as e:
         return jsonify(f'Failed to evaluate model: {str(e)}'), 500

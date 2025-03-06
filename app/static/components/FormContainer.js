@@ -747,6 +747,7 @@ class FormContainer extends HTMLElement {
       //
       for (const [key, param] of Object.entries(params.params)) {
         
+        param.name = param.name.replace(/\s*\(.*?\)\s*/g, '');
         if (!param.name.includes("and")) {
           param_names.push(param.name);
         }
