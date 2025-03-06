@@ -1,0 +1,191 @@
+# file: $NEDC_NFC/util/python/nedc_ml_vector_classify/params_00.toml
+#
+# A parameter file that defines key paramters for algorithms.
+#
+
+# set version information
+#
+version = "param_v1.0.0"
+
+#------------------------------------------------------------------------------
+#
+# Section 1: discriminant-based algorithms
+#
+#------------------------------------------------------------------------------
+
+[EUCLIDEAN]
+name = "EUCLIDEAN"
+model_name = "euclidean"
+weights = [1, 1, 1, 1, 1]
+
+[PCA]
+name = "PCA"
+model_name ="pca"
+prior = "ml"
+ctype = "full"
+center = "none"
+scale = "empirical"
+n_components = 2
+
+[LDA]
+name = "LDA"
+model_name = "lda"
+prior = "ml"
+ctype = "full"
+center = "none"
+scale = "none"
+
+[QDA]
+name = "QDA"
+model_name = "qda"
+prior = "ml"
+ctype = "full"
+center = "none"
+scale = "biased"
+n_components = 2
+
+[QLDA]
+name = "QLDA"
+model_name = "qlda"
+prior = "ml"
+ctype = "full"
+center = "none"
+scale = "none"
+
+[NB]
+name = "NB"
+model_name = "nb"
+prior = "ml"
+
+[GMM]
+name = "GMM"
+model_name = "gmm"
+prior = "ml"
+n_components = 1
+
+#------------------------------------------------------------------------------
+#
+# Section 2: nonparametric models
+#
+#------------------------------------------------------------------------------
+
+[KNN]
+name = "KNN"
+model_name = "knn"
+neighbor = 5
+
+[KMEANS]
+name = "KMEANS"
+model_name = "kmeans"
+n_cluster = 2
+n_init = 3
+random_state = 0
+max_iter = 100
+
+[RNF]
+name = "RNF"
+model_name = "rnf"
+estimator = 100
+max_depth = 5
+criterion = "gini"
+random_state = 0
+
+[SVM]
+name = "SVM"
+model_name = "svm"
+c = 1
+gamma = 0.1
+kernel = "linear"
+
+#------------------------------------------------------------------------------
+#
+# Section 3: neural network-based models
+#
+#------------------------------------------------------------------------------
+
+[MLP]
+name = "MLP"
+model_name = "mlp"
+hidden_size = 3
+activation = "relu"
+solver = "adam"
+batch_size = "auto"
+learning_rate = "constant"
+learning_rate_init = 0.009
+random_state = 0
+momentum = 0.9
+validation_fraction = 0.1
+max_iter= 20
+shuffle = false
+early_stopping = false
+
+[RBM]
+name = "RBM"
+model_name = "rbm"
+learning_rate = 0.1
+n_iter = 5
+random_state = 0
+batch_size = 32
+n_components = 200
+
+[TRANSFORMER]
+name = "TRANSFORMER"
+model_name = "transformer"
+epoch = 50
+lr = 0.001
+batch_size = 32
+embed_size = 32
+nheads = 2
+num_layers = 2
+MLP_dim = 64
+dropout = 0.1
+
+#------------------------------------------------------------------------------
+#
+# Section 4: quantum computing-based models
+#
+#------------------------------------------------------------------------------
+
+[QSVM]
+name = "QSVM"
+model_name = "qsvm"
+provider_name = "qiskit"
+hardware = "cpu"
+encoder_name = "zz"
+n_qubits = 4
+featuremap_reps = 2
+entanglement = "full"
+kernel_name = "fidelity"
+shots = 1024
+
+[QNN]
+name = "QNN"
+model_name = "qnn"
+provider_name = "qiskit"
+hardware = "cpu"
+encoder_name = "zz"
+n_qubits = 2
+featuremap_reps = 2
+ansatz_reps = 2
+entanglement = "full"
+ansatz_name = "real_amplitudes"
+optim_name = "cobyla"
+optim_max_steps = 50
+meas_type = "sampler"
+
+[QRBM]
+name = "QRBM"
+model_name = "qrbm"
+provider_name = "dwave"
+encoder_name = "bqm"
+n_hidden = 2
+shots = 2
+chain_strength = 2
+knn_n_neighbors = 2
+
+#------------------------------------------------------------------------------
+#
+# end of file
+#
+#------------------------------------------------------------------------------
+

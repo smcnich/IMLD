@@ -50,6 +50,7 @@ from sklearn.metrics import (silhouette_score,
 from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.mixture import GaussianMixture
 from sklearn.svm import SVC
 from sklearn.cluster import KMeans
 from sklearn.neural_network import MLPClassifier, BernoulliRBM
@@ -106,6 +107,7 @@ ALG_PRM_KEY_PARAM = "params"
 ALG_PRM_KEY_PRIOR = "prior"
 ALG_PRM_KEY_WEIGHTS = "weights"
 
+
 ALG_MDL_KEY_NAME = ALG_PRM_KEY_NAME
 ALG_MDL_KEY_MODEL = "model"
 ALG_MDL_KEY_MEANS = "means"
@@ -114,6 +116,10 @@ ALG_MDL_KEY_PRIOR = "prior"
 ALG_MDL_KEY_TRANS = "transform"
 ALG_MDL_KEY_EVAL = "eigen_value"
 ALG_MDL_KEY_MAPPING_LABEL = "mapping_label"
+
+ALG_MDL_KEY_CLASS_MODELS = "class_models"
+ALG_MDL_KEY_CLASS_LABELS = "class_labels"
+
 
 # define formats for generating a scoring report
 #
@@ -693,7 +699,6 @@ TRANS_PRM_KEY_NLAYERS = "num_layers"
 TRANS_PRM_KEY_MLP_DIM = "MLP_dim"
 TRANS_PRM_KEY_DROPOUT = "dropout"
 
-
 # The model for TRANSFORMER contains:
 # {'name': 'TRANSFORMER', 'model':
 # defaultdict(None, {'name': 'TRANSFORMER, 'model': OrderedDict([
@@ -791,7 +796,7 @@ QNN_NAME = "QNN"
 #               ansatz_name      : real_amplitudes
 #               hardware         : COBYLA
 #               optim_name       : COBYLA
-#               optim_max_steps  : 50   
+#               optim_max_steps  : 50
 #               entanglement     : full
 #               reps             : 2
 #               n_qubits         : 2
@@ -870,17 +875,61 @@ QRBM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
 #------------------------------------------------------------------------------
 
 
+#------------------------------------------------------------------------------
+# Alg = GMM: define dictionary keys for parameters
+#
+
+# define the algorithm name
+#
+GMM_NAME = "GMM"
+
+# the parameter block for NB looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'name': 'GMM',
+#   'params': {
+#               'name': 'GMM',
+#               'prior': 'ml',
+#               'n_components': 1,
+#    }
+#  })
+GMM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
+GMM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
+GMM_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
+GMM_PRM_KEY_COMP ='n_components'
+GMM_PRM_KEY_RANDOM = 'random_state'
+
+
+GMM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
+GMM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
+GMM_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
+GMM_MDL_KEY_CLASS_MODELS = ALG_MDL_KEY_CLASS_MODELS
+GMM_MDL_KEY_CLASS_LABELS = ALG_MDL_KEY_CLASS_LABELS
+
+# The model for NB contains:
+#
+#   defaultdict(<class 'dict'>, {
+#    'name': 'NB',
+#    'model': Sklearn.NB.Model
+#  })
+#
+# Define the keys for these parameters.
+#
+NB_MDL_KEY_NAME = ALG_MDL_KEY_NAME
+NB_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
+#------------------------------------------------------------------------------
+
 # declare global debug and verbosity objects so we can use them
 # in both functions and classes
 #
 dbgl_g = ndt.Dbgl()
 vrbl_g = ndt.Vrbl()
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
-# classes are listed here
+# Parent Class: Alg
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 class Alg:
     """
@@ -1174,12 +1223,13 @@ class Alg:
                    "unknown model format"))
             return None
 
-        # check the algorithm name of the model file
-        #
-        if self.set(model[ALG_MDL_KEY_NAME]) is False:
-           print("Error: %s (line: %s) %s: %s (%s)" %
-                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                  "unsupported algorithm name", model[ALG_MDL_KEY_NAME]))
+        if model[ALG_MDL_KEY_NAME] != self.alg_d.__class__.__name__:
+            print("Error: %s (line: %s) %s: the current set algorithm and \
+                model name does not match, "
+                "Model Name: %s, Set Algorithm: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__, model[ALG_MDL_KEY_NAME],
+                self.alg_d.__class__.__name__))
+            return None
 
         # set the parameters
         #
@@ -1839,38 +1889,218 @@ class Alg:
     #
     # end of method
 
-    def get_info(self):
+#
+# end of Alg
+
+#******************************************************************************
+#
+# Section 1: discriminant-based algorithms
+#
+#******************************************************************************
+
+#------------------------------------------------------------------------------
+# ML Tools Class: EUCLIDEAN
+#------------------------------------------------------------------------------
+
+class EUCLIDEAN:
+    """
+    Class: Euclidean
+
+    description:
+     this is a class that implements Euclidean Distance
+    """
+
+    def __init__(self) -> None:
         """
-        method: get_info
+        method: constructor
 
         arguments:
          none
 
         return:
-         a dictionary containing the algorithm information
+         none
 
         description:
-         this method returns the information of the current algorithm.
+         this is the default constructor for the class.
         """
-
-        # get the algorithm parameters
+        # set the class name
         #
-        if hasattr(self.alg_d, 'get_info'):
-            parameter_outcomes = self.alg_d.get_info()
-        else:
-            parameter_outcomes = None
+        EUCLIDEAN.__CLASS_NAME__ = self.__class__.__name__
 
-        # exit gracefully
-        # return the parameter outcomes
+        # initialize variables for the parameter block and model
         #
-        return parameter_outcomes
+        self.params_d = defaultdict(dict)
+        self.model_d = defaultdict()
+
+        # initialize a parameter dictionary
+        #
+        self.params_d[EUCLIDEAN_PRM_KEY_NAME] = self.__class__.__name__
+        self.params_d[EUCLIDEAN_PRM_KEY_PARAM] = defaultdict(dict)
+
+        # set the model
+        #
+        self.model_d[EUCLIDEAN_MDL_KEY_NAME] = self.__class__.__name__
+        self.model_d[EUCLIDEAN_MDL_KEY_MODEL] = defaultdict(dict)
     #
     # end of method
 
+    def weightedDistance(self, p1, p2, w):
+        """
+        method: weightedDistance
+
+        arguments:
+          p1: point 1 (numpy array)
+          p2: point 2 (numpy array)
+           w: weight
+
+        return:
+            the weighted euclidean distance
+
+        description:
+            this method returns the weighted euclidean distance
+        """
+        q = p2 - p1
+        return np.sqrt((w*q*q).sum())
+    #
+    # end of method
+
+    #--------------------------------------------------------------------------
+    #
+    # computational methods: train/predict
+    #
+    #--------------------------------------------------------------------------
+
+    def train(self,
+              data: MLToolsData,
+              write_train_labels: bool,
+              fname_train_labels: str,
+              ):
+        """
+        method: train
+
+        arguments:
+         data: a list of numpy float matrices of feature vectors
+         write_train_labels: a boolean to whether write the train data
+         fname_train_labels: the filename of the train file
+
+        return:
+         model: a dictionary containing the model (data dependent)
+         score: a float value containing a measure of the goodness of fit
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: training a model" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        if self.model_d[ALG_MDL_KEY_MODEL]:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "Doesn't support training on pre-trained model"))
+            return None, None
+
+        # get sorted_labels and sorted_samples
+        #
+        data = data.sort()
+        group_data = data.group_by_class()
+
+        # a list of mean for each class
+        #
+        means = []
+        for d in group_data.values():
+            means.append(np.mean(d, axis = 0))
+
+        self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS] = means
+
+        # get the weights
+        #
+        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
+
+        # scoring
+        #
+        acc = 0
+        for true_label, d in zip(data.labels, data.data):
+
+            diff_means = []
+
+            for ind, mean in enumerate(means):
+                diff_means.append(
+                    self.weightedDistance(mean, d, float(weights[ind]))
+                )
+
+            train_label_ind = np.argmin(diff_means)
+            if data.mapping_label[train_label_ind] == true_label:
+                acc += 1
+
+        score = acc / len(data.data)
+
+        return self.model_d, score
+    #
+    # end of method
+
+    def predict(self,
+                data: MLToolsData,
+                model = None):
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: entering predict" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        # check if model is none
+        #
+        if model is None:
+            model = self.model_d
+
+        # check for model validity
+        #
+        if model[EUCLIDEAN_MDL_KEY_NAME] != EUCLIDEAN_NAME:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "incorrect model name"))
+            return None, None
+
+        if not model[EUCLIDEAN_MDL_KEY_MODEL]:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "model parameter is empty"))
+            return None, None
+
+        means = self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS]
+        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
+        mapping_label = data.mapping_label
+
+        labels = []
+        posteriors = []
+
+        for d in data.data:
+
+            diff_means = []
+            cur_posterios = []
+
+            for ind, mean in enumerate(means):
+                distance = self.weightedDistance(mean, d, float(weights[ind]))
+                diff_means.append(distance)
+                cur_posterios.append(distance)
+            predict_label_ind = np.argmin(diff_means)
+            labels.append(predict_label_ind)
+            posteriors.append(cur_posterios)
+
+        return labels, posteriors
+    #
+    # end of method
 #
-# end of Alg
+# end of EUCLIDEAN
 
 #------------------------------------------------------------------------------
+# ML Tools Class: PCA
+#------------------------------------------------------------------------------
+
 class PCA:
     """
     Class: PCA
@@ -1959,7 +2189,7 @@ class PCA:
             print("%s (line: %s) %s: training a model" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -2264,415 +2494,13 @@ class PCA:
         return labels, posteriors
     #
     # end of method
-
-    def get_info(self):
-        """
-        method: get_info
-
-        arguments:
-         none
-
-        return:
-         a dictionary containing the algorithm information
-
-        description:
-         this method returns the means and covariances of the current algorithm.
-        """
-
-        # get the algorithm means and covariances
-        #
-        info = {
-            "means": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_MEANS],
-            "covariances": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_COV]
-        }
-
-        # exit gracefully
-        #
-        return info
-    #
-    # end of method
 #
 # end of PCA
 
-class QDA:
-    """
-    Class: QDA
-
-    arguments:
-     none
-
-    description:
-     This is a class that implements Quadratic Components Analysis (QDA). This
-     is also known as class-dependent PCA.
-    """
-
-    #--------------------------------------------------------------------------
-    #
-    # constructors/destructors/etc.
-    #
-    #--------------------------------------------------------------------------
-
-    def __init__(self):
-        """
-        method: constructor
-
-        arguments:
-         none
-
-        return:
-         none
-
-        description:
-         this is the default constructor for the class.
-        """
-
-        # set the class name
-        #
-        QDA.__CLASS_NAME__ = self.__class__.__name__
-
-        # initialize variables for the parameter block and model
-        #
-        self.params_d = defaultdict(dict)
-        self.model_d = defaultdict(dict)
-
-        # initialize a parameter dictionary
-        #
-        self.params_d[QDA_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[QDA_PRM_KEY_PARAM] = defaultdict(dict)
-
-        # set the names
-        #
-        self.model_d[QDA_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[QDA_MDL_KEY_MODEL] = defaultdict(dict)
-    #
-    # end of method
-
-    #--------------------------------------------------------------------------
-    #
-    # computational methods: train/predict
-    #
-    #--------------------------------------------------------------------------
-
-    def train(self,
-              data: MLToolsData,
-              write_train_labels: bool,
-              fname_train_labels: str,
-              ):
-        """
-        method: train
-
-        arguments:
-         data: a list of numpy float matrices of feature vectors
-         write_train_labels: a boolean to whether write the train data
-         fname_train_labels: the filename of the train file
-
-        return:
-         model: a dictionary containing the model (data dependent)
-         score: a float value containing a measure of the goodness of fit
-
-        description:
-         QDA is implemented as class dependent PCA.
-        """
-
-        # display an informational message
-        #
-        if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
-
-        if self.model_d is not None:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "Doesn't support training on pre-trained model"))
-            return None, None
-
-        data = data.sort()
-        uni_label = np.unique(data.labels)
-        new_data =[]
-        for i in range(len(uni_label)):
-            class_data =[]
-
-            for j in range(len(data.labels)):
-                if uni_label[i]==data.labels[j]:
-                    class_data.append(data.data[j])
-
-            new_data.append(np.array(class_data))
-
-        ndim = new_data[0].shape[1]
-
-        num_classes = len(new_data)
-
-        # number of components
-        #
-        n_comp= int(self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_COMP])
-        if not(0 < n_comp <= new_data[0].shape[1]):
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "features out of range"))
-            self.model_d[QDA_MDL_KEY_MODEL].clear()
-            return None, None
-
-        # calculate number of classes
-        #
-
-        # calculate number of data points
-        #
-        npts = 0
-        for element in new_data:
-            npts += len(element)
-
-        # initialize an empty array to save the priors
-        #
-        priors = np.empty((0,0))
-
-        # case: (ml) equal priors
-        #
-        mode_prior = self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
-
-            # save priors for each class
-            #
-            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = \
-                np.full(shape = num_classes,
-                        fill_value = (float(1.0) / float(num_classes)))
-
-        # if the priors are based on occurrences : nct.PRIORs_MAP
-        #
-        elif mode_prior == ALG_PRIORS_MAP:
-
-            # create an array of priors by finding the the number of points
-            # in each class and dividing by the total number of samples
-            #
-            for element in new_data:
-
-                # appending the number of samples in
-                # each element(class) to empty array
-                #
-                priors = np.append(priors, len(element))
-
-            # final calculation of priors
-            #
-            sum = float(1.0) / float(npts)
-            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = priors * sum
-
-        else:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "unknown value for priors"))
-            self.model_d[QDA_MDL_KEY_MODEL].clear()
-            return None, None
-
-        # calculate the means of each class:
-        #  note these are a list of numpy vectors
-        #
-        means = []
-        for elem in new_data:
-            means.append(np.mean(elem, axis = 0))
-        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS] = means
-
-        # calculate the cov:
-        #  note this is a list of matrices, and each matrix for a class
-        #
-        # an empty list to save covariances
-        #
-        t = []
-
-        # loop over classes to calculate covariance of each class
-        #
-        for i,element in enumerate(new_data):
-
-
-            covar = nct.compute(element,
-                ctype= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CTYPE],
-                center= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CENTER],
-                scale= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_SCALE])
-
-            # eigen vector and eigen value decomposition
-            # for each class
-            #
-            eigvals, eigvecs = np.linalg.eig(covar)
-
-            # sorted eigenvalues and eigvecs and choose
-            # the first l-1 columns from eigenvalues
-            # and eigenvectors
-            #
-            sorted_indexes = eigvals.argsort () [::-1]
-            eigvals = eigvals[sorted_indexes[0:n_comp]]
-            eigvecs = eigvecs[:,sorted_indexes[0:n_comp]]
-            if any(eigvals < 0):
-                print("Error: %s (line: %s) %s: %s" %
-                    (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                    "negative eigenvalues"))
-                self.model_d[QDA_MDL_KEY_MODEL].clear()
-                return None, None
-
-            try:
-                eigvals_in = np.linalg.inv(np.diag(eigvals**(1/2)))
-
-            except np.linalg.LinAlgError as e:
-                print("Error: %s (line: %s) %s: %s" %
-                    (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                    "singular matrix model is none"))
-                self.model_d[QDA_MDL_KEY_MODEL].clear()
-                return None, None
-
-            # calculation of transformation matrix
-            #
-            trans = eigvecs @ eigvals_in
-            t.append(trans)
-
-        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS] = t
-
-        # compute a goodness of fit measure: use the average weighted
-        # mean-square-error computed across the entire data set
-        #
-        transf = np.identity(new_data[0].shape[1])
-        gsum = float(0.0)
-        for i, d in enumerate(new_data):
-
-            # iterate over the data in class i and calculate the norms
-            #
-            sum = float(0.0)
-            for v in d:
-                sum += np.linalg.norm(transf*(v - means[i]))
-
-            # weight by the prior
-            #
-            gsum += self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][i] * \
-                sum
-        score = gsum / float(npts)
-
-        # exit gracefully
-        #
-        return self.model_d, score
-    #
-    # end of method
-
-    def predict(self,
-                data: MLToolsData,
-                model = None):
-        """
-        method: predict
-
-        arguments:
-         data: a list of numpy float matrices of feature vectors
-         model: an algorithm model (None = use the internal model)
-
-        return:
-         labels: a list of predicted labels
-         posteriors: a list of float numpy vectors with the posterior
-         probabilities for each class
-
-        description:
-         none
-        """
-
-        # display an informational message
-        #
-        if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
-
-        # check if model is none
-        #
-        if model is None:
-            model = self.model_d
-
-        # check for model validity
-        #
-        if model[QDA_MDL_KEY_NAME] != QDA_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "incorrect model name"))
-            return None, None
-
-        if not model[QDA_MDL_KEY_MODEL]:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "model parameter is empty"))
-            return None, None
-
-        # get the number of features
-        #
-        ndim = data.data.shape[1]
-
-        # transform data and mean to new space
-        #
-        t =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS]
-        mu = model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS]
-
-        # calculate number of classes
-        #
-        mt = []
-        num_classes = len(mu)
-        for i in range(len(mu)):
-            m_new = mu[i] @ t[i]
-            mt.append(m_new)
-
-        # pre-compute the scaling term
-        #
-        scale = np.power(2 * np.pi, -ndim / 2)
-
-        # loop over data
-        #
-        labels = []
-        posteriors = []
-
-        # loop over each matrix in data
-        #
-        for j in range(len(data.data)):
-
-            # create temporary helper variables
-            #
-            count = 0
-            post = []
-
-            # loop over number of classes
-            #
-            for k in range(num_classes):
-
-                sample = data.data[j] @ t[k]
-
-                # manually compute the log likelihood
-                # as a weighted Euclidean distance
-                #
-                # priors of class k
-                #
-                prior =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][k]
-
-                # mean of class k
-                #
-                m = mt[k]
-
-                # posterior calculation for sample j
-                #
-                # @ : short-hand notation for matrix multiplication
-                #
-                g1 = (sample - m).T @ (sample-m)
-                g2 = np.exp(-1/2 * g1)
-                g = g2 * scale * prior
-                count = count + g
-                post.append(g)
-
-            post = post/count
-
-            # choose the class label with the highest posterior
-            #
-            labels.append(np.argmax(post))
-
-            # save the posteriors
-            #
-            posteriors.append(post)
-
-        # exit gracefully
-        #
-        return labels, posteriors
-    #
-    # end of method
-#
-# end of QDA
-
 #------------------------------------------------------------------------------
+# ML Tools Class: LDA
+#------------------------------------------------------------------------------
+
 class LDA:
     """
     Class: LDA
@@ -2751,7 +2579,7 @@ class LDA:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3069,6 +2897,391 @@ class LDA:
 # end of LDA
 
 #------------------------------------------------------------------------------
+# ML Tools Class: QDA
+#------------------------------------------------------------------------------
+
+class QDA:
+    """
+    Class: QDA
+
+    arguments:
+     none
+
+    description:
+     This is a class that implements Quadratic Components Analysis (QDA). This
+     is also known as class-dependent PCA.
+    """
+
+    #--------------------------------------------------------------------------
+    #
+    # constructors/destructors/etc.
+    #
+    #--------------------------------------------------------------------------
+
+    def __init__(self):
+        """
+        method: constructor
+
+        arguments:
+         none
+
+        return:
+         none
+
+        description:
+         this is the default constructor for the class.
+        """
+
+        # set the class name
+        #
+        QDA.__CLASS_NAME__ = self.__class__.__name__
+
+        # initialize variables for the parameter block and model
+        #
+        self.params_d = defaultdict(dict)
+        self.model_d = defaultdict(dict)
+
+        # initialize a parameter dictionary
+        #
+        self.params_d[QDA_PRM_KEY_NAME] = self.__class__.__name__
+        self.params_d[QDA_PRM_KEY_PARAM] = defaultdict(dict)
+
+        # set the names
+        #
+        self.model_d[QDA_MDL_KEY_NAME] = self.__class__.__name__
+        self.model_d[QDA_MDL_KEY_MODEL] = defaultdict(dict)
+    #
+    # end of method
+
+    #--------------------------------------------------------------------------
+    #
+    # computational methods: train/predict
+    #
+    #--------------------------------------------------------------------------
+
+    def train(self,
+              data: MLToolsData,
+              write_train_labels: bool,
+              fname_train_labels: str,
+              ):
+        """
+        method: train
+
+        arguments:
+         data: a list of numpy float matrices of feature vectors
+         write_train_labels: a boolean to whether write the train data
+         fname_train_labels: the filename of the train file
+
+        return:
+         model: a dictionary containing the model (data dependent)
+         score: a float value containing a measure of the goodness of fit
+
+        description:
+         QDA is implemented as class dependent PCA.
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: training a model" %
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        if self.model_d[ALG_MDL_KEY_MODEL]:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "Doesn't support training on pre-trained model"))
+            return None, None
+
+        data = data.sort()
+        uni_label = np.unique(data.labels)
+        new_data =[]
+        for i in range(len(uni_label)):
+            class_data =[]
+
+            for j in range(len(data.labels)):
+                if uni_label[i]==data.labels[j]:
+                    class_data.append(data.data[j])
+
+            new_data.append(np.array(class_data))
+
+        ndim = new_data[0].shape[1]
+
+        num_classes = len(new_data)
+
+        # number of components
+        #
+        n_comp= int(self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_COMP])
+        if not(0 < n_comp <= new_data[0].shape[1]):
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "features out of range"))
+            self.model_d[QDA_MDL_KEY_MODEL].clear()
+            return None, None
+
+        # calculate number of classes
+        #
+
+        # calculate number of data points
+        #
+        npts = 0
+        for element in new_data:
+            npts += len(element)
+
+        # initialize an empty array to save the priors
+        #
+        priors = np.empty((0,0))
+
+        # case: (ml) equal priors
+        #
+        mode_prior = self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_PRIOR]
+        if mode_prior == ALG_PRIORS_ML:
+
+            # save priors for each class
+            #
+            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = \
+                np.full(shape = num_classes,
+                        fill_value = (float(1.0) / float(num_classes)))
+
+        # if the priors are based on occurrences : nct.PRIORs_MAP
+        #
+        elif mode_prior == ALG_PRIORS_MAP:
+
+            # create an array of priors by finding the the number of points
+            # in each class and dividing by the total number of samples
+            #
+            for element in new_data:
+
+                # appending the number of samples in
+                # each element(class) to empty array
+                #
+                priors = np.append(priors, len(element))
+
+            # final calculation of priors
+            #
+            sum = float(1.0) / float(npts)
+            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = priors * sum
+
+        else:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "unknown value for priors"))
+            self.model_d[QDA_MDL_KEY_MODEL].clear()
+            return None, None
+
+        # calculate the means of each class:
+        #  note these are a list of numpy vectors
+        #
+        means = []
+        for elem in new_data:
+            means.append(np.mean(elem, axis = 0))
+        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS] = means
+
+        # calculate the cov:
+        #  note this is a list of matrices, and each matrix for a class
+        #
+        # an empty list to save covariances
+        #
+        t = []
+
+        # loop over classes to calculate covariance of each class
+        #
+        for i,element in enumerate(new_data):
+
+
+            covar = nct.compute(element,
+                ctype= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CTYPE],
+                center= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CENTER],
+                scale= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_SCALE])
+
+            # eigen vector and eigen value decomposition
+            # for each class
+            #
+            eigvals, eigvecs = np.linalg.eig(covar)
+
+            # sorted eigenvalues and eigvecs and choose
+            # the first l-1 columns from eigenvalues
+            # and eigenvectors
+            #
+            sorted_indexes = eigvals.argsort () [::-1]
+            eigvals = eigvals[sorted_indexes[0:n_comp]]
+            eigvecs = eigvecs[:,sorted_indexes[0:n_comp]]
+            if any(eigvals < 0):
+                print("Error: %s (line: %s) %s: %s" %
+                    (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                    "negative eigenvalues"))
+                self.model_d[QDA_MDL_KEY_MODEL].clear()
+                return None, None
+
+            try:
+                eigvals_in = np.linalg.inv(np.diag(eigvals**(1/2)))
+
+            except np.linalg.LinAlgError as e:
+                print("Error: %s (line: %s) %s: %s" %
+                    (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                    "singular matrix model is none"))
+                self.model_d[QDA_MDL_KEY_MODEL].clear()
+                return None, None
+
+            # calculation of transformation matrix
+            #
+            trans = eigvecs @ eigvals_in
+            t.append(trans)
+
+        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS] = t
+
+        # compute a goodness of fit measure: use the average weighted
+        # mean-square-error computed across the entire data set
+        #
+        transf = np.identity(new_data[0].shape[1])
+        gsum = float(0.0)
+        for i, d in enumerate(new_data):
+
+            # iterate over the data in class i and calculate the norms
+            #
+            sum = float(0.0)
+            for v in d:
+                sum += np.linalg.norm(transf*(v - means[i]))
+
+            # weight by the prior
+            #
+            gsum += self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][i] * \
+                sum
+        score = gsum / float(npts)
+
+        # exit gracefully
+        #
+        return self.model_d, score
+    #
+    # end of method
+
+    def predict(self,
+                data: MLToolsData,
+                model = None):
+        """
+        method: predict
+
+        arguments:
+         data: a list of numpy float matrices of feature vectors
+         model: an algorithm model (None = use the internal model)
+
+        return:
+         labels: a list of predicted labels
+         posteriors: a list of float numpy vectors with the posterior
+         probabilities for each class
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: entering predict" %
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        # check if model is none
+        #
+        if model is None:
+            model = self.model_d
+
+        # check for model validity
+        #
+        if model[QDA_MDL_KEY_NAME] != QDA_NAME:
+            print("Error: %s (line: %s) %s: %s" %
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                   "incorrect model name"))
+            return None, None
+
+        if not model[QDA_MDL_KEY_MODEL]:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "model parameter is empty"))
+            return None, None
+
+        # get the number of features
+        #
+        ndim = data.data.shape[1]
+
+        # transform data and mean to new space
+        #
+        t =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS]
+        mu = model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS]
+
+        # calculate number of classes
+        #
+        mt = []
+        num_classes = len(mu)
+        for i in range(len(mu)):
+            m_new = mu[i] @ t[i]
+            mt.append(m_new)
+
+        # pre-compute the scaling term
+        #
+        scale = np.power(2 * np.pi, -ndim / 2)
+
+        # loop over data
+        #
+        labels = []
+        posteriors = []
+
+        # loop over each matrix in data
+        #
+        for j in range(len(data.data)):
+
+            # create temporary helper variables
+            #
+            count = 0
+            post = []
+
+            # loop over number of classes
+            #
+            for k in range(num_classes):
+
+                sample = data.data[j] @ t[k]
+
+                # manually compute the log likelihood
+                # as a weighted Euclidean distance
+                #
+                # priors of class k
+                #
+                prior =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][k]
+
+                # mean of class k
+                #
+                m = mt[k]
+
+                # posterior calculation for sample j
+                #
+                # @ : short-hand notation for matrix multiplication
+                #
+                g1 = (sample - m).T @ (sample-m)
+                g2 = np.exp(-1/2 * g1)
+                g = g2 * scale * prior
+                count = count + g
+                post.append(g)
+
+            post = post/count
+
+            # choose the class label with the highest posterior
+            #
+            labels.append(np.argmax(post))
+
+            # save the posteriors
+            #
+            posteriors.append(post)
+
+        # exit gracefully
+        #
+        return labels, posteriors
+    #
+    # end of method
+#
+# end of QDA
+
+#------------------------------------------------------------------------------
+# ML Tools Class: QLDA
+#------------------------------------------------------------------------------
+
 class QLDA:
     """
     Class: QLDA
@@ -3146,7 +3359,7 @@ class QLDA:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3474,6 +3687,9 @@ class QLDA:
 # end of QLDA
 
 #------------------------------------------------------------------------------
+# ML Tools Class: NB
+#------------------------------------------------------------------------------
+
 class NB:
     """
     Class: NB
@@ -3550,7 +3766,7 @@ class NB:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3689,15 +3905,21 @@ class NB:
 #
 # end of NB
 
-class EUCLIDEAN:
+#------------------------------------------------------------------------------
+# ML Tools Class: GMM
+#------------------------------------------------------------------------------
+
+class GMM:
     """
-    Class: Euclidean
+    Class: GMM
 
     description:
-     this is a class that implements Euclidean Distance
+     This is a class that implements classification using Gaussian Mixture
+     Models (GMM). A separate GMM is trained for each class and the final
+     decision is based on the posterior probability computed via Bayes' rule.
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         """
         method: constructor
 
@@ -3708,54 +3930,26 @@ class EUCLIDEAN:
          none
 
         description:
-         this is the default constructor for the class.
+         This is the default constructor for the GMMClassifier class.
         """
-        # set the class name
-        #
-        EUCLIDEAN.__CLASS_NAME__ = self.__class__.__name__
+        # Set the class name (for informational/debug purposes)
+        GMM.__CLASS_NAME__ = self.__class__.__name__
 
-        # initialize variables for the parameter block and model
-        #
+        # Initialize variables for the parameter block and model
         self.params_d = defaultdict(dict)
         self.model_d = defaultdict()
 
-        # initialize a parameter dictionary
-        #
-        self.params_d[EUCLIDEAN_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[EUCLIDEAN_PRM_KEY_PARAM] = defaultdict(dict)
+        # Initialize a parameter dictionary
+        self.params_d[GMM_PRM_KEY_NAME] = self.__class__.__name__
+        self.params_d[GMM_PRM_KEY_PARAM] = defaultdict(dict)
 
-        # set the model
-        #
-        self.model_d[EUCLIDEAN_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[EUCLIDEAN_MDL_KEY_MODEL] = defaultdict(dict)
-    #
-    # end of method
+        # Set the model; we will store a dictionary of trained GMMs per class
+        self.model_d[GMM_MDL_KEY_NAME] = self.__class__.__name__
+        self.model_d[GMM_MDL_KEY_MODEL] = defaultdict(dict)
 
-    def weightedDistance(self, p1, p2, w):
-        """
-        method: weightedDistance
-
-        arguments:
-          p1: point 1 (numpy array)
-          p2: point 2 (numpy array)
-           w: weight
-
-        return:
-            the weighted euclidean distance
-
-        description:
-            this method returns the weighted euclidean distance
-        """
-        q = p2 - p1
-        return np.sqrt((w*q*q).sum())
-    #
-    # end of method
-
-    #--------------------------------------------------------------------------
-    #
-    # computational methods: train/predict
-    #
-    #--------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
+    # Computational methods: train / predict
+    #---------------------------------------------------------------------------
 
     def train(self,
               data: MLToolsData,
@@ -3766,123 +3960,223 @@ class EUCLIDEAN:
         method: train
 
         arguments:
-         data: a list of numpy float matrices of feature vectors
-         write_train_labels: a boolean to whether write the train data
-         fname_train_labels: the filename of the train file
+         data: an MLToolsData object containing:
+               - data.data: a list/numpy array of feature vectors
+               - data.labels: a list/numpy array of labels
+         write_train_labels: a boolean indicating whether to write the train
+         predictions to file
+         fname_train_labels: the filename for the train labels output
 
         return:
-         model: a dictionary containing the model (data dependent)
-         score: a float value containing a measure of the goodness of fit
+         model: a dictionary of GMM models (and additional parameters such as
+         priors)
+         score: the macro-averaged f1 score on the training data
 
         description:
-         none
+         This method trains a separate GMM for each class using the training
+         data. It computes the class priors, fits the models, predicts on the
+         training data, calculates the f1 score, and (optionally) writes out
+         the predicted labels.
         """
 
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
             print("%s (line: %s) %s: training a model" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__))
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
             return None, None
 
-        # get sorted_labels and sorted_samples
-        #
+
+        # Identify unique labels and group the data by class
         data = data.sort()
-        group_data = data.group_by_class()
+        uni_label = np.unique(data.labels)
+        new_data = []  # list to hold numpy arrays for each class's data
+        for ul in uni_label:
+            class_data = []
+            for i in range(len(data.labels)):
+                if data.labels[i] == ul:
+                    class_data.append(data.data[i])
+            new_data.append(np.array(class_data))
 
-        # a list of mean for each class
+        num_classes = len(new_data)
+
+        # Get the number of mixture components from the parameters
+        n_components= int(self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_COMP])
+        if not(0 < n_components <= new_data[0].shape[1]):
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "features out of range"))
+            self.model_d[GMM_MDL_KEY_MODEL].clear()
+            return None, None
+
+        # calculate number of data points
         #
-        means = []
-        for d in group_data.values():
-            means.append(np.mean(d, axis = 0))
+        npts = 0
+        for element in new_data:
+            npts += len(element)
 
-        self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS] = means
-
-        # get the weights
+        # initialize an empty array to save the priors
         #
-        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
+        priors = np.empty((0,0))
 
-        # scoring
-        #
-        acc = 0
-        for true_label, d in zip(data.labels, data.data):
+        # Determine the prior mode from parameters
+        mode_prior = self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_PRIOR]
+        if mode_prior == ALG_PRIORS_ML:
+            # Equal priors for each class
+            priors = np.full(shape=num_classes, fill_value=(1.0 / num_classes))
+        elif mode_prior == ALG_PRIORS_MAP:
+            # Priors based on the relative frequency of each class
+            counts = np.array([len(class_data) for class_data in new_data])
+            priors = counts / float(npts)
+        else:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "unknown value for priors"))
+            self.model_d[GMM_MDL_KEY_MODEL].clear()
+            return None, None
 
-            diff_means = []
+        # Save the priors in the model dictionary
+        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_PRIOR] = priors
 
-            for ind, mean in enumerate(means):
-                diff_means.append(
-                    self.weightedDistance(mean, d, float(weights[ind]))
-                )
+        random_state = \
+            int(self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_RANDOM])
 
-            train_label_ind = np.argmin(diff_means)
-            if data.mapping_label[train_label_ind] == true_label:
-                acc += 1
+        # Train a GMM for each class
+        class_models = {}
+        for idx, class_data in enumerate(new_data):
+            gm = GaussianMixture(n_components=n_components,
+                                 random_state=random_state)
+            gm.fit(class_data)
+            class_models[idx] = gm
 
-        score = acc / len(data.data)
+        # Save the trained class models and class labels
+        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_MODELS] = class_models
+        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_LABELS] = uni_label
+
+        # Prepare a full data matrix and labels for computing the training score
+        f_data = np.vstack(new_data)
+        labels = []
+        for idx, class_data in enumerate(new_data):
+            labels.extend([idx] * len(class_data))
+        labels = np.array(labels)
+
+        # Prediction on the training data via posterior probability calculation:
+        # For each sample, compute for each class:
+        #    likelihood = exp(log-likelihood) * prior
+        # then choose the class with the highest resulting value.
+        ypred = []
+        posteriors = []
+        for x in f_data:
+            likelihoods = []
+            for idx in range(num_classes):
+                # Compute log likelihood for sample x under the class's GMM
+                log_likelihood = class_models[idx].score_samples(
+                    x.reshape(1, -1))[0]
+                likelihood = np.exp(log_likelihood) * priors[idx]
+                likelihoods.append(likelihood)
+            likelihoods = np.array(likelihoods)
+            pred_label = np.argmax(likelihoods)
+            ypred.append(pred_label)
+            # Compute normalized posterior probabilities
+            post = likelihoods / np.sum(likelihoods)
+            posteriors.append(post)
+        ypred = np.array(ypred)
+
+        # Compute the macro-averaged f1 score on the training data
+        score = f1_score(labels, ypred, average="macro")
+
+        # Optionally, write the predicted training labels to file using the
+        # MLToolsData.write() method
+        if write_train_labels:
+            data.write(oname=fname_train_labels, label=ypred)
 
         return self.model_d, score
-    #
-    # end of method
 
     def predict(self,
                 data: MLToolsData,
-                model = None):
+                model=None):
+        """
+        method: predict
 
+        arguments:
+         data: an MLToolsData object containing feature vectors (each row is a
+          vector)
+         model: a GMM model dictionary (if None, the internal model is used)
+
+        return:
+         p_labels: a numpy array of predicted labels
+         posteriors: a numpy array of posterior probabilities (one row per sample)
+
+        description:
+         This method predicts the class labels for the given data using the
+         trained GMM models.
+         It computes the posterior probabilities for each sample and selects
+         the class with the highest probability.
+        """
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
             print("%s (line: %s) %s: entering predict" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__))
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
         # check if model is none
         #
+        data = np.array(data.data)
         if model is None:
             model = self.model_d
 
-        # check for model validity
+        # retrieving the priors, class models and class labels from the trained
+        # model
         #
-        if model[EUCLIDEAN_MDL_KEY_NAME] != EUCLIDEAN_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "incorrect model name"))
-            return None, None
+        priors = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_PRIOR]
+        class_models = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_MODELS]
+        class_labels = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_LABELS]
+        num_classes = len(class_models)
 
-        if not model[EUCLIDEAN_MDL_KEY_MODEL]:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "model parameter is empty"))
-            return None, None
-
-        means = self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS]
-        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
-        mapping_label = data.mapping_label
-
-        labels = []
+        p_labels = []
+        # Posterior calculation
+        #
         posteriors = []
+        for single_data in data:
 
-        for d in data.data:
+            # Likelihoods calculation
+            #
+            likelihoods = []
+            for idx in range(num_classes):
+                # Log Likelihood calculation for each sample
+                #
+                log_likelihood = class_models[idx].score_samples(
+                    single_data.reshape(1, -1))[0]
+                likelihood = np.exp(log_likelihood) * priors[idx]
+                likelihoods.append(likelihood)
+            likelihoods = np.array(likelihoods)
+            # predicting labels based on maximum likelihood
+            #
+            pred_label = np.argmax(likelihoods)
+            p_labels.append(class_labels[pred_label])
+            post = likelihoods / np.sum(likelihoods)
+            posteriors.append(post)
+        p_labels = np.array(p_labels)
+        posteriors = np.array(posteriors)
 
-            diff_means = []
-            cur_posterios = []
+        # exit gracefully
+        #
+        return p_labels, posteriors
 
-            for ind, mean in enumerate(means):
-                distance = self.weightedDistance(mean, d, float(weights[ind]))
-                diff_means.append(distance)
-                cur_posterios.append(distance)
-            predict_label_ind = np.argmin(diff_means)
-            labels.append(predict_label_ind)
-            posteriors.append(cur_posterios)
-
-        return labels, posteriors
-    #
-    # end of method
+#******************************************************************************
 #
-# end of EUCLIDEAN
+# Section 2: nonparametric models
+#
+#******************************************************************************
+
+#------------------------------------------------------------------------------
+# ML Tools Class: KNN
+#------------------------------------------------------------------------------
 
 class KNN:
     """
@@ -3960,7 +4254,7 @@ class KNN:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4039,6 +4333,180 @@ class KNN:
     # end of method
 
 #------------------------------------------------------------------------------
+# ML Tools Class: KMEANS
+#------------------------------------------------------------------------------
+
+class KMEANS:
+    """
+    Class: KMEANS
+
+    description:
+     This is a class that implements KMEANS
+    """
+
+    def __init__(self):
+        """
+        method: constructor
+
+        arguments:
+         none
+
+        return:
+         none
+
+        description:
+         this is the default constructor for the class.
+        """
+
+        # set the class name
+        #
+        KMEANS.__CLASS_NAME__ = self.__class__.__name__
+
+        # initialize variables for the parameter block and model
+        #
+        self.params_d = defaultdict(dict)
+        self.model_d = defaultdict()
+
+        # initialize a parameter dictionary
+        #
+        self.params_d[KMEANS_PRM_KEY_NAME] = self.__class__.__name__
+        self.params_d[KMEANS_PRM_KEY_PARAM] = defaultdict(dict)
+
+        # set the model
+        #
+        self.model_d[KMEANS_MDL_KEY_NAME] = self.__class__.__name__
+        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans()
+    #
+    # end of method
+
+    #--------------------------------------------------------------------------
+    #
+    # computational methods: train/predict
+    #
+    #--------------------------------------------------------------------------
+
+    def train(self,
+              data: MLToolsData,
+              write_train_labels: bool,
+              fname_train_labels: str,
+              ):
+        """
+        method: train
+
+        arguments:
+         data: a list of numpy float matrices of feature vectors
+         write_train_labels: a boolean to whether write the train data
+         fname_train_labels: the filename of the train file
+
+        return:
+         model: a dictionary of covariance, means and priors
+         score: silhouette score
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: training a model" %
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        if self.model_d[ALG_MDL_KEY_MODEL]:
+            print("Error: %s (line: %s) %s: %s" %
+                (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                "Doesn't support training on pre-trained model"))
+            return None, None
+
+        # making the final data
+        #
+        samples = np.array(data.data)
+
+        # fit the model
+        #
+        n_cluster = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NCLUSTER])
+        random_state =int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_RANDOM])
+        n_init = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NINIT])
+        m_iter = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_MITER])
+
+        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans(n_clusters=n_cluster,
+        random_state = random_state,
+        n_init = n_init,
+        max_iter = m_iter).fit(samples)
+
+        predicted_labels = self.model_d[KMEANS_MDL_KEY_MODEL].labels_
+
+        score = silhouette_score(samples, predicted_labels)
+
+        if write_train_labels:
+            data.write(oname = fname_train_labels, label = predicted_labels)
+
+        # exit gracefully
+        #
+        return self.model_d, score
+    #
+    # end of method
+
+    def predict(self,
+                data: MLToolsData,
+                model = None):
+        """
+        method: predict
+
+        arguments:
+         data: a numpy float matrix of feature vectors (each row is a vector)
+         model: an algorithm model (None = use the internal model)
+
+        return:
+         labels: a list of predicted labels
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s: entering predict" %
+                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+
+        # check if model is none
+        #
+        if model is None:
+            model = self.model_d
+        posteriors = []
+
+        data = np.array(data.data)
+
+        p_labels = model[KMEANS_MDL_KEY_MODEL].predict(data)
+
+        # cluster centers
+        #
+        centers = model[KMEANS_MDL_KEY_MODEL].cluster_centers_
+
+        # posteriors calculation
+        #
+        for d in data:
+            dis_c = []
+            count = 0
+            for c in centers:
+                dis = np.linalg.norm(d - c)
+                dis_c.append(dis)
+                count = count + dis
+            posteriors.append(dis_c/count)
+
+        # exit gracefully
+        #
+        return p_labels, posteriors
+    #
+    # end of method
+#
+# end of KMEANS
+
+#------------------------------------------------------------------------------
+# ML Tools Class: RNF
+#------------------------------------------------------------------------------
+
 class RNF:
     """
     Class: RNF
@@ -4115,7 +4583,7 @@ class RNF:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4213,6 +4681,9 @@ class RNF:
 # end of RNF
 
 #------------------------------------------------------------------------------
+# ML Tools Class: SVM
+#------------------------------------------------------------------------------
+
 class SVM:
     """
     Class: SVM
@@ -4289,7 +4760,7 @@ class SVM:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4375,175 +4846,16 @@ class SVM:
 #
 # end of SVM
 
-#------------------------------------------------------------------------------
-class KMEANS:
-    """
-    Class: KMEANS
-
-    description:
-     This is a class that implements KMEANS
-    """
-
-    def __init__(self):
-        """
-        method: constructor
-
-        arguments:
-         none
-
-        return:
-         none
-
-        description:
-         this is the default constructor for the class.
-        """
-
-        # set the class name
-        #
-        KMEANS.__CLASS_NAME__ = self.__class__.__name__
-
-        # initialize variables for the parameter block and model
-        #
-        self.params_d = defaultdict(dict)
-        self.model_d = defaultdict()
-
-        # initialize a parameter dictionary
-        #
-        self.params_d[KMEANS_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[KMEANS_PRM_KEY_PARAM] = defaultdict(dict)
-
-        # set the model
-        #
-        self.model_d[KMEANS_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans()
-    #
-    # end of method
-
-    #--------------------------------------------------------------------------
-    #
-    # computational methods: train/predict
-    #
-    #--------------------------------------------------------------------------
-
-    def train(self,
-              data: MLToolsData,
-              write_train_labels: bool,
-              fname_train_labels: str,
-              ):
-        """
-        method: train
-
-        arguments:
-         data: a list of numpy float matrices of feature vectors
-         write_train_labels: a boolean to whether write the train data
-         fname_train_labels: the filename of the train file
-
-        return:
-         model: a dictionary of covariance, means and priors
-         score: silhouette score
-
-        description:
-         none
-        """
-
-        # display an informational message
-        #
-        if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
-
-        if self.model_d is not None:
-            print("Error: %s (line: %s) %s: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                "Doesn't support training on pre-trained model"))
-            return None, None
-
-        # making the final data
-        #
-        samples = np.array(data.data)
-
-        # fit the model
-        #
-        n_cluster = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NCLUSTER])
-        random_state =int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_RANDOM])
-        n_init = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NINIT])
-        m_iter = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_MITER])
-
-        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans(n_clusters=n_cluster,
-        random_state = random_state,
-        n_init = n_init,
-        max_iter = m_iter).fit(samples)
-
-        predicted_labels = self.model_d[KMEANS_MDL_KEY_MODEL].labels_
-
-        score = silhouette_score(samples, predicted_labels)
-
-        if write_train_labels:
-            data.write(oname = fname_train_labels, label = predicted_labels)
-
-        # exit gracefully
-        #
-        return self.model_d, score
-    #
-    # end of method
-
-    def predict(self,
-                data: MLToolsData,
-                model = None):
-        """
-        method: predict
-
-        arguments:
-         data: a numpy float matrix of feature vectors (each row is a vector)
-         model: an algorithm model (None = use the internal model)
-
-        return:
-         labels: a list of predicted labels
-
-        description:
-         none
-        """
-
-        # display an informational message
-        #
-        if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
-
-        # check if model is none
-        #
-        if model is None:
-            model = self.model_d
-        posteriors = []
-
-        data = np.array(data.data)
-
-        p_labels = model[KMEANS_MDL_KEY_MODEL].predict(data)
-
-        # cluster centers
-        #
-        centers = model[KMEANS_MDL_KEY_MODEL].cluster_centers_
-
-        # posteriors calculation
-        #
-        for d in data:
-            dis_c = []
-            count = 0
-            for c in centers:
-                dis = np.linalg.norm(d - c)
-                dis_c.append(dis)
-                count = count + dis
-            posteriors.append(dis_c/count)
-
-        # exit gracefully
-        #
-        return p_labels, posteriors
-    #
-    # end of method
+#******************************************************************************
 #
-# end of KMEANS
+# Section 3: neural network-based models
+#
+#******************************************************************************
 
 #------------------------------------------------------------------------------
+# ML Tools Class: MLP
+#------------------------------------------------------------------------------
+
 class MLP:
     """
     Class: MLP
@@ -4620,7 +4932,7 @@ class MLP:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4725,6 +5037,10 @@ class MLP:
 #
 # end of MLP
 
+#------------------------------------------------------------------------------
+# ML Tools Class: RBM
+#------------------------------------------------------------------------------
+
 class RBM:
     """
     Class: RBM
@@ -4801,7 +5117,7 @@ class RBM:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d is not None:
+        if self.model_d[ALG_MDL_KEY_MODEL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4895,7 +5211,8 @@ class RBM:
 #
 # end of RBM
 
-
+#------------------------------------------------------------------------------
+# ML Tools Class: TRANSFORMER
 #------------------------------------------------------------------------------
 
 class TRANSFORMER:
@@ -4937,7 +5254,7 @@ class TRANSFORMER:
         #
         self.model_d[TRANS_MDL_KEY_NAME] = self.__class__.__name__
         self.model_d[TRANS_MDL_KEY_MODEL] = defaultdict(dict)
-        
+
 
     #
     # end of method
@@ -5136,7 +5453,7 @@ class TRANSFORMER:
         # assign the model to the model_d['model']
         #
         self.model_d[TRANS_MDL_KEY_MODEL] = state_dict
-        
+
         # get the predicted labels
         #
         ypred, _ = self.predict(data=data)
@@ -5177,7 +5494,7 @@ class TRANSFORMER:
         # get the samples
         #
         samples = np.array(data.data)
-        
+
         # get the parameters
         #
         self.lr = float(self.params_d[TRANS_PRM_KEY_PARAM]
@@ -5264,6 +5581,14 @@ class TRANSFORMER:
 #
 # end of TRANSFORMER
 
+#******************************************************************************
+#
+# Section 4: quantum computing-based models
+#
+#******************************************************************************
+
+#------------------------------------------------------------------------------
+# ML Tools Class: QSVM
 #------------------------------------------------------------------------------
 
 class QSVM:
@@ -5370,7 +5695,7 @@ class QSVM:
                                       [QSVM_PRM_KEY_SHOTS])
         self.kernel_name = str(self.params_d[QSVM_PRM_KEY_PARAM]
                                             [QSVM_PRM_KEY_KERNEL])
-        
+
         # create the model
         #
         qsvm_model = nqt.QML(model_name=self.mdl_name,
@@ -5384,20 +5709,20 @@ class QSVM:
                              featuremap_reps=self.feat_reps,
                              shots=self.shots,
                              kernel_name=self.kernel_name)
-                                                   
+
         # get the trained model
         #
         self.model_d[QSVM_MDL_KEY_MODEL] = qsvm_model.fit(samples, labels)
-        
+
         # get the error rate for the training samples
         #
-        error_rate, y_pred = qsvm_model.score(samples, labels)
-        
+        error_rate, ypred = qsvm_model.score(samples, labels)
+
         # if write_train_labels is True, write the labels to the file
         #
         if write_train_labels:
             data.write(oname = fname_train_labels, label = ypred)
-        
+
         # exit gracefully
         #
         return self.model_d, error_rate
@@ -5426,15 +5751,15 @@ class QSVM:
         if dbgl_g == ndt.FULL:
             print("%s (line: %s) %s: entering predict" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
-            
+
         # get the samples
         #
         samples = np.array(data.data)
-        
+
         # get the trained model
         #
         model = self.model_d[QSVM_MDL_KEY_MODEL]
-                                                    
+
         # get the predicted labels
         #
         p_labels = model.predict(samples)
@@ -5452,6 +5777,8 @@ class QSVM:
 #
 # end of QSVM
 
+#------------------------------------------------------------------------------
+# ML Tools Class: QNN
 #------------------------------------------------------------------------------
 
 class QNN:
@@ -5566,7 +5893,7 @@ class QNN:
                                                 [QNN_PRM_KEY_MAXSTEPS])
         self.meas_type = str(self.params_d[QNN_PRM_KEY_PARAM]
                                           [QNN_PRM_KEY_MEAS_TYPE])
-        
+
         # create the model
         #
         qnn_model = nqt.QML(model_name=self.mdl_name,
@@ -5585,20 +5912,20 @@ class QNN:
                             measurement_type=self.meas_type,
                             n_classes = data.num_of_classes
                             )
-                                                   
+
         # get the trained model
         #
         self.model_d[QNN_MDL_KEY_MODEL] = qnn_model.fit(samples, labels)
-        
+
         # get the error rate for the training samples
         #
         error_rate, ypred = qnn_model.score(samples, labels)
-        
+
         # if write_train_labels is True, write the labels to the file
         #
         if write_train_labels:
             data.write(oname = fname_train_labels, label = ypred)
-        
+
         # exit gracefully
         #
         return self.model_d, error_rate
@@ -5627,15 +5954,15 @@ class QNN:
         if dbgl_g == ndt.FULL:
             print("%s (line: %s) %s: entering predict" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
-            
+
         # get the samples
         #
         samples = np.array(data.data)
-        
+
         # get the trained model
         #
         model = self.model_d[QNN_MDL_KEY_MODEL]
-                                                    
+
         # get the predicted labels
         #
         p_labels = model.predict(samples)
@@ -5653,6 +5980,8 @@ class QNN:
 #
 # end of QNN
 
+#------------------------------------------------------------------------------
+# ML Tools Class: QRBM
 #------------------------------------------------------------------------------
 
 class QRBM:
@@ -5756,13 +6085,13 @@ class QRBM:
                                       [QRBM_PRM_KEY_N_NEIGHBORS])
         self.encoder = str(self.params_d[QRBM_PRM_KEY_PARAM]
                                       [QRBM_PRM_KEY_ENCODER])
-        
+
         # get the number of visible node which is the number of features
         # in the dataset
         #
         self.n_visible = samples[0].shape[0]
-        
-        
+
+
         # create the model
         #
         qrbm_knn_model = nqt.QML(model_name=self.mdl_name,
@@ -5775,20 +6104,20 @@ class QRBM:
                                  chain_strength=self.cs,
                                  n_neighbors=self.n_neighbors,
                                 )
-                                                   
+
         # get the trained model
         #
         self.model_d[QRBM_MDL_KEY_MODEL] = qrbm_knn_model.fit(samples, labels)
-        
+
         # get the error rate for the training samples
         #
         error_rate, ypred = qrbm_knn_model.score(samples, labels)
-        
+
         # if write_train_labels is True, write the labels to the file
         #
         if write_train_labels:
             data.write(oname = fname_train_labels, label = ypred)
-        
+
         # exit gracefully
         #
         return self.model_d, error_rate
@@ -5817,7 +6146,7 @@ class QRBM:
         if dbgl_g == ndt.FULL:
             print("%s (line: %s) %s: entering predict" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
-            
+
         # get the samples
         #
         samples = np.array(data.data)
@@ -5826,11 +6155,11 @@ class QRBM:
         # in the dataset
         #
         self.n_visible = samples[0].shape[0]
-        
+
         # get the trained model
         #
         model = self.model_d[QRBM_MDL_KEY_MODEL]
-                                                    
+
         # get the predicted labels
         #
         p_labels = model.predict(samples)
@@ -5848,19 +6177,20 @@ class QRBM:
 #
 # end of QRBM
 
-#------------------------------------------------------------------------------
+#******************************************************************************
 #
-# definitions dependent on the above classes go here
+# Section 5: definitions dependent on the above classes go here
 #
-#------------------------------------------------------------------------------
+#******************************************************************************
 
 # define variables to configure the machine learning algorithms
 #
-ALGS = {PCA_NAME: PCA(), LDA_NAME:LDA(), QDA_NAME:QDA(),
-        QLDA_NAME: QLDA(), NB_NAME:NB(), KNN_NAME:KNN(),
-        RNF_NAME:RNF(), SVM_NAME:SVM(), KMEANS_NAME:KMEANS(),
-        MLP_NAME:MLP(), EUCLIDEAN_NAME: EUCLIDEAN(), RBM_NAME:RBM(),
-        TRANSFORMER_NAME:TRANSFORMER(), QSVM_NAME:QSVM(), QNN_NAME:QNN(), QRBM_NAME:QRBM()}
+ALGS = {EUCLIDEAN_NAME:EUCLIDEAN(), PCA_NAME:PCA(), LDA_NAME:LDA(),
+        QDA_NAME:QDA(), QLDA_NAME:QLDA(), NB_NAME:NB(), GMM_NAME:GMM(),
+        KNN_NAME:KNN(), KMEANS_NAME:KMEANS(), RNF_NAME:RNF(), SVM_NAME:SVM(),
+        MLP_NAME:MLP(), RBM_NAME:RBM(), TRANSFORMER_NAME:TRANSFORMER(),
+        QSVM_NAME:QSVM(), QNN_NAME:QNN(), QRBM_NAME:QRBM()}
+
 #
 # end of file
 
