@@ -4,11 +4,12 @@
 #
 # revision history: 
 #
+# 20250404 (JP): refactored and reviewed
 # 20230623 (AB): code refactored to new comment style
 # 20230309 (SS): added an option for scaling
 # 20230226 (JP): final review
 # 20230222 (SS): updated implementations
-# 20230218 (JP): refectored the code based on what we have learned recently
+# 20230218 (JP): refactored the code based on what we have learned recently
 # 20230113 (JP): changed the interface to handle shrinkage properly
 # 20230110 (JP): converted to functions and simplified things
 # 20230106 (JP): refactored
@@ -20,7 +21,7 @@
 #   - ctype: full (def) or diagonal
 #   - center: none, tied or untied (def)
 #   - scale:  none, biased (def), unbiased or empirical
-#isi
+#
 # A good reference on this can be found here:
 #
 #  Hertzog, C. (1986). On Pooling Covariance Matrices for Multivariate
@@ -46,7 +47,7 @@
 #
 #------------------------------------------------------------------------------
 
-# import reqired system modules
+# import required system modules
 #
 import numpy as np
 import os
@@ -289,7 +290,7 @@ def calculate(data, ctype , scale):
      a covariance matrix or None (if it fails)
 
     description:
-     This function calcuates a raw covariance from the data. it has two
+     This function calculates a raw covariance from the data. it has two
      modes - full and diagonal. note that subtraction of the mean (debiasing)
      is done within scikit-learn.
     """
@@ -343,7 +344,7 @@ def calculate(data, ctype , scale):
         #
         cov = 0
 
-        # calculate emperical weights
+        # calculate empirical weights
         #
         weights = calculate_empirical_weights(data)
 
@@ -357,7 +358,7 @@ def calculate(data, ctype , scale):
                 #
                 cov += weights[i] * np.cov(data[i].T, bias = False)
 
-            # ctype is diagnal
+            # ctype is diagonal
             #
             elif ctype == CTYPE_DIAG:
 
@@ -382,7 +383,7 @@ def calculate_empirical_weights(data):
      a numpy vector containing the empirical priors
 
     description:
-     This function calcuates the priors from the data using an empirical estimate:
+     This function calculates the priors from the data using an empirical estimate:
 
      weight = (Nt - 1) / (N - num_classes)
 

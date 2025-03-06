@@ -4,6 +4,8 @@
 #                                                                              
 # revision history:
 #
+# 20250128 (SP): added set_seed() method to Dbgl class
+# 20241003 (JP): added a log function to timestamp programs
 # 20230622 (AB): refactored code to new comment format
 # 20200531 (JP): refactored code
 # 20200514 (JP): initial version
@@ -14,7 +16,12 @@
 # import system modules
 #
 import os
+import random
 import sys
+import time
+
+import numpy as np
+from numpy.random import default_rng
 
 # import NEDC modules
 #
@@ -51,6 +58,11 @@ MAX_PRECISION = int(10)
 # from a common starting point
 #
 RANDSEED = int(27)
+
+# define a newline delimiter
+#
+DELIM_EQUAL = '='
+DELIM_NEWLINE = '\n'
 
 #------------------------------------------------------------------------------
 #
@@ -178,6 +190,10 @@ class Dbgl:
         """
          
         Dbgl.__CLASS_NAME__ = self.__class__.__name__
+        
+        # set the seed for random number generators to a common value so that we can reproduce results
+        #
+        self.set_seed(value = RANDSEED)
     
     #--------------------------------------------------------------------------
     #
@@ -362,7 +378,35 @@ class Dbgl:
         # exit gracefully
         #
         return Dbgl.level_d
-
+    
+    def set_seed(self, value: int) -> None:
+        """
+        method: set_seed
+        arguments:
+         value: the seed value
+        return:
+         none
+        description:
+         This method sets the seed for random number generators.
+        """
+        
+        # set the seed for Python's random number generators
+        #
+        random.seed(value)
+        # set the seed for numpy's random number generators
+        #
+        np.random.seed(value)
+        # set the seed for numpy's random number generators
+        rng = default_rng(value)
+        
+        # set the seed for Python's hash function
+        #
+        os.environ['PYTHONHASHSEED'] = str(value)
+        
+        # exit gracefully
+        #
+        return rng
+        
     def get(self):
         """
         method: get
@@ -399,6 +443,55 @@ class Dbgl:
             return False;
         else:
             return True
+
+    #--------------------------------------------------------------------------
+    #
+    # miscellaneous methods
+    #
+    #--------------------------------------------------------------------------
+
+    def log(self, fname, version):
+
+        """
+        method: log
+        
+        arguments:
+         fname: the filename to be timestamped
+         version: the user-defined version of the software
+
+        return: 
+         a string containing the log message
+
+        description: 
+         this method produces a standard log message that is used
+         to timestamp programs.
+
+        """
+
+        # convert the filename to an absolute path:
+        #  this displays the path in a user-friendly way
+        #
+        aname = os.path.abspath(os.path.expanduser(os.path.expandvars(fname)))
+
+        # add a preamble
+        #
+        str = DELIM_EQUAL * 78 + DELIM_NEWLINE
+
+        # print out various timestamps for the executable
+        #
+        aname_ctime = time.ctime(os.path.getmtime(fname))
+        str += "     Date: %s" % (time.strftime("%c") + DELIM_NEWLINE)
+        str += "     File: %s" % (aname + DELIM_NEWLINE)
+        str += "  Version: %s" % (version + DELIM_NEWLINE)
+        str += " Mod Time: %s" % (aname_ctime + DELIM_NEWLINE)
+
+        # add an epilogue
+        #
+        str += DELIM_EQUAL * 78 + DELIM_NEWLINE
+
+        # exit gracefully
+        #
+        return str
 
 #
 # end of class

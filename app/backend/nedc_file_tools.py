@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 #
 # file: $NEDC_NFC/class/python/nedc_sys_tools/nedc_file_tools.py
-#                                                                              
+#
 # revision history:
 #
 # 20240806 (DH): added new constants used in eeg/dpath ann tools
@@ -18,15 +18,15 @@
 # 20170706 (NC): refactored eval_tools into file_tools and display_tools
 # 20170611 (JP): updated error handling
 # 20170521 (JP): initial version
-#                                                                             
-# usage:                                                                       
+#
+# usage:
 #  import nedc_file_tools as nft
-#                                                                              
+#
 # This class contains a collection of functions that deal with file handling
 #------------------------------------------------------------------------------
-#                                                                             
-# imports are listed here                                                     
-#                                                                             
+#
+# imports are listed here
+#
 #------------------------------------------------------------------------------
 
 # import system modules
@@ -35,15 +35,16 @@ import errno
 import os
 import re
 import sys
+import tomllib
 
 # import NEDC modules
 #
 import nedc_debug_tools as ndt
 
 #------------------------------------------------------------------------------
-#                                                                              
-# global variables are listed here                                             
-#                                                                              
+#
+# global variables are listed here
+#
 #------------------------------------------------------------------------------
 
 # set the filename using basename
@@ -92,6 +93,7 @@ DEF_EXT_LBL = "lbl"
 DEF_EXT_PNG = "png"
 DEF_EXT_REC = "rec"
 DEF_EXT_SVS = "svs"
+DEF_EXT_TIF = "tif"
 DEF_EXT_TXT = "txt"
 DEF_EXT_XML = "xml"
 
@@ -247,19 +249,19 @@ dbgl = ndt.Dbgl()
 def trim_whitespace(istr):
     """
     function: trim_whitespace
-    
+
     arguments:
      istr: input string
 
-    return: 
+    return:
      an output string that has been trimmed
 
-    description: 
+    description:
      This function removes leading and trailing whitespace.
      It is needed because text fields in Edf files have all
      sorts of junk in them.
     """
-       
+
     # display informational message
     #
     if dbgl == ndt.FULL:
@@ -282,7 +284,7 @@ def trim_whitespace(istr):
     #
     if flag == False:
         return STRING_EMPTY
-        
+
     # find the last non-whitespace character
     #
     for j in range(last_index - 1, -1, -1):
@@ -292,26 +294,26 @@ def trim_whitespace(istr):
     # exit gracefully: return the trimmed string
     #
     return istr[i:j+1]
-#                                                                          
+#
 # end of function
 
 def first_substring(strings, substring):
     """
     function: first_substring
-    
+
     arguments:
      strings: list of strings (input)
      substring: the substring to be matched (input)
 
-    return: 
+    return:
      the index of the match in strings
      none
 
-    description: 
+    description:
      This function finds the index of the first string in strings that
      contains the substring. This is similar to running strstr on each
      element of the input list.
-    """    
+    """
     try:
         return next(i for i, string in enumerate(strings) if \
                     substring in string)
@@ -323,20 +325,20 @@ def first_substring(strings, substring):
 def first_string(strings, tstring):
     """
     function: first_string
-    
+
     arguments:
      strings: list of strings (input)
      substring: the string to be matched (input)
 
-    return: 
+    return:
      the index of the match in strings
      none
 
-    description: 
+    description:
      This function finds the index of the first string in strings that
      contains an exact match. This is similar to running strstr on each
      element of the input list.
-    """    
+    """
     try:
         return next(i for i, string in enumerate(strings) if \
                     tstring == string)
@@ -346,10 +348,10 @@ def first_string(strings, tstring):
 # end of function
 
 # function: atoi
-#                                                                          
+#
 # arguments:
 #  value: the value to be converted as a string
-#                                              
+#
 # return: an integer value
 #
 # This function emulates what C++ atoi does by replacing
@@ -359,16 +361,16 @@ def first_string(strings, tstring):
 def atoi(value):
     """
     function: atoi
-    
+
     arguments:
      none
      none
 
-    return: 
+    return:
      none
      none
 
-    description: 
+    description:
      none
      none
      none
@@ -406,14 +408,14 @@ def atoi(value):
 def atof(value):
     """
     function: atof
-    
+
     arguments:
      value: the value to be converted as a string
 
-    return: 
+    return:
      an integer value
 
-    description: 
+    description:
      This function emulates what C++ atof does by replacing
      null characters with spaces before conversion. This allows
      Python's integer conversion function to work properly.
@@ -433,7 +435,7 @@ def atof(value):
                               if (x in value) else len(value)),
                    LIST_SPECIALS)))
     tstr = value[0:ind]
-    
+
     # try to convert the input
     #
     try:
@@ -458,14 +460,14 @@ def atof(value):
 def get_fullpath(path):
     """
     function: get_fullpath
-    
+
     arguments:
      path: path to directory or file
 
-    return: 
+    return:
      the full path to directory/file path argument
 
-    description: 
+    description:
      This function returns the full pathname for a file. It expands
      environment variables.
     """
@@ -485,7 +487,7 @@ def get_fullpath(path):
 def create_filename(iname, odir, oext, rdir, cdir = False):
     """
     function: create_filename
-    
+
     arguments:
      iname: input filename (string)
      odir: output directory (string)
@@ -493,10 +495,10 @@ def create_filename(iname, odir, oext, rdir, cdir = False):
      rdir: replace directory (string)
      cdir: create directory (boolean - true means create the directory)
 
-    return: 
+    return:
      the output filename
 
-    description: 
+    description:
      This function creates an output file name based on the input arguments. It
      is a Python version of Edf::create_filename().
     """
@@ -538,7 +540,7 @@ def create_filename(iname, odir, oext, rdir, cdir = False):
         rdir = os.path.abspath(os.path.realpath(
             os.path.expanduser(rdir)))
 
-        # replace the replace directory portion of path with 
+        # replace the replace directory portion of path with
         # the output directory
         #
         ofile = ofile.replace(rdir, odir)
@@ -568,16 +570,16 @@ def create_filename(iname, odir, oext, rdir, cdir = False):
 def concat_names(odir, fname):
     """
     function: concat_names
-    
+
     arguments:
      odir: the output directory that will hold the file
      fname: the output filename
 
-    return: 
+    return:
      fname: a filename that is a concatenation of odir and fname
      none
 
-    description: 
+    description:
      none
      none
      none
@@ -599,23 +601,23 @@ def concat_names(odir, fname):
     #
     new_name = str + DELIM_SLASH + fname
 
-    # exit gracefully                                                     
-    #                                                                      
+    # exit gracefully
+    #
     return new_name
-#                                                                          
+#
 # end of function
 
 def get_flist(fname):
     """
     function: get_flist
-    
+
     arguments:
      fname: full pathname of a filelist file
 
-    return: 
+    return:
      flist: a list of filenames
 
-    description: 
+    description:
      This function opens a file and reads filenames. It ignores comment
      lines and blank lines.
     """
@@ -632,9 +634,9 @@ def get_flist(fname):
 
     # open the file
     #
-    try: 
-        fp = open(fname, MODE_READ_TEXT) 
-    except IOError: 
+    try:
+        fp = open(fname, MODE_READ_TEXT)
+    except IOError:
         print("Error: %s (line: %s) %s: file not found (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return None
@@ -666,22 +668,22 @@ def get_flist(fname):
     # exit gracefully
     #
     return flist
-#                                                                          
+#
 # end of function
 
 def make_fp(fname):
     """
     function: make_fp
-    
+
     arguments:
      fname: the filename
      none
 
-    return: 
+    return:
      fp: a file pointer
      none
 
-    description: 
+    description:
      none
     """
 
@@ -699,9 +701,9 @@ def make_fp(fname):
         print("Error: %s (line: %s) %s: error opening file (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return None
- 
-    # exit gracefully                                                     
-    #                                                                      
+
+    # exit gracefully
+    #
     return fp
 #
 # end of function
@@ -715,34 +717,32 @@ def make_fp(fname):
 def is_edf(fname):
     """
     method: is_edf
-        
+
     arguments:
      fname: path to edf file
 
-    return: 
+    return:
      True if file is an edf file
 
-    description: 
+    description:
      This method looks at the beginning 8 bytes of the edf file, and decides
-     if the file is an edf file. 
+     if the file is an edf file.
     """
 
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for an edf file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for an edf file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # open the file
     #
     fp = open(fname, MODE_READ_BINARY)
     if fp is None:
-        print("Error: %s (line: %s) %s::%s: error opening file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("Error: %s (line: %s) %s: error opening file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return False
-            
+
     # make sure we are at the beginning of the file and read
     #
     fp.seek(0, os.SEEK_SET)
@@ -765,14 +765,14 @@ def is_edf(fname):
 def is_raw(fname):
     """
     method: is_raw
-        
+
     arguments:
      fname: path to a file
 
-     return: 
+     return:
       True if file is a raw file
 
-    description: 
+    description:
      This method looks at the beginning of the edf file, and decides
      if the file is a raw or text based on the values.
      """
@@ -790,7 +790,7 @@ def is_raw(fname):
         print("Error: %s (line: %s) %s::%s: error opening file (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return False
-            
+
     # make sure we are at the beginning of the file and read
     #
     fp.seek(0, os.SEEK_SET)
@@ -802,7 +802,7 @@ def is_raw(fname):
     for val in barray:
         if int(val) < 0 or int(val) > 127:
             return True
-        
+
     # exit gracefully - it is most likely a text file
     #
     return False
@@ -813,31 +813,29 @@ def is_raw(fname):
 def is_hea(hfile):
     """
     method: is_hea
-    
+
     arguments:
      fname: the input header filename
 
     returns:
      a boolean value indicating status
 
-    description: 
+    description:
      This method checks if a file is a header file.
      """
 
     # display debug message
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for a header file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for a header file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # open the file
     #
     fp = open(hfile, MODE_READ_TEXT)
     if fp is None:
-        print("Error: %s (line: %s) %s::%s: error opening (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               hname))
+        print("Error: %s (line: %s) %s: error opening (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, hname))
         return None
 
     # grab and the first line
@@ -865,8 +863,8 @@ def is_hea(hfile):
     # display debug message
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: done checking for a header file" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__))
+        print("%s (line: %s) %s: done checking for a header file" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
     # exit gracefully
     #
@@ -893,24 +891,35 @@ def is_ann(fname):
     description:
      This method checks if a file is a valid annotation file.
     """
-    
+
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for an ann file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for an ann file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
-    # check the list of known types
+    # attempt to determine file type
     #
-    if is_tse(fname):
-        return True
-    elif is_lbl(fname):
-        return True
-    elif is_csv(fname):
-        return True
-    elif is_xml(fname):
-        return True
+    try:
+
+        # check the list of known types
+        #
+        if is_tse(fname):
+            return True
+        elif is_lbl(fname):
+            return True
+        elif is_csv(fname):
+            return True
+        elif is_xml(fname):
+            return True
+
+    # if an error occurs due to utf encoding
+    # return false as all annotation files
+    # are text files
+    #
+    except:
+
+        return False
 
     # exit ungracefully: not a valid annotation file type
     #
@@ -931,23 +940,22 @@ def is_tse(fname):
     description:
      This method checks if a file is a tse file.
     """
-    
+
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for a tse file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for a tse file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # get the magic sequence
     #
     magic_str = get_version(fname)
-    
+
     # check the magic sequence
     #
     if magic_str != TSE_VERSION:
         return False
-    
+
     # exit gracefully: it is a tse file
     #
     return True
@@ -971,25 +979,24 @@ def is_lbl(fname):
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for an lbl file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for an lbl file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # get the magic sequence
     #
     magic_str = get_version(fname)
- 
+
     # if the fname's magic sequence
     # is not a lbl file's return false
     #
     if magic_str != LBL_VERSION:
         return False
-    
+
     # exit gracefully: it is an lbl file
     #
     return True
 #
-# end of function 
+# end of function
 
 def is_csv(fname):
     """
@@ -1004,24 +1011,23 @@ def is_csv(fname):
     description:
      This method checks if a file is a csv file.
     """
-    
+
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for an csv file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for an csv file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # get the magic sequence
     #
     magic_str = get_version(fname)
-    
+
     # if the fname's magic sequence
     # is not a csv file's return false
     #
     if magic_str != CSV_VERSION:
         return False
-    
+
     # exit gracefully: it is a csv file
     #
     return True
@@ -1045,28 +1051,27 @@ def is_xml(fname, num_bytes_to_read = FLIST_BSIZE):
     # display debug information
     #
     if dbgl > ndt.BRIEF:
-        print("%s (line: %s) %s::%s: checking for an xml file (%s)" %
-              (__FILE__, ndt.__LINE__, Edf.__CLASS_NAME__, ndt.__NAME__,
-               fname))
+        print("%s (line: %s) %s: checking for an xml file (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
 
     # declare status variables to determine
     # if a file is xml
     #
     status = False
-    
+
     with open(fname, MODE_READ_BINARY) as fp:
-        
+
         # read first n bytes
         #
         barray = fp.read(num_bytes_to_read)
-        
+
         # create status helper variables
         #
         has_greator_than = False
         has_less_than = False
         has_less_than_slash = False
         has_slash_greator_than = False
-        
+
         # determine if barray has a greater than symbol
         #
         if DELIM_GREATTHAN.encode() in barray:
@@ -1089,7 +1094,7 @@ def is_xml(fname, num_bytes_to_read = FLIST_BSIZE):
 
         status = has_greator_than and has_less_than \
             and (has_less_than_slash or has_slash_greator_than)
-        
+
     # exit gracefully
     #
     return status
@@ -1098,21 +1103,21 @@ def is_xml(fname, num_bytes_to_read = FLIST_BSIZE):
 
 #------------------------------------------------------------------------------
 #
-# functions listed here: manipulate directories 
+# functions listed here: manipulate directories
 #
 #------------------------------------------------------------------------------
 
 def make_dirs(dirlist):
     """
     function: make_dirs
-    
+
     arguments:
      dirlist - the list of directories to create
 
-    return: 
+    return:
      none
 
-    description: 
+    description:
      This function creates all the directories in a given list
     """
 
@@ -1139,16 +1144,16 @@ def make_dirs(dirlist):
 def make_dir(path):
     """
     function: make_dir
-    
+
     arguments:
      path: new directory path (input)
      none
 
-    return: 
+    return:
      a boolean value indicating status
      none
 
-    description: 
+    description:
      This function emulates the Unix command "mkdir -p". It creates
      a directory tree, recursing through each level automatically.
      If the directory already exists, it continues past that level.
@@ -1181,17 +1186,17 @@ def make_dir(path):
 def get_dirs(flist, odir=DELIM_NULL, rdir=DELIM_NULL, oext=None):
     """
     function: get_dirs
-    
+
     arguments:
      flist: list of files
      odir: output directory
      rdir: replace directory
      oext: output extension
 
-    return: 
+    return:
      set of unique directory paths
 
-    description: 
+    description:
      This function returns a set containing unique directory paths
      from a given file list. This is done by replacing the rdir
      with odir and adding the base directory of the fname to the set
@@ -1247,7 +1252,7 @@ def get_kv_pair(input_str):
      key:value pair value. This function supports key:single-value pairs and
      key:list pairs
     """
-    
+
     # split the current key into key and value parts
     #
     parts = input_str.split(DELIM_EQUAL)
@@ -1265,7 +1270,7 @@ def get_kv_pair(input_str):
     #
     if ((parts[1].startswith(DELIM_QUOTE) and parts[1].endswith(DELIM_QUOTE)) \
     or (parts[1].startswith(DELIM_SQUOTE) and parts[1].endswith(DELIM_SQUOTE))):
-        
+
         value = parts[1].strip("'").strip('"')
 
     # if the value is not surrounded by quotes, determine the value as a list
@@ -1274,7 +1279,7 @@ def get_kv_pair(input_str):
     else:
 
         # split the value using regex. this expression will split the value string
-        # into lists if there are commas present. if the commas are inside of 
+        # into lists if there are commas present. if the commas are inside of
         # parenthesis they will not be counted
         #
         parts[1] = re.split(r',\s*(?![^()]*\))', parts[1])
@@ -1284,7 +1289,7 @@ def get_kv_pair(input_str):
         #
         if len(parts[1]) <= 1:
             value = parts[1][0].strip()
-        
+
         # if there is more than one string in the value list, return the key
         # value pair as a list of strings
         #
@@ -1300,18 +1305,17 @@ def get_kv_pair(input_str):
 def load_parameters(pfile, keyword):
     """
     function: load_parameters
-    
+
     arguments:
-     pfile: path of a parameter file
+     pfile: path of a parameter file in TOML format
      keyword: a parameter that has a section or a single value
 
-    return: 
+    return:
      values: a dict, containing the value/s of the specified parameter
 
-    description: 
+    description:
      This function reads a specified parameter file and reads the specified
-     parameter into a Python dictionary object. This function works on parameter
-     'blocks' as well as single value parameters.
+     parameter into a Python dictionary object.
     """
 
     # display informational message
@@ -1320,124 +1324,38 @@ def load_parameters(pfile, keyword):
         print("%s (line: %s) %s: loading (%s %s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, pfile, keyword))
 
-    # declare local variables
+        # display informational message
     #
-    values = {}
+    if dbgl == ndt.FULL:
+        print("%s (line: %s) %s: loading (%s %s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, pfile, keyword))
 
-    # make sure the file is a parameter file
-    #
-    if get_version(pfile) != PFILE_VERSION:
-        return None
-
-    # open the file
-    #
-    try: 
-        fp = open(pfile, MODE_READ_TEXT) 
-    except ioerror: 
+    try:
+        with open(pfile, "rb") as f:
+            values = tomllib.load(f)
+    except FileNotFoundError:
         print("Error: %s (line: %s) %s: file not found (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, pfile))
         return None
 
-    # loop over all lines in the file
-    #
-    flag_pblock = False
-    for line in fp:
-
-        # initialize empty value for each line
-        value = ""
-        
-        # remove white spaces at the edges of the string
-        #
-        if DELIM_EQUAL in line:
-            value = line.split(DELIM_EQUAL)[1]
-            value = value.strip()
-            
-        # remove white spaces unless string starts with quotes
-        #
-        if ((value.startswith(DELIM_QUOTE) and value.endswith(DELIM_QUOTE)) \
-        or value.startswith(DELIM_SQUOTE) and value.endswith(DELIM_SQUOTE)):
-            
-            str = line
-
-        else:
-            str = line.replace(DELIM_SPACE, DELIM_NULL) \
-                        .replace(DELIM_NEWLINE, DELIM_NULL) \
-                        .replace(DELIM_TAB, DELIM_NULL)
-
-        # throw away commented and blank lines
-        #
-        if ((str.startswith(DELIM_COMMENT) == True) or (len(str) == 0)):
-            pass
-
-        # if the block starts with the given keyword, flag the current block
-        #
-        elif (str.startswith(keyword) == True):
-
-            # if the keyword contains a block, flag the block
-            #
-            if (DELIM_BOPEN in str):
-                flag_pblock = True
-
-            # if the keyword is only a single value, return the single value
-            #
-            elif (DELIM_EQUAL in str):
-
-                # get the key value pair for the current line and add it to the
-                # "values" dictionary
-                #
-                key, value = get_kv_pair(str)
-                values[key] = value
-
-                # exit gracefully
-                #
-                fp.close()
-                return values
-
-
-        # if the block is closed with the "}" character, return the found values
-        #
-        elif ((flag_pblock == True) and (DELIM_BCLOSE in str)):
-
-            # exit gracefully
-            #
-            fp.close()
-            return values
-
-        # if the current block is flagged
-        #
-        elif (flag_pblock == True):
-
-            # get the key value pair for the current line and add it to the
-            # "values" dictionary
-            #
-            key, value = get_kv_pair(str)
-            values[key] = value
-
-    # make sure we found a block
-    #
-    if flag_pblock == False:
-        fp.close()
-        print("Error: %s (line: %s) %s: invalid parameter file (%s)" %
-              (__FILE__, ndt.__LINE__, ndt.__NAME__, pfile))
+    if keyword not in values:
+        print("Error: %s (line: %s) %s: keyword not found (%s)" %
+              (__FILE__, ndt.__LINE__, ndt.__NAME__, keyword))
         return None
 
-    # exit gracefully
-    #
-    return values
-#                                                                          
-# end of function
+    return values[keyword]
 
 def generate_map(pblock):
     """
     function: generate_map
-    
+
     arguments:
      pblock: a dictionary containing a parameter block
 
-    return: 
+    return:
      pmap: a parameter file map
 
-    description: 
+    description:
      This function converts a dictionary returned from load_parameters to
      a dictionary containing a parameter map. Note that is lowercases the
      map so that text is normalized.
@@ -1469,14 +1387,14 @@ def generate_map(pblock):
 def permute_map(map):
     """
     function: permute_map
-    
+
     arguments:
      map: the input map
 
-    return: 
+    return:
      pmap: an inverted map
 
-    description: 
+    description:
      this function permutes a map so symbol lookups can go fast.
     """
 
@@ -1497,9 +1415,9 @@ def permute_map(map):
     for sym in map:
         for event in map[sym]:
             pmap[event] = sym
- 
-    # exit gracefully                                                     
-    #                                                                      
+
+    # exit gracefully
+    #
     return pmap
 #
 # end of function
@@ -1507,15 +1425,15 @@ def permute_map(map):
 def map_events(elist, pmap):
     """
     function: map_events
-    
+
     arguments:
      elist: a list of events
      pmap: a permuted map (look up symbols to be converted)
 
-    return: 
+    return:
      mlist: a list of mapped events
 
-    description: 
+    description:
      this function maps event labels to mapped values.
     """
 
@@ -1543,9 +1461,9 @@ def map_events(elist, pmap):
         # increment the counter
         #
         i += int(1)
- 
-    # exit gracefully                                                     
-    #                                                                      
+
+    # exit gracefully
+    #
     return mlist
 #
 # end of function
@@ -1553,14 +1471,14 @@ def map_events(elist, pmap):
 def get_version(fname):
     """
     function: get_version
-    
+
     arguments:
      fname: input filename
 
-    return: 
+    return:
      a string containing the type
 
-    description: 
+    description:
      this function opens a file, reads the magic sequence and returns
      the string.
     """
@@ -1573,9 +1491,9 @@ def get_version(fname):
 
     # open the file
     #
-    try: 
-        fp = open(fname, MODE_READ_TEXT) 
-    except IOError: 
+    try:
+        fp = open(fname, MODE_READ_TEXT)
+    except IOError:
         print("%s (line: %s) %s: file not found (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return None
@@ -1583,7 +1501,7 @@ def get_version(fname):
     # define version value
     #
     ver = None
-    
+
     # iterate over lines until we find the magic string
     #
     for line in fp:
@@ -1596,7 +1514,7 @@ def get_version(fname):
         #
         if line.startswith(DEF_VERSION) or line.startswith(FMT_XML_VERSION) \
             or line.startswith(DELIM_COMMENT + DELIM_SPACE + DEF_VERSION):
-            
+
             # only get version value after "version"
             #  for example, xxx_v1.0.0
             #
@@ -1607,7 +1525,7 @@ def get_version(fname):
             #  remove "" if has
             #
             ver = ver.replace(DELIM_QUOTE, DELIM_NULL)
-            
+
             # break after we find the version
             #
             break
@@ -1615,7 +1533,7 @@ def get_version(fname):
     # close the file
     #
     fp.close()
-    
+
     # substring "version" not found
     #
     if (ver is None):
@@ -1624,7 +1542,7 @@ def get_version(fname):
     # exit gracefully
     #
     return ver
-#                                                                          
+#
 # end of function
 
 #------------------------------------------------------------------------------
@@ -1636,24 +1554,24 @@ def get_version(fname):
 def extract_comments(fname, cdelim = "#", cassign = "="):
     """
     function: extract_comments
-    
+
     arguments:
      fname : the filename
      cdelim: the character to check for the beginning of the comment
      cassign: the character used the assignment operator in name/value pairs
 
-    return: 
+    return:
      a dict
 
-    description: 
-     this function extract a key-value comments from a file and returns a 
+    description:
+     this function extract a key-value comments from a file and returns a
      dictionary
 
      dict_comments = { "header" : "value" }
      note: everything is a string literal
     """
 
-    # create the regular expression pattern 
+    # create the regular expression pattern
     #
     regex_assign_comment = re.compile(DEF_REGEX_ASSIGN_COMMENT %
                                       (cdelim, cassign),
@@ -1673,9 +1591,9 @@ def extract_comments(fname, cdelim = "#", cassign = "="):
 
     # open the file
     #
-    try: 
-        fp = open(fname, MODE_READ_TEXT) 
-    except IOError: 
+    try:
+        fp = open(fname, MODE_READ_TEXT)
+    except IOError:
         print("%s (line: %s) %s: file not found (%s)" %
               (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
         return None
@@ -1692,7 +1610,7 @@ def extract_comments(fname, cdelim = "#", cassign = "="):
         #
         if not line.startswith(cdelim):
             continue
-        
+
         # extract all of the comments
         #
         assign_comment = re.findall(regex_assign_comment, line)
@@ -1702,7 +1620,7 @@ def extract_comments(fname, cdelim = "#", cassign = "="):
         if assign_comment:
             dict_comments[assign_comment[0][0].strip()] \
                             = assign_comment[0][1].strip()
-        
+
     # close the file
     #
     fp.close()
@@ -1711,5 +1629,5 @@ def extract_comments(fname, cdelim = "#", cassign = "="):
     #
     return dict_comments
 
-#                                                                              
-# end of file 
+#
+# end of file
