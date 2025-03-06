@@ -55,17 +55,16 @@ def get_alg_params():
     # get the default parameter file. do not do this as a global variable
     # because the 'current_app.config' object only works in a route
     #
-    pfile = os.path.join(current_app.config['BACKEND'], 'imld_alg_params.json')
+    pfile = os.path.join(current_app.config['BACKEND'], 'algo_params_v00.toml')
 
-    with open(pfile, 'r') as file:
-        data = json.load(file)
+    # load the algorithm parameters from the file
+    #
+    params = imld.load_params(pfile)
 
-    # Convert data to an OrderedDict to preserve the order of keys
-    ordered_data = OrderedDict(data)
-
-    # Manually serialize the ordered data and return it as JSON
+    # manually serialize the ordered data and return it as JSON
+    #
     return current_app.response_class(
-        json.dumps(ordered_data),  # Serialize ordered data to JSON
+        json.dumps(OrderedDict(params)),
         mimetype='application/json'
     )
 
@@ -75,19 +74,16 @@ def get_data_params():
     # get the default parameter file. do not do this as a global variable
     # because the 'current_app.config' object only works in a route
     #
-    pfile = os.path.join(current_app.config['BACKEND'], 'imld_data_params.json')
+    pfile = os.path.join(current_app.config['BACKEND'], 'data_params_v00.toml')
 
-    with open(pfile, 'r') as file:
-        data = json.load(file)
-
-    # Convert data to an OrderedDict to preserve the order of keys
+    # load the algorithm parameters from the file
     #
-    ordered_data = OrderedDict(data)
+    params = imld.load_params(pfile)
 
     # Manually serialize the ordered data and return it as JSON
     #
     return current_app.response_class(
-        json.dumps(ordered_data),  # Serialize ordered data to JSON
+        json.dumps(OrderedDict(params)),  # Serialize ordered data to JSON
         mimetype='application/json'
     )
 

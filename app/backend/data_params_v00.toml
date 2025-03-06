@@ -1,0 +1,444 @@
+# file: $NEDC_NFC/util/python/nedc_imld/v4.0.0/data_params_v00.toml
+#
+# A parameter file that defines key paramters for data generation.
+#
+
+# set version "inf"ormation
+#
+version = "param_v1.0.0"
+
+# set a list of distribution names
+#
+LIST = [
+    "two_gaussian",
+    "four_gaussian",
+    "overlapping_gaussian",
+    "two_ellipses",
+    "four_ellipses",
+    "rotated_ellipses",
+    "toroidal",
+    "yin_yang"
+]
+
+#------------------------------------------------------------------------------
+#
+# Section 1: gaussian-based distributions
+#
+#------------------------------------------------------------------------------
+
+[two_gaussian]
+    name = "Two Gaussian"
+    dist_name = "two_gaussian"
+    method = "gaussian"
+    [two_gaussian.params]
+        [two_gaussian.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [two_gaussian.params.meancov1.params]
+                [two_gaussian.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [two_gaussian.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [0.5]]
+                [two_gaussian.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+        [two_gaussian.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [two_gaussian.params.meancov2.params]
+                [two_gaussian.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [two_gaussian.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [-0.5]]
+                [two_gaussian.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+
+[four_gaussian]
+    name = "Four Gaussian"
+    dist_name = "four_gaussian"
+    method = "gaussian"
+    [four_gaussian.params]
+        [four_gaussian.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [four_gaussian.params.meancov1.params]
+                [four_gaussian.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_gaussian.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [0.5]]
+                [four_gaussian.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+        [four_gaussian.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [four_gaussian.params.meancov2.params]
+                [four_gaussian.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_gaussian.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [-0.5]]
+                [four_gaussian.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+        [four_gaussian.params.meancov3]
+            name = "Mean and Covariance 3"
+            type = "group"
+            [four_gaussian.params.meancov3.params]
+                [four_gaussian.params.meancov3.params.npts3]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_gaussian.params.meancov3.params.mean3]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [-0.5]]
+                [four_gaussian.params.meancov3.params.cov3]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+        [four_gaussian.params.meancov4]
+            name = "Mean and Covariance 4"
+            type = "group"
+            [four_gaussian.params.meancov4.params]
+                [four_gaussian.params.meancov4.params.npts4]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_gaussian.params.meancov4.params.mean4]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [0.5]]
+                [four_gaussian.params.meancov4.params.cov4]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+
+[overlapping_gaussian]
+    name = "Overlapping Gaussian"
+    dist_name = "overlapping_gaussian"
+    method = "gaussian"
+    [overlapping_gaussian.params]
+        [overlapping_gaussian.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [overlapping_gaussian.params.meancov1.params]
+                [overlapping_gaussian.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [overlapping_gaussian.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.0], [0.0]]
+                [overlapping_gaussian.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+        [overlapping_gaussian.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [overlapping_gaussian.params.meancov2.params]
+                [overlapping_gaussian.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [overlapping_gaussian.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.0], [0.0]]
+                [overlapping_gaussian.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.025, 0.0], [0.0, 0.025]]
+
+[two_ellipses]
+    name = "Two Ellipses"
+    dist_name = "two_ellipses"
+    method = "gaussian"
+    [two_ellipses.params]
+        [two_ellipses.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [two_ellipses.params.meancov1.params]
+                [two_ellipses.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [two_ellipses.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [0.5]]
+                [two_ellipses.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+        [two_ellipses.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [two_ellipses.params.meancov2.params]
+                [two_ellipses.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [two_ellipses.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [-0.5]]
+                [two_ellipses.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+
+[four_ellipses]
+    name = "Four Ellipses"
+    dist_name = "four_ellipses"
+    method = "gaussian"
+    [four_ellipses.params]
+        [four_ellipses.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [four_ellipses.params.meancov1.params]
+                [four_ellipses.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_ellipses.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [0.5]]
+                [four_ellipses.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+        [four_ellipses.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [four_ellipses.params.meancov2.params]
+                [four_ellipses.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_ellipses.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [-0.5]]
+                [four_ellipses.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+        [four_ellipses.params.meancov3]
+            name = "Mean and Covariance 3"
+            type = "group"
+            [four_ellipses.params.meancov3.params]
+                [four_ellipses.params.meancov3.params.npts3]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_ellipses.params.meancov3.params.mean3]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [-0.5]]
+                [four_ellipses.params.meancov3.params.cov3]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+        [four_ellipses.params.meancov4]
+            name = "Mean and Covariance 4"
+            type = "group"
+            [four_ellipses.params.meancov4.params]
+                [four_ellipses.params.meancov4.params.npts4]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [four_ellipses.params.meancov4.params.mean4]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [0.5]]
+                [four_ellipses.params.meancov4.params.cov4]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+
+[rotated_ellipses]
+    name = "Rotated Ellipses"
+    dist_name = "rotated_ellipses"
+    method = "gaussian"
+    [rotated_ellipses.params]
+        [rotated_ellipses.params.meancov1]
+            name = "Mean and Covariance 1"
+            type = "group"
+            [rotated_ellipses.params.meancov1.params]
+                [rotated_ellipses.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [rotated_ellipses.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[-0.5], [0.5]]
+                [rotated_ellipses.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0333, 0], [0, 0.0043]]
+        [rotated_ellipses.params.meancov2]
+            name = "Mean and Covariance 2"
+            type = "group"
+            [rotated_ellipses.params.meancov2.params]
+                [rotated_ellipses.params.meancov2.params.npts2]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [rotated_ellipses.params.meancov2.params.mean2]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.5], [-0.5]]
+                [rotated_ellipses.params.meancov2.params.cov2]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0043, 0], [0,0.0333]]
+
+#------------------------------------------------------------------------------
+#
+# Section 2: non-gaussian-based distributions
+#
+#------------------------------------------------------------------------------
+
+[toroidal]
+    name = "Toroidal"
+    dist_name = "toroidal"
+    method = "toroidal"
+    [toroidal.params]
+        [toroidal.params.npts_ring]
+            name = "Number of Points (Ring)"
+            type = "int"
+            range = [0, "inf"]
+            default = 2000
+        [toroidal.params.inner_outer_rad]
+            name = "Inner and Outer Radius"
+            type = "group"
+            [toroidal.params.inner_outer_rad.params]
+                [toroidal.params.inner_outer_rad.params.inner_rad]
+                    name = "Inner Radius (Ring)"
+                    type = "float"
+                    range = [0, "inf"]
+                    default = 0.650
+                [toroidal.params.inner_outer_rad.params.outer_rad]
+                    name = "Outer Radius (Ring)"
+                    type = "float"
+                    range = [0, "inf"]
+                    default = 0.850
+        [toroidal.params.meancov1]
+            name = "Mean and Covariance (Mass)"
+            type = "group"
+            [toroidal.params.meancov1.params]
+                [toroidal.params.meancov1.params.npts1]
+                    name = "Number of Points"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 10000
+                [toroidal.params.meancov1.params.mean1]
+                    name = "Mean"
+                    type = "matrix"
+                    dimensions = [2, 1]
+                    default = [[0.0], [0.0]]
+                [toroidal.params.meancov1.params.cov1]
+                    name = "Covariance"
+                    type = "matrix"
+                    dimensions = [2, 2]
+                    default = [[0.0083, 0], [0, 0.0083]]
+
+[yin_yang]
+    name = "Yin-Yang"
+    dist_name = "yin_yang"
+    method = "yin_yang"
+    [yin_yang.params]
+        [yin_yang.params.npts_yin]
+            name = "Number of Points (Yin)"
+            type = "int"
+            range = [0, "inf"]
+            default = 5000
+        [yin_yang.params.npts_yang]
+            name = "Number of Points (Yang)"
+            type = "int"
+            range = [0, "inf"]
+            default = 5000
+        [yin_yang.params.radius]
+            name = "Radius"
+            type = "float"
+            range = [0, "inf"]
+            default = 1.5
+        [yin_yang.params.ovlp]
+            name = "Overlap"
+            type = "float"
+            range = [0, 1]
+            default = 0
+        

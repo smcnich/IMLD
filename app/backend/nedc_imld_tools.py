@@ -54,9 +54,7 @@ def check_return(func, *args, **kwargs):
     #
     if res is None or \
     (isinstance(res, (list, tuple)) and any(x is None for x in res)):
-        # raise Exception(capture.getvalue().split(':')[-1].strip().capitalize())
         raise MLToolsError(capture.getvalue())
-    
 
     # exit gracefully
     #
@@ -222,10 +220,11 @@ def train(model:mlt.Alg, data:mltd.MLToolsData):
       the labels generated while calculating the goodness of fit score.    
     '''
 
+    print(model.alg_d.model_d)
+
     # train the model
     #
     check_return(model.train, data)
-    # model.train(data)
 
     # get the performance metrics of the model on the test data
     #
@@ -271,7 +270,8 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
 
     # get the parameter outcomes
     #
-    parameter_outcomes = model.get_info()
+    # parameter_outcomes = model.get_info()
+    parameter_outcomes = ''
 
     # exit gracefully
     #
@@ -344,24 +344,23 @@ def score(model:mlt.Alg, data:mltd.MLToolsData, hyp_labels:list):
 #
 # end of function
 
-def load_alg_params(pfile:str) -> dict:
+def load_params(pfile:str) -> dict:
     '''
-    function: load_alg_params
+    function: load_params
 
     args:
-     pfile (str): the file to load the algorithm parameters from
-     algo (str) : the name of the algorithm to load the parameters
+     pfile (str): the file to load the parameters from
 
     return:
-     params (dict): a dictionary of the algorithm parameters
+     params (dict): a dictionary of the parameters
 
     description:
-     load the algorithm parameters from a file and return them as a dictionary
+     load the parameters from a file and return them as a dictionary
     '''
 
     # load the algorithm parameters from the file
     #
-    algs = load_parameters(pfile, "ALGS")["ALGS"]
+    algs = load_parameters(pfile, "LIST")
 
     # get the parameters for each algorithm
     #

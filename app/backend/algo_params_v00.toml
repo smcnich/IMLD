@@ -1,0 +1,464 @@
+# file: $NEDC_NFC/util/python/nedc_imld/v4.0.0/algo_params_v00.toml
+#
+# A parameter file that defines key paramaters for algorithms.
+#
+
+# set version "inf"ormation
+#
+version = "param_v1.0.0"
+
+# set the list of algorithms
+#
+LIST = [
+    "EUCLIDEAN",
+    "PCA",
+    "LDA",
+    "QDA",
+    "QLDA",
+    "NB",
+    "GMM",
+    "KNN",
+    "KMEANS",
+    "RNF",
+    "SVM",
+    "MLP",
+    "RBM",
+    "TRANSFORMER"
+]
+
+#------------------------------------------------------------------------------
+#
+# Section 1: discriminant-based algorithms
+#
+#------------------------------------------------------------------------------
+
+[EUCLIDEAN]
+    name = "Euclidean Distance"
+    model_name = "EUCLIDEAN"
+    [EUCLIDEAN.params]
+        [EUCLIDEAN.params.weights]
+            name = "Weights"
+            type = "class-based"
+            default = 1
+
+[PCA]
+    name = "Principle Component Analysis (PCA)"
+    model_name = "PCA"
+    [PCA.params]
+        [PCA.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+        [PCA.params.ctype]
+            name = "Covariance Type"
+            type = "select"
+            options = ["full", "diagonal"]
+            default = "full"
+        [PCA.params.center]
+            name = "Center"
+            type = "select"
+            options = ["none", "tied", "untied"]
+            default = "none"
+        [PCA.params.scale]
+            name = "Scale"
+            type = "select"
+            options = ["none", "biased", "unbiased", "empirical"]
+            default = "none"
+        [PCA.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [0, 2] # range for IMLD since its 2D
+            default = 2 # default value for IMLD since its 2D
+
+[LDA]
+    name = "Linear Discriminant Analysis (LDA)"
+    model_name = "LDA"
+    [LDA.params]
+        [LDA.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+        [LDA.params.ctype]
+            name = "Covariance Type"
+            type = "select"
+            options = ["full", "diagonal"]
+            default = "full"
+        [LDA.params.center]
+            name = "Center"
+            type = "select"
+            options = ["none", "tied", "untied"]
+            default = "none"
+        [LDA.params.scale]
+            name = "Scale"
+            type = "select"
+            options = ["none", "biased", "unbiased", "empirical"]
+            default = "none"
+
+[QDA]
+    name = "Quadratic Components Analysis (QDA)"
+    model_name = "QDA"
+    [QDA.params]
+        [QDA.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+        [QDA.params.ctype]
+            name = "Covariance Type"
+            type = "select"
+            options = ["full", "diagonal"]
+            default = "full"
+        [QDA.params.center]
+            name = "Center"
+            type = "select"
+            options = ["none", "tied", "untied"]
+            default = "none"
+        [QDA.params.scale]
+            name = "Scale"
+            type = "select"
+            options = ["none", "biased", "unbiased", "empirical"]
+            default = "none"
+        [QDA.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [0, 2] # range for IMLD since its 2D
+            default = 2 # default value for IMLD since its 2D
+
+[QLDA]
+    name = "Quadratic Linear Discriminant Analysis (QLDA)"
+    model_name = "QLDA"
+    [QLDA.params]
+        [QLDA.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+        [QLDA.params.ctype]
+            name = "Covariance Type"
+            type = "select"
+            options = ["full", "diagonal"]
+            default = "full"
+        [QLDA.params.center]
+            name = "Center"
+            type = "select"
+            options = ["none", "tied", "untied"]
+            default = "none"
+        [QLDA.params.scale]
+            name = "Scale"
+            type = "select"
+            options = ["none", "biased", "unbiased", "empirical"]
+            default = "none"
+
+[NB]
+    name = "Naive Bayes (NB)"
+    model_name = "NB"
+    [NB.params]
+        [NB.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+
+[GMM]
+    name = "Gaussian Mixture Model (GMM)"
+    model_name = "GMM"
+    [GMM.params]
+        [GMM.params.prior]
+            name = "Prior"
+            type = "select"
+            options = ["ml", "map"]
+            default = "ml"
+        [GMM.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [1, 10]
+            default = 1
+        [GMM.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+
+#------------------------------------------------------------------------------
+#
+# Section 2: nonparametric models
+#
+#------------------------------------------------------------------------------
+
+[KNN]
+    name = "K-Nearest Neighbors (KNN)"
+    model_name = "KNN"
+    [KNN.params]
+        [KNN.params.neighbor]
+            name = "Number of Neighbors"
+            type = "int"
+            range = [1, "inf"]
+            default = 1
+
+[KMEANS]
+    name = "K-Means (KMEANS)"
+    model_name = "KMEANS"
+    [KMEANS.params]
+        [KMEANS.params.n_cluster]
+            name = "Number of Clusters"
+            type = "int"
+            range = [1, "inf"]
+            default = 8
+        [KMEANS.params.n_init]
+            name = "Number of Initializations"
+            type = "int"
+            range = [1, "inf"]
+            default = 3
+        [KMEANS.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+        [KMEANS.params.max_iter]
+            name = "Maximum Iterations"
+            type = "int"
+            range = [1, "inf"]
+            default = 100
+
+[RNF]
+    name = "Random Forest (RNF)"
+    model_name = "RNF"
+    [RNF.params]
+        [RNF.params.estimator]
+            name = "Number of Estimators"
+            type = "int"
+            range = [1, "inf"]
+            default = 100
+        [RNF.params.max_depth]
+            name = "Maximum Depth"
+            type = "int"
+            range = [1, "inf"]
+            default = 10
+        [RNF.params.criterion]
+            name = "Criterion"
+            type = "select"
+            options = ["gini", "entropy", "log_loss"]
+            default = "gini"
+        [RNF.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+
+[SVM]
+    name = "Support Vector Machines (SVM)"
+    model_name = "SVM"
+    [SVM.params]
+        [SVM.params.c]
+            name = "Regularization Parameter (c)"
+            type = "float"
+            range = [0, 10000]
+            default = 1.0
+        [SVM.params.gamma]
+            name = "Kernel Coefficient (gamma)"
+            type = "float"
+            range = [0, 10000]
+            default = 0.1
+        [SVM.params.kernel]
+            name = "Kernel"
+            type = "select"
+            options = ["linear", "poly", "rbf", "sigmoid, precomputed"]
+            default = "linear"
+
+#------------------------------------------------------------------------------
+#
+# Section 3: neural network-based models
+#
+#------------------------------------------------------------------------------
+
+[MLP]
+    name = "Multi-Layer Perceptron (MLP)"
+    model_name = "MLP"
+    [MLP.params]
+        [MLP.params.hidden_size]
+            name = "Hidden Size"
+            type = "int"
+            range = [1, "inf"]
+            default = 3
+        [MLP.params.activation]
+            name = "Activation"
+            type = "select"
+            options = ["relu", "identity", "logistic", "tanh"]
+            default = "relu"
+        [MLP.params.solver]
+            name = "Solver"
+            type = "select"
+            options = ["adam", "lbfgs", "sgd"]
+            default = "adam"
+        [MLP.params.batch_size]
+            name = "Batch Size"
+            type = "select"
+            options = ["auto"]
+            default = "auto"
+        [MLP.params.learning_rate]
+            name = "Learning Rate"
+            type = "select"
+            options = ["constant", "invscaling", "adaptive"]
+            default = "constant"
+        [MLP.params.learning_rate_init]
+            name = "Initial Learning Rate"
+            type = "float"
+            range = [0, 1]
+            default = 0.009
+        [MLP.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+        [MLP.params.momentum]
+            name = "Momentum"
+            type = "float"
+            range = [0, 1]
+            default = 0.9
+        [MLP.params.validation_fraction]
+            name = "Validation Fraction"
+            type = "float"
+            range = [0, 1]
+            default = 0.1
+        [MLP.params.max_iter]
+            name = "Maximum Iterations"
+            type = "int"
+            range = [1, "inf"]
+            default = 20
+        [MLP.params.shuffle]
+            name = "Shuffle"
+            type = "select"
+            options = [true, false]
+            default = false
+        [MLP.params.early_stopping]
+            name = "Early Stopping"
+            type = "select"
+            options = [true, false]
+            default = false
+
+[RBM]
+    name = "Restricted Boltzmann Machine (RBM)"
+    model_name = "RBM"
+    [RBM.params]
+        [RBM.params.learning_rate]
+            name = "Learning Rate"
+            type = "float"
+            range = [0, 1]
+            default = 0.1
+        [RBM.params.n_iter]
+            name = "Number of Iterations"
+            type = "int"
+            range = [1, "inf"]
+            default = 5
+        [RBM.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+        [RBM.params.batch_size]
+            name = "Batch Size"
+            type = "int"
+            range = [1, "inf"]
+            default = 32
+        [RBM.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [1, "inf"]
+            default = 200
+
+[TRANSFORMER]
+    name = "Transformer"
+    model_name = "TRANSFORMER"
+    [TRANSFORMER.params]
+        [TRANSFORMER.params.epoch]
+            name = "Epoch"
+            type = "int"
+            range = [1, "inf"]
+            default = 50
+        [TRANSFORMER.params.lr]
+            name = "Learning Rate"
+            type = "float"
+            range = [0, 1]
+            default = 0.001
+        [TRANSFORMER.params.batch_size]
+            name = "Batch Size"
+            type = "int"
+            range = [1, "inf"]
+            default = 32
+        [TRANSFORMER.params.embed_size]
+            name = "Embed Size"
+            type = "int"
+            range = [1, "inf"]
+            default = 32
+        [TRANSFORMER.params.nheads]
+            name = "Number of Heads"
+            type = "int"
+            range = [1, "inf"]
+            default = 2
+        [TRANSFORMER.params.num_layers]
+            name = "Number of Layers"
+            type = "int"
+            range = [1, "inf"]
+            default = 2
+        [TRANSFORMER.params.MLP_dim]
+            name = "MLP Dimension"
+            type = "int"
+            range = [1, "inf"]
+            default = 64
+        [TRANSFORMER.params.dropout]
+            name = "Dropout"
+            type = "float"
+            range = [0, 1]
+            default = 0.1
+
+#------------------------------------------------------------------------------
+#
+# Section 4: quantum computing-based models
+#
+#------------------------------------------------------------------------------
+
+# [QSVM]
+# name = "QSVM"
+# model_name = "qsvm"
+# provider_name = "qiskit"
+# hardware = "cpu"
+# encoder_name = "zz"
+# n_qubits = 4
+# featuremap_reps = 2
+# entanglement = "full"
+# kernel_name = "fidelity"
+# shots = 1024
+
+# [QNN]
+# name = "QNN"
+# model_name = "qnn"
+# provider_name = "qiskit"
+# hardware = "cpu"
+# encoder_name = "zz"
+# n_qubits = 2
+# featuremap_reps = 2
+# ansatz_reps = 2
+# entanglement = "full"
+# ansatz_name = "real_amplitudes"
+# optim_name = "cobyla"
+# optim_max_steps = 50
+# meas_type = "sampler"
+
+# [QRBM]
+# name = "QRBM"
+# model_name = "qrbm"
+# provider_name = "dwave"
+# encoder_name = "bqm"
+# n_hidden = 2
+# shots = 2
+# chain_strength = 2
+# knn_n_neighbors = 2
+
+#------------------------------------------------------------------------------
+#
+# end of file
+#
+#------------------------------------------------------------------------------
+
