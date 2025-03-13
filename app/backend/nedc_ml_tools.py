@@ -3,6 +3,8 @@
 # file: $NEDC_NFC/class/python/nedc_ml_tools/nedc_ml_tools.py
 #
 # revision history:
+# 20250304 (JP): reviewed and refactored
+# 20250228 (AM): added GMM
 # 20250226 (SP): added QSVM, QNN and QRBM classes
 # 20250222 (PM): Moved MLToolsData class to its own file
 # 20250107 (SP): added TRANSFORMER class
@@ -21,19 +23,49 @@
 # This class contains a collection of classes and methods that consolidate
 # some of our most common machine learning algorithms. Currently, we support:
 #
-#  Principle Component Analysis (PCA)
-#  Quadratic Discriminant Analysis (QDA)
-#  Linear Discriminate Analysis class independent (LDA)
-#  Linear Discriminate Analysis class dependent (QLDA)
+#  Discriminant-Based Algorithms:
+#   Euclidean Distance (EUCLIDEAN)
+#   Principle Component Analysis (PCA)
+#   Linear Discriminate Analysis (LDA)
+#   Quadratic Discriminant Analysis (QDA)
+#   Linear Discriminate Analysis class dependent (QLDA)
+#   Naive Bayes (NB)
+#   Gaussian Mixture Models (GMM)
+#
+#  Nonparametric Models:
+#   K-Nearest Neighbor (KNN)
+#   KMEANS Clustering (KMEANS)
+#   Random Forests (RNF)
+#   Support Vector Machines (SVM)
+#
+#  Neural Network Models:
+#   Multilayer Perceptron (MLP)
+#   Restricted Boltzmann Machine (RBM)
+#   Transformer (TRANSFORMER)
+#
+#  Quantum Computing-Based Models:
+#   Quantum Support Vector Machies (QSVM)
+#   Quantum Neural Network (QNN)
+#   Quantum Restricted Boltzmann Machine (QRBM)
 #
 # in this class. These are accessed through a wrapper class called Algorithm.
 #
 # The implementations that are included here are a mixture of things found
 # in the statistical package JMP, the Python machine learning library
 # scikit-learn and the ISIP machine learning demo, IMLD.
+#
+# Example Usage:
+#  This is an example of how to use this class to load and classify data
+#   alg = Alg()
+#   alg.set(LDA_NAME)
+#   alg.load_parameters("params_v00.toml")
+#   data = MLToolsData("data.csv")
+#   score, model = alg.train(data)
+#   labels, post = alg.predict(data)
+#
 #------------------------------------------------------------------------------
 
-# import required system modules
+# import required system modules (basic)
 #
 from collections import defaultdict
 import datetime as dt
@@ -41,23 +73,24 @@ import numpy as np
 import pickle
 import os
 import sys
+
+# import required system modules (machine learning)
+#
 from imblearn.metrics import sensitivity_score, specificity_score
-from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import (silhouette_score,
-                            classification_report,
-                            precision_score,
-                            accuracy_score, f1_score)
-from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.mixture import GaussianMixture
-from sklearn.svm import SVC
+
 from sklearn.cluster import KMeans
-from sklearn.neural_network import MLPClassifier, BernoulliRBM
-from sklearn.metrics import f1_score
-from sklearn.neural_network import BernoulliRBM
-from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestClassifier
 from sklearn import linear_model
+from sklearn.metrics import (accuracy_score, classification_report, f1_score,
+                             precision_score, silhouette_score)
+from sklearn.metrics import confusion_matrix as sklearn_confusion_matrix
+from sklearn.mixture import GaussianMixture
+from sklearn.naive_bayes import GaussianNB
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.neural_network import (MLPClassifier, BernoulliRBM)
+from sklearn.pipeline import Pipeline
+from sklearn.svm import SVC
+
 import torch
 
 # import required NEDC modules
@@ -69,17 +102,6 @@ import nedc_trans_tools as ntt
 import nedc_qml_tools as nqt
 from nedc_ml_tools_data import MLToolsData
 
-#---------------------------- Example -----------------------------------------
-# alg = Alg()
-# alg.set(LDA_NAME)
-# alg.load_parameters("params_00.txt")
-#
-# data = MLToolsData("data.csv")
-#
-# score, model = alg.train(data)
-# labels, post = alg.predict(data)
-#------------------------------------------------------------------------------
-
 #------------------------------------------------------------------------------
 #
 # global variables are listed here
@@ -90,840 +112,704 @@ from nedc_ml_tools_data import MLToolsData
 #
 __FILE__ = os.path.basename(__file__)
 
-DATA_LABELS = "labels"
-DATA_DATA = "data"
-
-DEF_TRAIN_LABELS_FNAME = "train_labels.csv"
-
-# define the names of keys in dictionaries that are used to access parameters:
-#  these are common across all algorithms. a parameter dictionary has
-#  two keys (name and param). a model dictionary has two keys (name and model).
+# define names that appear in all algorithms
 #
-ALG_PRIORS_ML = "ml"
-ALG_PRIORS_MAP = "map"
+ALG_NAME_ALG = "algorithm_name"
+ALG_NAME_IMP = "implementation_name"
+ALG_NAME_MDL = "model"
 
-ALG_PRM_KEY_NAME = "name"
-ALG_PRM_KEY_PARAM = "params"
-ALG_PRM_KEY_PRIOR = "prior"
-ALG_PRM_KEY_WEIGHTS = "weights"
-
-
-ALG_MDL_KEY_NAME = ALG_PRM_KEY_NAME
-ALG_MDL_KEY_MODEL = "model"
-ALG_MDL_KEY_MEANS = "means"
-ALG_MDL_KEY_COV = "covariance"
-ALG_MDL_KEY_PRIOR = "prior"
-ALG_MDL_KEY_TRANS = "transform"
-ALG_MDL_KEY_EVAL = "eigen_value"
-ALG_MDL_KEY_MAPPING_LABEL = "mapping_label"
-
-ALG_MDL_KEY_CLASS_MODELS = "class_models"
-ALG_MDL_KEY_CLASS_LABELS = "class_labels"
-
+# define common names that appear in many, but not all,
+# algorithms (listed alphabetically)
+#
+ALG_NAME_BSIZE = "batch_size"
+ALG_NAME_CMODELS = "class_models"
+ALG_NAME_CLABELS = "class_labels"
+ALG_NAME_COV = "covariance"
+ALG_NAME_DSCR = "discriminant"
+ALG_NAME_EIGV = "eigenvalue"
+ALG_NAME_HDW = "hardware"
+ALG_NAME_LR = "learning_rate"
+ALG_NAME_LRINIT = "learning_rate_init"
+ALG_NAME_MAXITER = "max_iters"
+ALG_NAME_MEANS = "means"
+ALG_NAME_NCMP = "n_components"
+ALG_NAME_NNEARN = "k_nearest_neighbors"
+ALG_NAME_NLAYERS = "num_layers"
+ALG_NAME_PRIORS = "priors"
+ALG_NAME_PRIORS_MAP = "map"
+ALG_NAME_PRIORS_ML = "ml"
+ALG_NAME_PROVIDER = "provider_name"
+ALG_NAME_RANDSTATE = "random_state"
+ALG_NAME_TRANS = "transform"
+ALG_NAME_WEIGHTS = "weights"
+ALG_NAME_RANDOM = "random_state"
 
 # define formats for generating a scoring report
 #
-ALG_SCL_PCT = float(100.0)
-
+ALG_FMT_DEC = ".4f"
 ALG_FMT_DTE = "Date: %s%s"
-ALG_FMT_LBL = "%06d"
 ALG_FMT_ERR = "%012s %10.2f%%"
-ALG_FMT_WLB = "%10s"
+ALG_FMT_LBL = "%06d"
+ALG_FMT_PCT = float(100.0)
 ALG_FMT_WCL = "%6d"
+ALG_FMT_WLB = "%10s"
 ALG_FMT_WPC = "%6.2f"
 ALG_FMT_WST = "%6d (%6.2f%%)"
-ALG_FMT_DEC = ".4f"
 
-#------------------------------------------------------------------------------
-# Alg = PCA: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-PCA_NAME = "PCA"
-
-# the parameter block for PCA looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'PCA',
-#   'params': {
-#                'name': 'PCA',
-#               'prior': 'ml',
-#               'ctype': 'full',
-#              'center': 'None',
-#               'scale': 'biased'
-#   }
-#  })
-#
-# Define the keys for these parameters. The keys ("name" and "params") are
-# the same across all algorithms. The actual parameters are contained
-# in a sub-dictionary that has keys specific to that algorithm.
-#
-PCA_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-PCA_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-PCA_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-PCA_PRM_KEY_CTYPE = nct.PRM_CTYPE
-PCA_PRM_KEY_CENTER = nct.PRM_CENTER
-PCA_PRM_KEY_SCALE = nct.PRM_SCALE
-PCA_PRM_KEY_COMP ='n_components'
-
-# The model for PCA contains:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'PCA',
-#   'model': {
-#               'prior': numpy array,
-#         '      means': list,
-#          'covariance': matrix
-#   }
-#  })
-#
-# Define the keys for these model parameters. The first key, name, is the same
-# across all algorithms. The actual parameters are contained in
-# a sub-dictionary that has keys specific to that algorithm.
-#
-PCA_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-PCA_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-PCA_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
-PCA_MDL_KEY_MEANS = ALG_MDL_KEY_MEANS
-PCA_MDL_KEY_TRANS = ALG_MDL_KEY_TRANS
-PCA_MDL_KEY_COV = ALG_MDL_KEY_COV
-PCA_MDL_KEY_EVAL = ALG_MDL_KEY_EVAL
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = QDA: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-QDA_NAME = "QDA"
-
-# the parameter block for QDA looks like this:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'QDA',
-#    'params': {
-#                'name': 'QDA',
-#               'prior': 'ml',
-#               'ctype': 'full',
-#              'center': 'None',
-#               'scale': 'biased'
-#    }
-#   })
-#
-# Define the keys for these parameters.
-#
-QDA_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-QDA_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-QDA_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-QDA_PRM_KEY_CTYPE = nct.PRM_CTYPE
-QDA_PRM_KEY_CENTER = nct.PRM_CENTER
-QDA_PRM_KEY_SCALE = nct.PRM_SCALE
-QDA_PRM_KEY_COMP ='n_components'
-
-# The model for QDA contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'QDA',
-#    'model': {
-#               'prior': numpy array,
-#               'means': list,
-#          'covariance': matrix
-#   }
-#  })
-#
-# Define the keys for these model parameters.
-#
-QDA_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-QDA_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-QDA_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
-QDA_MDL_KEY_MEANS = ALG_MDL_KEY_MEANS
-QDA_MDL_KEY_COV = ALG_MDL_KEY_COV
-QDA_MDL_KEY_TRANS = ALG_MDL_KEY_TRANS
-QDA_MDL_KEY_EVAL = ALG_MDL_KEY_EVAL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = LDA: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-LDA_NAME = "LDA"
-
-# the parameter block for LDA looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'LDA',
-#   'params': {
-#                'name': 'LDA',
-#               'prior': 'ml',
-#               'ctype': 'full',
-#              'center': 'None',
-#               'scale': 'None'
-#    }
-#  })
-#
-#
-# Define the keys for these parameters.
-#
-LDA_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-LDA_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-LDA_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-LDA_PRM_KEY_CTYPE = nct.PRM_CTYPE
-LDA_PRM_KEY_CENTER = nct.PRM_CENTER
-LDA_PRM_KEY_SCALE = nct.PRM_SCALE
-
-# The model for LDA contains:
-#
-#   defaultdict(<class 'dict'>, {
-#   'name': 'LDA',
-#   'model': {
-#               'prior': numpy array,
-#               'means': list,
-#           'transform': matrix
-#   }
-#  })
-#
-# Define the keys for these model parameters.
-#
-LDA_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-LDA_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-LDA_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
-LDA_MDL_KEY_MEANS = ALG_MDL_KEY_MEANS
-LDA_MDL_KEY_TRANS = ALG_MDL_KEY_TRANS
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = QLDA: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-QLDA_NAME = "QLDA"
-
-# the parameter block for QLDA contains:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'QLDA',
-#   'params': {
-#                'name': 'QLDA',
-#               'prior': 'ml',
-#               'ctype': 'full',
-#              'center': 'None',
-#               'scale': 'None'
-#   }
-#  })
-#
-# define the keys for these parameters. the keys ("name" and "params"), are
-# the same across all algorithms. the actual parameters are contained
-# in a sub-dictionary that has keys specific to that algorithm.
-#
-QLDA_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-QLDA_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-QLDA_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-QLDA_PRM_KEY_CTYPE = nct.PRM_CTYPE
-QLDA_PRM_KEY_CENTER = nct.PRM_CENTER
-QLDA_PRM_KEY_SCALE = nct.PRM_SCALE
-
-# The model for QLDA contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'QLDA',
-#    'model': {
-#               'prior': numpy array,
-#               'means': list,
-#           'transform': matrix
-#   }
-#  })
-#
-# Define the keys for these model parameters.
-#
-QLDA_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-QLDA_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-QLDA_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
-QLDA_MDL_KEY_MEANS = ALG_MDL_KEY_MEANS
-QLDA_MDL_KEY_TRANS = ALG_MDL_KEY_TRANS
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = NB: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-NB_NAME = "NB"
-
-# the parameter block for NB looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'NB',
-#   'params': {
-#                'name': 'NB',
-#               'prior': 'ml'
-#             'average': 'None'
-#         'multi_class': 'ovr'
-#    }
-#  })
-NB_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-NB_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-NB_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-
-# The model for NB contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'NB',
-#    'model': Sklearn.NB.Model
-#  })
-#
-# Define the keys for these parameters.
-#
-NB_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-NB_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = EUCLIDEAN: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-EUCLIDEAN_NAME = "EUCLIDEAN"
-
-# the parameter block for EUCLIDEAN looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'EUCLIDEAN',
-#   'params': {
-#                'name': 'EUCLIDEAN',
-#             'weights': list
-#    }
-#  })
-EUCLIDEAN_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-EUCLIDEAN_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-EUCLIDEAN_PRM_KEY_WEIGHTS = ALG_PRM_KEY_WEIGHTS
-
-# The model for EUCLIDEAN contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'EUCLIDEAN',
-#    'model' {
-#                'means': list,
-#    }
-#  })
-#
-# Define the keys for these parameters.
-#
-EUCLIDEAN_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-EUCLIDEAN_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-EUCLIDEAN_MDL_KEY_MEANS = ALG_MDL_KEY_MEANS
-
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = KNN: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-KNN_NAME = "KNN"
-
-# the parameter block for NB looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'KNN',
-#   'params': {
-#                 'name': 'KNN',
-#             'neighbor': 1
-#    }
-#  })
-
-KNN_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-KNN_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-KNN_PRM_KEY_NEIGHB = "neighbor"
-
-# The model for KNN contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'KNN',
-#    'model': Sklearn KNN Model
-#  })
-#
-KNN_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-KNN_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = RNF: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-RNF_NAME = "RNF"
-
-# the parameter block for NB looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'RNF',
-#   'params': {
-#                 'name': 'RNF',
-#          'n_estimator': 1,
-#            'max_depth': 5,
-#            'criterion': 'gini'
-#    }
-#  })
-
-RNF_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-RNF_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-RNF_PRM_KEY_ESTIMATOR = "estimator"
-RNF_PRM_KEY_CRITERION = "criterion"
-RNF_PRM_KEY_MAXDEPTH  = 'max_depth'
-RNF_PRM_KEY_RANDOM = 'random_state'
-
-# The model for RNF contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'RNF',
-#    'model': Sklearn RNF Model
-#  })
-#
-RNF_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-RNF_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = SVM: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-SVM_NAME = "SVM"
-
-# the parameter block for SVMlooks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'SVM ,
-#   'params': {
-#                 'name': 'SVM',
-#                    'C': 1,
-#                'gamma': 0.1,
-#               'kernel': 'linear'
-#    }
-#  })
-
-SVM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-SVM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-SVM_PRM_KEY_C = "c"
-SVM_PRM_KEY_GAMMA = "gamma"
-SVM_PRM_KEY_KERNEL = 'kernel'
-
-# The model for SVM contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'SVM',
-#    'model': Sklearn SVM Model
-#  })
-#
-SVM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-SVM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = SVM: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-MLP_NAME = "MLP"
-
-# the parameter block for SVMlooks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'MLP ,
-#   'params': {
-#                 'name': 'MLP',
-#          'hidden_size': 3,
-#           'activation': 'relu',
-#               'solver': 'adam',
-#            'batch_size: 'auto',
-#         'learning_rate: 'constant',
-#         'random_state': 0,
-#    'learning_rate_init: 0.001,
-#        'early_stopping: False,
-#               'shuffle: True,
-#   'validation_fraction: 0.1,
-#             'momentum': 0.9
-#             'max_iter': 200
-#    }
-#  })
-
-MLP_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-MLP_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-MLP_PRM_KEY_HSIZE = "hidden_size"
-MLP_PRM_KEY_ACT = "activation"
-MLP_PRM_KEY_SOLVER = "solver"
-MLP_PRM_KEY_BSIZE = "batch_size"
-MLP_PRM_KEY_LR = "learning_rate"
-MLP_PRM_KEY_RANDOM = "random_state"
-MLP_PRM_KEY_LRINIT = "learning_rate_init"
-MLP_PRM_KEY_STOP = "early_stopping"
-MLP_PRM_KEY_SHUFFLE = "shuffle"
-MLP_PRM_KEY_VAL = "validation_fraction"
-MLP_PRM_KEY_MOMENTUM = "momentum"
-MLP_PRM_KEY_MITER = "max_iter"
-
-# The model for MLP contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'MLP',
-#    'model': Sklearn MLP Model
-#  })
-#
-MLP_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-MLP_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = KMEANS: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-KMEANS_NAME = "KMEANS"
-
-# the parameter block for KMEANS looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'KMEANS"
-#   'params': {
-#               'name': 'KMEANS',
-#          'n_cluster': 2,
-#             'n_init': 3,
-#       'random_state': 0,
-#           'max_iter': 100
-#    }
-#  })
-
-KMEANS_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-KMEANS_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-KMEANS_PRM_KEY_NCLUSTER = "n_cluster"
-KMEANS_PRM_KEY_NINIT = "n_init"
-KMEANS_PRM_KEY_RANDOM = "random_state"
-KMEANS_PRM_KEY_MITER = "max_iter"
-
-# The model for KMEANS contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'KMEANS',
-#    'model': Sklearn KMEANS Model
-#  })
-#
-KMEANS_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-KMEANS_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
-
-#------------------------------------------------------------------------------
-# Alg = RBM: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-RBM_NAME = "RBM"
-
-# the parameter block for RBM looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'RBM"
-#   'params': {
-#               'name': 'RBM',
-#       'n_components': 2,
-#      'learning_rate': 3,
-#         'batch_size': 0,
-#             'n_iter': 100,
-#            'verbose': 0,
-#       'random_state': None
-#    }
-#  })
-
-RBM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-RBM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-RBM_PRM_KEY_COMP = "n_components"
-RBM_PRM_KEY_NITER = "n_iter"
-RBM_PRM_KEY_RANDOM = "random_state"
-RBM_PRM_KEY_LR = "learning_rate"
-RBM_PRM_KEY_BSIZE = "batch_size"
-RBM_PRM_KEY_VERBOSE = "verbose"
-RBM_PRM_KEY_CLASSIF ="classifier"
-
-# The model for RBM contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'RBM',
-#    'model': Sklearn RBM Model
-#  })
-#
-RBM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-RBM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-
-#------------------------------------------------------------------------------
-# Alg = TRANSFORMER: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-TRANSFORMER_NAME = "TRANSFORMER"
-
-# the parameter block for TRANSFORMER looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'TRANSFORMER"
-#   'params': {
-#                name : TRANSFORMER
-#               epoch : 50
-#                  lr : 0.001
-#          batch_size : 32
-#          embed_size : 32
-#              nheads : 2
-#          num_layers : 2
-#             MLP_dim : 64
-#             dropout : 0.1
-#    }
-#  })
-
-TRANS_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-TRANS_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-TRANS_PRM_KEY_EPOCH = "epoch"
-TRANS_PRM_KEY_LR = "lr"
-TRANS_PRM_KEY_BSIZE = "batch_size"
-TRANS_PRM_KEY_EMBED_SIZE = "embed_size"
-TRANS_PRM_KEY_NHEADS = "nheads"
-TRANS_PRM_KEY_NLAYERS = "num_layers"
-TRANS_PRM_KEY_MLP_DIM = "MLP_dim"
-TRANS_PRM_KEY_DROPOUT = "dropout"
-
-# The model for TRANSFORMER contains:
-# {'name': 'TRANSFORMER', 'model':
-# defaultdict(None, {'name': 'TRANSFORMER, 'model': OrderedDict([
-#     ('input_embedding.weight', tensor([32, 2])),
-#     ('input_embedding.bias', tensor(32)),
-#     ('encoder.layers.0.self_attention_block.w_q.weight', tensor([32, 32])),
-#     ('encoder.layers.0.self_attention_block.w_q.bias', tensor(32)),
-#     ('encoder.layers.0.self_attention_block.w_k.weight', tensor([32, 32])),
-#     ('encoder.layers.0.self_attention_block.w_k.bias', tensor(32)),
-#     ...
-#     ('encoder.norm.alpha', tensor([0.9810])),
-#     ('encoder.norm.beta', tensor([0.9940])),
-#     ('classifier.weight', tensor([2, 32])),
-#     ('classifier.bias', tensor([ 0.0642, -0.1198]))
-# ])})
-TRANS_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-TRANS_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-
-#------------------------------------------------------------------------------
-# Alg = QSVM: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-QSVM_NAME = "QSVM"
-
-# the parameter block for QSVM looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'QSVM"
-#   'params': {
-#               name          : QSVM
-#               model_name    : qsvm
-#               provider_name : qiskit
-#               hardware      : cpu
-#               encoder_name  : zz
-#               kernel_name   : fidelity
-#               entanglement  : full
-#               reps          : 2
-#               n_qubits      : 4
-#               shots         : 1024
-#    }
-#  })
-
-# define quantum ML algorithms related common parameters keys
-#
-QML_PRM_KEY_MDL_NAME = "model_name"
-QML_PRM_KEY_PROVIDER = "provider_name"
-QML_PRM_KEY_HARDWARE = "hardware"
-QML_PRM_KEY_ENCODER = "encoder_name"
-QML_PRM_KEY_ENTANGLEMENT = "entanglement"
-QML_PRM_KEY_FEAT_REPS = "featuremap_reps"
-QML_PRM_KEY_ANSATZ_REPS = "ansatz_reps"
-QML_PRM_KEY_NQUBITS = "n_qubits"
-QML_PRM_KEY_SHOTS = "shots"
-
-# define QSVM algorithms related common model keys
-#
-QSVM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-QSVM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-QSVM_PRM_KEY_PROVIDER = QML_PRM_KEY_PROVIDER
-QSVM_PRM_KEY_HARDWAR = QML_PRM_KEY_HARDWARE
-QSVM_PRM_KEY_ENCODER = QML_PRM_KEY_ENCODER
-QSVM_PRM_KEY_ENTANGLEMENT = QML_PRM_KEY_ENTANGLEMENT
-QSVM_PRM_KEY_NQUBITS = QML_PRM_KEY_NQUBITS
-QSVM_PRM_KEY_FEAT_REPS = QML_PRM_KEY_FEAT_REPS
-QSVM_PRM_KEY_ANSATZ_REPS = QML_PRM_KEY_ANSATZ_REPS
-QSVM_PRM_KEY_MDL_NAME = QML_PRM_KEY_MDL_NAME
-QSVM_PRM_KEY_SHOTS = QML_PRM_KEY_SHOTS
-QSVM_PRM_KEY_KERNEL = "kernel_name"
-
-# The model for QSVM contains:
-# {'name': 'QSVM', 'model':
-# defaultdict(None, {'name': 'QSVM, 'model': <nedc_qml_tools.QSVM object at
-# 0x7f887741a1d0>})
-#
-QSVM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-QSVM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-
-#------------------------------------------------------------------------------
-# Alg = QNN: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-QNN_NAME = "QNN"
-
-# the parameter block for QNN looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'QNN"
-#   'params': {
-#               name             : QNN
-#               model_name       : qnn
-#               provider_name    : qiskit
-#               encoder_name     : zz
-#               ansatz_name      : real_amplitudes
-#               hardware         : COBYLA
-#               optim_name       : COBYLA
-#               optim_max_steps  : 50
-#               entanglement     : full
-#               reps             : 2
-#               n_qubits         : 2
-#               meas_type        : sampler
-#    }
-#  })
-
-
-# define QSVM algorithms related common model keys
-#
-QNN_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-QNN_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-QNN_PRM_KEY_PROVIDER = QML_PRM_KEY_PROVIDER
-QNN_PRM_KEY_HARDWAR = QML_PRM_KEY_HARDWARE
-QNN_PRM_KEY_ENCODER = QML_PRM_KEY_ENCODER
-QNN_PRM_KEY_ENTANGLEMENT = QML_PRM_KEY_ENTANGLEMENT
-QNN_PRM_KEY_NQUBITS = QML_PRM_KEY_NQUBITS
-QNN_PRM_KEY_REPS = QML_PRM_KEY_FEAT_REPS
-QNN_PRM_KEY_ANSATZ_REPS = QML_PRM_KEY_ANSATZ_REPS
-QNN_PRM_KEY_MDL_NAME = QML_PRM_KEY_MDL_NAME
-QNN_PRM_KEY_MEAS_TYPE = "meas_type"
-QNN_PRM_KEY_ANSATZ = "ansatz_name"
-QNN_PRM_KEY_MAXSTEPS = "optim_max_steps"
-QNN_PRM_KEY_OPTIM = "optim_name"
-
-# The model for QNN contains:
-# {'name': 'QNN', 'model':
-# defaultdict(None, {'name': 'QNN, 'model': <nedc_qml_tools.QNN object at
-# 0x7fd6626e2b10>})
-#
-QNN_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-QNN_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-
-#------------------------------------------------------------------------------
-# Alg = QRBM: define dictionary keys for parameters
-#
-# define the algorithm name
-#
-QRBM_NAME = "QRBM"
-
-# the parameter block for QRBM looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'QRBM"
-#   'params': {
-#               name             : QRBM
-#               model_name       : qrbm
-#               n_hiddem         : 10
-#               shots            : 2
-#               chain_strength   : 2
-#    }
-#  })
-
-
-# define QRBM algorithms related common model keys
-#
-QRBM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-QRBM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-QRBM_PRM_KEY_MDL_NAME = QML_PRM_KEY_MDL_NAME
-QRBM_PRM_KEY_SHOTS = QML_PRM_KEY_SHOTS
-QRBM_PRM_KEY_PROVIDER = QML_PRM_KEY_PROVIDER
-QRBM_PRM_KEY_ENCODER = QML_PRM_KEY_ENCODER
-QRBM_PRM_KEY_NHIDDEN = "n_hidden"
-QRBM_PRM_KEY_CS = "chain_strength"
-QRBM_PRM_KEY_N_NEIGHBORS = "knn_n_neighbors"
-
-
-# The model for QRBM contains:
-# {'name': 'QRBM', 'model':
-# defaultdict(None, {'name': 'QRBM, 'model': QRBMClassifier
-# (provider=DWaveProvider))
-#
-QRBM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-QRBM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-
-#------------------------------------------------------------------------------
-
-
-#------------------------------------------------------------------------------
-# Alg = GMM: define dictionary keys for parameters
-#
-
-# define the algorithm name
-#
-GMM_NAME = "GMM"
-
-# the parameter block for NB looks like this:
-#
-#  defaultdict(<class 'dict'>, {
-#   'name': 'GMM',
-#   'params': {
-#               'name': 'GMM',
-#               'prior': 'ml',
-#               'n_components': 1,
-#    }
-#  })
-GMM_PRM_KEY_NAME = ALG_PRM_KEY_NAME
-GMM_PRM_KEY_PARAM = ALG_PRM_KEY_PARAM
-GMM_PRM_KEY_PRIOR = ALG_PRM_KEY_PRIOR
-GMM_PRM_KEY_COMP ='n_components'
-GMM_PRM_KEY_RANDOM = 'random_state'
-
-
-GMM_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-GMM_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-GMM_MDL_KEY_PRIOR = ALG_MDL_KEY_PRIOR
-GMM_MDL_KEY_CLASS_MODELS = ALG_MDL_KEY_CLASS_MODELS
-GMM_MDL_KEY_CLASS_LABELS = ALG_MDL_KEY_CLASS_LABELS
-
-# The model for NB contains:
-#
-#   defaultdict(<class 'dict'>, {
-#    'name': 'NB',
-#    'model': Sklearn.NB.Model
-#  })
-#
-# Define the keys for these parameters.
-#
-NB_MDL_KEY_NAME = ALG_MDL_KEY_NAME
-NB_MDL_KEY_MODEL = ALG_MDL_KEY_MODEL
-#------------------------------------------------------------------------------
+# define the names of keys in dictionaries that are used to access parameters:
+#  these are common to all quantum algorithms.
+#
+QML_NAME_ENCODER = "encoder_name"
+QML_NAME_ENTANGLEMENT = "entanglement"
+QML_NAME_FEAT_REPS = "featuremap_reps"
+QML_NAME_ANSATZ_REPS = "ansatz_reps"
+QML_NAME_NQUBITS = "n_qubits"
+QML_NAME_SHOTS = "shots"
 
 # declare global debug and verbosity objects so we can use them
 # in both functions and classes
 #
 dbgl_g = ndt.Dbgl()
 vrbl_g = ndt.Vrbl()
+
+#******************************************************************************
+#
+# Algorithm-Specific Parameter Definitions
+#
+#******************************************************************************
+
+#------------------------------------------------------------------------------
+# Alg = EUCLIDEAN: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+EUCL_NAME = "EUCLIDEAN"
+EUCL_IMPLS = ["discriminant"]
+
+# the parameter block (param_d) for EUCLIDEAN looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'discriminant',
+#   'weights': list
+#   }
+#  })
+#
+# the model (model_d) for EUCLIDEAN contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'EUCLIDEAN',
+#   'implementation_name': 'discriminant',
+#   'model': {
+#    'means': list
+#    'weights': list
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  - all parameter blocks begin with an implementation name
+#    and need a list of allowable values
+#  - the remaining names are algorithm-specific
+#  - paramter block names, model block names and keys should use the same names
+#  - variables named here are only created if they do not appear above
+#
+# note: no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = PCA: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name
+#
+PCA_NAME = "PCA"
+PCA_IMPLS = ["discriminant"]
+
+# the parameter block (param_d) for PCA looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'discriminant',
+#   'priors': 'ml',
+#   'ctype': 'full',
+#   'center': 'none',
+#   'scale': 'biased'
+#   'n_components': -1 (all)
+#   }
+#  })
+#
+# the model (model_d) for PCA contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'PCA',
+#   'implementation_name': 'discriminant',
+#   'model': {
+#    'priors': numpy array,
+#    'ctype': 'full',
+#    'center': 'none',
+#    'scale': 'biased',
+#    'means': list,
+#    'transform': matrix
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = LDA: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+LDA_NAME = "LDA"
+LDA_IMPLS = ["discriminant"]
+
+# the parameter block (param_d) for LDA looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'discriminant',
+#   'priors': 'ml',
+#   'ctype': 'full',
+#   'center': 'none',
+#   'scale': 'none'
+#   'n_components': -1 (all)
+#   }
+#  })
+#
+# the model (model_d) for LDA contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'LDA',
+#   'implementation_name': 'discriminant',
+#   'model': {
+#    'priors': numpy array,
+#    'ctype': 'full',
+#    'center': 'none',
+#    'scale': 'biased',
+#    'means': list,
+#    'transform': matrix
+#   }
+#  })
+#
+# define the keys for these model parameters:
+#  no additional key names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = QDA: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+QDA_NAME = "QDA"
+QDA_IMPLS = ["discriminant"]
+
+# the parameter block (param_d) for QDA looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'discriminant',
+#   'priors': 'ml',
+#   'ctype': 'full',
+#   'center': 'none',
+#   'scale': 'biased'
+#   'n_components': -1 (all)
+#   }
+#  })
+#
+# the model (model_d) for QDA contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'QDA',
+#   'implementation_name': 'discriminant',
+#   'model': {
+#    'priors': numpy array,
+#    'ctype': 'full',
+#    'center': 'none',
+#    'scale': 'biased',
+#    'means': list,
+#    'transform': matrix
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = QLDA: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+QLDA_NAME = "QLDA"
+QLDA_IMPLS = ["discriminant"]
+
+# the parameter block (param_d) for QLDA contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'QLDA',
+#   'priors': 'ml',
+#   'ctype': 'full',
+#   'center': 'none',
+#   'scale': 'none'
+#   'n_components': -1 (all)
+#   }
+#  })
+#
+# the model (model_d) for QLDA contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'QLDA',
+#   'implementation_name': 'discriminant',
+#   'priors': numpy array,
+#   'ctype': 'full',
+#   'center': 'none',
+#   'scale': 'none'
+#   'means': list,
+#   'transform': matrix
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = NB: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+NB_NAME = "NB"
+NB_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for NB looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'NB',
+#   'priors': 'ml'
+#   'average': 'none'
+#   'multi_class': 'ovr'
+#   }
+#  })
+#
+# the model (model_d) for NB contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'NB',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn.NB.Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names)
+#
+NB_NAME_AVERAGE = "average"
+NB_NAME_MULTICLASS = "multi_class"
+
+#------------------------------------------------------------------------------
+# Alg = GMM: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+GMM_NAME = "GMM"
+GMM_IMPLS = ["em"]
+
+# the parameter block (param_d) for GMM looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'GMM',
+#   'priors': 'ml',
+#   'n_components': -1 (all),
+#   'random_state': 27,
+#   }
+#  })
+#
+# the model (model_d) for GMM contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'GMM',
+#   'implementation_name': 'em',
+#   'model': {
+#    'priors': numpy array,
+#    'class_models': dict,
+#    'class_labels': numpy array
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+
+#------------------------------------------------------------------------------
+# Alg = KNN: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+KNN_NAME = "KNN"
+KNN_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for KNN looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'sklearn',
+#   'k_nearest_neighbors': 5
+#   }
+#  })
+#
+# the model (model_d) for KNN contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'KNN',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn KNN Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names)
+#
+
+#------------------------------------------------------------------------------
+# Alg = KMEANS: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+KMEANS_NAME = "KMEANS"
+KMEANS_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for KMEANS looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'sklearn"
+#   'n_clusters': 2,
+#   'n_init': 3,
+#   'random_state': 27,
+#   'max_iters': 100
+#   }
+#  })
+#
+# the model (model_d) for KMEANS contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'KMEANS',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn KMEANS Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+KMEANS_NAME_NCLUSTERS = "n_clusters"
+KMEANS_NAME_NINIT = "n_init"
+
+#------------------------------------------------------------------------------
+# Alg = RNF: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+RNF_NAME = "RNF"
+RNF_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for RNF looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'RNF',
+#   'n_estimators': 100,
+#   'max_depth': 5,
+#   'criterion': 'gini'
+#   'random_state': 27
+#   }
+#  })
+#
+# the model (model_d) for RNF contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'RNF',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn RNF Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+RNF_NAME_NEST = "n_estimators"
+RNF_NAME_MAXDEPTH  = 'max_depth'
+RNF_NAME_CRITERION = "criterion"
+
+#------------------------------------------------------------------------------
+# Alg = SVM: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+SVM_NAME = "SVM"
+SVM_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for SVM looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'sklearn',
+#   'c': 1,
+#   'gamma': 0.1,
+#   'kernel': 'linear'
+#   }
+#  })
+#
+# the model (model_d) for SVM contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'SVM',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn SVM Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+SVM_NAME_C = "c"
+SVM_NAME_GAMMA = "gamma"
+SVM_NAME_KERNEL = 'kernel'
+
+#------------------------------------------------------------------------------
+# Alg = MLP: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+
+# define the algorithm name and the available implementations
+#
+MLP_NAME = "MLP"
+MLP_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for MLP looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'sklearn',
+#   'hidden_size': 3,
+#   'activation': 'relu',
+#   'solver': 'adam',
+#   'batch_size: 'auto',
+#   'learning_rate: 'constant',
+#   'learning_rate_init: 0.001,
+#   'random_state': 27,
+#   'momentum': 0.9
+#   'validation_fraction: 0.1,
+#   'max_iters': 100,
+#   'shuffle: true
+#   'early_stopping: false,
+#   }
+#  })
+#
+# the model (model_d) for MLP contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'MLP',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn MLP Model
+#  })
+#
+MLP_NAME_HSIZE = "hidden_size"
+MLP_NAME_ACT = "activation"
+MLP_NAME_SOLVER = "solver"
+MLP_NAME_MOMENTUM = "momentum"
+MLP_NAME_VAL = "validation_fraction"
+MLP_NAME_SHUFFLE = "shuffle"
+MLP_NAME_STOP = "early_stopping"
+
+#------------------------------------------------------------------------------
+# Alg = RBM: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+RBM_NAME = "RBM"
+RBM_IMPLS = ["sklearn"]
+
+# the parameter block (param_d) for RBM looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'sklearn"
+#   'classifier: '????'
+#   'learning_rate': 0.1,
+#   'batch_size': 0,
+#   'verbose': 0,
+#   'random_state': none,
+#   'n_components': 2,
+#   'max_iters': 100,
+#   }
+#  })
+#
+# the model (model_d) for RBM contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'RBM',
+#   'implementation_name': 'sklearn',
+#   'model': Sklearn RBM Model
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+RBM_NAME_CLASSF = "classifier"
+
+#------------------------------------------------------------------------------
+# Alg = TRANSFORMER: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+TRANSF_NAME = "TRANSFORMER"
+TRANSF_IMPLS = ["self-attention"]
+
+# the parameter block (param_d) for TRANSFORMER looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'self-attention"
+#   'epoch': 50
+#   'learning_rater': 0.001
+#   'batch_size': 32
+#   'embed_size': 32
+#   'nheads': 2
+#   'num_layers': 2
+#   'mlp_dim': 64
+#   'dropout': 0.1
+#   }
+#  })
+
+# the model (model_d) for TRANSFORMER contains:
+#
+#  defaultdict(None, {
+#   'algorithm_name': 'TRANSFORMER',
+#   'implementation_name': 'self-attention',
+#   'model': {
+#    ('input_embedding.weight', tensor([32, 2])),
+#    ('input_embedding.bias', tensor(32)),
+#    ('encoder.layers.0.self_attention_block.w_q.weight', tensor([32, 32])),
+#    ('encoder.layers.0.self_attention_block.w_q.bias', tensor(32)),
+#    ('encoder.layers.0.self_attention_block.w_k.weight', tensor([32, 32])),
+#    ('encoder.layers.0.self_attention_block.w_k.bias', tensor(32)),
+#    ...
+#    ('encoder.norm.alpha', tensor([0.9810])),
+#    ('encoder.norm.beta', tensor([0.9940])),
+#    ('classifier.weight', tensor([2, 32])),
+#    ('classifier.bias', tensor([ 0.0642, -0.1198]))
+#   }
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+TRANS_NAME_EPOCH = "epoch"
+TRANS_NAME_EMBED_SIZE = "embed_size"
+TRANS_NAME_NHEADS = "nheads"
+TRANS_NAME_MLP_DIM = "mlp_dim"
+TRANS_NAME_DROPOUT = "dropout"
+
+#------------------------------------------------------------------------------
+# Alg = QSVM: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+QSVM_NAME = "QSVM"
+QSVM_IMPLS = ["qiskit"]
+
+# the parameter block (param_d) for QSVM looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': '[qiskit]'
+#   'provider_name': 'qiskit'
+#   'hardware': 'cpu'
+#   'encoder_name': 'zz'
+#   'kernel_name': 'fidelity'
+#   'entanglement': 'full'
+#   'featuremap_reps': 2
+#   'n_qubits': 4
+#   'shots': 1024
+#   }
+#  })
+#
+# the model (model_d) for QSVM contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'QSVM',
+#   'implementation_name': 'qiskit',
+#   'model': QSVM(provider=QiskitProvider)
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names)
+#  no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = QNN: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+QNN_NAME = "QNN"
+QNN_IMPLS = ["qiskit"]
+
+# the parameter block (param_d) for QNN looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'qiskit"
+#   'provider_name': 'qiskit'
+#   'hardware': 'COBYLA'
+#   'encoder_name': 'zz'
+#   'n_qubits': 2
+#   'entanglement': 'full'
+#   'featuremap_reps': 2
+#   'ansatz_reps': 2
+#   'ansatz_name': 'real_amplitudes'
+#   'optim_name': 'COBYLA'
+#   'optim_max_steps': 50
+#   'meas_type': 'sampler'
+#   }
+#  })
+#
+# the model (model_d) for QNN contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'QNN',
+#   'implementation_name': 'qiskit',
+#   'model': QNN(provider=QiskitProvider)
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names)
+#  no additional names unique to this algorithm
+#
+#------------------------------------------------------------------------------
+# Alg = QRBM: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+#
+# define the algorithm name and the available implementations
+#
+QRBM_NAME = "QRBM"
+QRBM_IMPLS = ["dwave"]
+
+# the parameter block (param_d) for QRBM looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#   'implementation_name': 'dwave'
+#   'provider_name': 'qiskit'
+#   'encoder_name': 'bqm'
+#   'n_hidden': 10
+#   'shots': 2
+#   'chain_strength': 2
+#   'k_nearest_neighbors': 2
+#   }
+#  })
+#
+# the model (model_d) for QRBM contains:
+#
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'QRBM',
+#   'implementation_name': 'dwave',
+#   'model': QRBM(provider=DWaveProvider)
+#  })
+#
+# additional parameter or model names go here (algorithm-specific names):
+#  no additional names unique to this algorithm
+#
+# define QRBM algorithms related common model keys
+#
+QRBM_NAME_NHIDDEN = "n_hidden"
+QRBM_NAME_CS = "chain_strength"
 
 #******************************************************************************
 #
@@ -1223,11 +1109,11 @@ class Alg:
                    "unknown model format"))
             return None
 
-        if model[ALG_MDL_KEY_NAME] != self.alg_d.__class__.__name__:
+        if model[ALG_NAME_ALG] != self.alg_d.__class__.__name__:
             print("Error: %s (line: %s) %s: the current set algorithm and \
                 model name does not match, "
                 "Model Name: %s, Set Algorithm: %s" %
-                (__FILE__, ndt.__LINE__, ndt.__NAME__, model[ALG_MDL_KEY_NAME],
+                (__FILE__, ndt.__LINE__, ndt.__NAME__, model[ALG_NAME_ALG],
                 self.alg_d.__class__.__name__))
             return None
 
@@ -1292,8 +1178,7 @@ class Alg:
 
         # set the internal parameters
         #
-        self.alg_d.params_d[ALG_PRM_KEY_NAME] = self.alg_d.__class__.__name__
-        self.alg_d.params_d[ALG_PRM_KEY_PARAM] = params
+        self.alg_d.params_d = params
 
         # exit gracefully
         #  return loaded parameters
@@ -1400,17 +1285,14 @@ class Alg:
         #
         fp.write("%s %s %s" % (nft.DELIM_VERSION, nft.DELIM_EQUAL,
                                nft.PFILE_VERSION + nft.DELIM_NEWLINE))
-        fp.write("%s %s" % (self.alg_d.__class__.__name__,
-                            nft.DELIM_BOPEN + nft.DELIM_NEWLINE))
+        fp.write("%s %s %s" % (nft.DELIM_OPEN, self.alg_d.__class__.__name__,
+                            nft.DELIM_CLOSE + nft.DELIM_NEWLINE))
 
         # add the parameter structure
         #
-        for key, val in self.alg_d.params_d[ALG_PRM_KEY_PARAM].items():
+        for key, val in self.alg_d.params_d.items():
             fp.write(" %s %s %s" % (key, nft.DELIM_EQUAL,
                                     val + nft.DELIM_NEWLINE))
-
-        fp.write("%s" % (nft.DELIM_BCLOSE + nft.DELIM_NEWLINE))
-
         # exit gracefully
         #  parameters successfully written to parameter file
         #
@@ -1424,21 +1306,18 @@ class Alg:
     # computational methods: train/predict
     #
     #--------------------------------------------------------------------------
-
     def train(self,
               data: MLToolsData,
               *, # This means that after the "data" argument,
                  # you would need a keyword argument.
               write_train_labels = False,
-              fname_train_labels = DEF_TRAIN_LABELS_FNAME,
-              ):
+              fname_train_labels = "train_labels.csv"):
         """
         method: train
 
         arguments:
-         data: a list of numpy matrices where the index corresponds to the class
-         write_train_labels: option to output the predicted labels from the after
-                             after training (False)
+         data: a list of numpy matrices
+         write_train_labels: output the predicted labels from training (False)
          fname_train_labels: the fname to output it too ("train_labels.csv")
          excel: if true, write the file as excel (.xlsx) (False)
 
@@ -1709,7 +1588,7 @@ class Alg:
             # write the numeric data and then add a new line
             #
             for j in range(ncols):
-                fp.write(ALG_FMT_WST % (cnf[i][j], ALG_SCL_PCT * pct[i][j]))
+                fp.write(ALG_FMT_WST % (cnf[i][j], ALG_FMT_PCT * pct[i][j]))
             fp.write(nft.DELIM_NEWLINE)
 
         # exit gracefully
@@ -1762,7 +1641,7 @@ class Alg:
         # calculate accuracy and error score
         #
         acc = accuracy_score(r_labels, h_labels)
-        err = ALG_SCL_PCT * (float(1.0) - acc)
+        err = ALG_FMT_PCT * (float(1.0) - acc)
         sens = None
         spec = None
         prec = None
@@ -1878,7 +1757,7 @@ class Alg:
         # compute the accuracy and the error rate
         #
         acc = accuracy_score(rlabels, hlabels)
-        err = ALG_SCL_PCT * (float(1.0) - acc)
+        err = ALG_FMT_PCT * (float(1.0) - acc)
         print(ALG_FMT_ERR % ("error rate", err))
 
         # exit gracefully
@@ -1927,20 +1806,19 @@ class EUCLIDEAN:
         #
         EUCLIDEAN.__CLASS_NAME__ = self.__class__.__name__
 
-        # initialize variables for the parameter block and model
+        # initialize variables for the parameter block (param_d) and model
         #
         self.params_d = defaultdict(dict)
         self.model_d = defaultdict()
 
         # initialize a parameter dictionary
         #
-        self.params_d[EUCLIDEAN_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[EUCLIDEAN_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[EUCLIDEAN_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[EUCLIDEAN_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -1997,7 +1875,7 @@ class EUCLIDEAN:
             print("%s (line: %s) %s: training a model" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -2014,27 +1892,35 @@ class EUCLIDEAN:
         for d in group_data.values():
             means.append(np.mean(d, axis = 0))
 
-        self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS] = means
+        self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS] = means
 
         # get the weights
         #
-        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
+        weights = self.params_d[ALG_NAME_WEIGHTS]
 
-        # scoring
+        # get algorithm implementation
         #
-        acc = 0
-        for true_label, d in zip(data.labels, data.data):
+        impl = self.params_d[ALG_NAME_IMP]
 
-            diff_means = []
+        if impl == "discriminant":
 
-            for ind, mean in enumerate(means):
-                diff_means.append(
-                    self.weightedDistance(mean, d, float(weights[ind]))
-                )
+            # scoring
+            #
+            acc = 0
+            for true_label, d in zip(data.labels, data.data):
 
-            train_label_ind = np.argmin(diff_means)
-            if data.mapping_label[train_label_ind] == true_label:
-                acc += 1
+                diff_means = []
+
+                for ind, mean in enumerate(means):
+                    diff_means.append(
+                        self.weightedDistance(mean, d, float(weights[ind]))
+                    )
+
+                train_label_ind = np.argmin(diff_means)
+                if data.mapping_label[train_label_ind] == true_label:
+                    acc += 1
+
+            self.model_d[ALG_NAME_IMP] = impl
 
         score = acc / len(data.data)
 
@@ -2059,20 +1945,20 @@ class EUCLIDEAN:
 
         # check for model validity
         #
-        if model[EUCLIDEAN_MDL_KEY_NAME] != EUCLIDEAN_NAME:
+        if model[ALG_NAME_ALG] != EUCL_NAME:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "incorrect model name"))
             return None, None
 
-        if not model[EUCLIDEAN_MDL_KEY_MODEL]:
+        if not model[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "model parameter is empty"))
             return None, None
 
-        means = self.model_d[EUCLIDEAN_MDL_KEY_MODEL][EUCLIDEAN_MDL_KEY_MEANS]
-        weights = self.params_d[EUCLIDEAN_PRM_KEY_PARAM][EUCLIDEAN_PRM_KEY_WEIGHTS]
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        weights = self.model_d[ALG_NAME_MDL][ALG_NAME_WEIGHTS]
         mapping_label = data.mapping_label
 
         labels = []
@@ -2143,13 +2029,12 @@ class PCA:
 
         # initialize a parameter dictionary
         #
-        self.params_d[PCA_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[PCA_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the names
         #
-        self.model_d[PCA_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[PCA_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -2189,7 +2074,7 @@ class PCA:
             print("%s (line: %s) %s: training a model" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -2243,19 +2128,19 @@ class PCA:
 
         # case: (ml) equal priors
         #
-        mode_prior = self.params_d[PCA_PRM_KEY_PARAM][PCA_PRM_KEY_PRIOR]
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
 
-        if mode_prior == ALG_PRIORS_ML:
+        if mode_prior == ALG_NAME_PRIORS_ML:
 
             # compute the priors for each class
             #
-            self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_PRIOR] = \
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = \
                 np.full(shape = num_classes,
                         fill_value = (float(1.0) / float(num_classes)))
 
         # if the priors are based on occurrences : nct.PRIORs_MAP
         #
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
 
             # create an array of priors by finding the the number of points
             # in each class and dividing by the total number of samples
@@ -2271,13 +2156,13 @@ class PCA:
             #
             _sum = float(1.0) / float(npts)
 
-            self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_PRIOR] = priors * _sum
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors * _sum
 
         else:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "unknown value for priors"))
-            self.model_d[PCA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate the means of each class:
@@ -2287,22 +2172,24 @@ class PCA:
         for element in new_data:
             means.append(np.mean(element, axis = 0))
 
-        self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_MEANS] = means
+        self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS] = means
 
         # calculate the cov:
         #  note this is a single matrix
         #
-        self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_COV] = nct.compute(
+        self.model_d[ALG_NAME_MDL][ALG_NAME_COV] = nct.compute(
             new_data,
-            ctype = self.params_d[PCA_PRM_KEY_PARAM][PCA_PRM_KEY_CTYPE],
-            center= self.params_d[PCA_PRM_KEY_PARAM][PCA_PRM_KEY_CENTER],
-            scale= self.params_d[PCA_PRM_KEY_PARAM][PCA_PRM_KEY_SCALE])
-        cov = self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_COV]
-        print(cov)
+            ctype = self.params_d[nct.PRM_CTYPE],
+            center= self.params_d[nct.PRM_CENTER],
+            scale= self.params_d[nct.PRM_SCALE])
+        cov = self.model_d[ALG_NAME_MDL][ALG_NAME_COV]
 
         # number of components
         #
-        n_comp= int(self.params_d[PCA_PRM_KEY_PARAM][PCA_PRM_KEY_COMP])
+        n_comp= int(self.params_d[ALG_NAME_NCMP])
+
+        if n_comp == -1:
+            n_comp = new_data[0].shape[1]
 
         #if not( 0 < n_comp <= len(data.data[0])):
         if not( 0 < n_comp <= new_data[0].shape[1]):
@@ -2310,7 +2197,7 @@ class PCA:
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "features out of range"))
 
-            self.model_d[PCA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
 
             return None, None
 
@@ -2330,7 +2217,7 @@ class PCA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "negative eigenvalues"))
-                self.model_d[PCA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
         try:
@@ -2342,12 +2229,12 @@ class PCA:
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "singular matrix model is none"))
 
-            self.model_d[PCA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
 
             return None, None
 
         t = eigvecs @ eigval_in
-        self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_TRANS] = t
+        self.model_d[ALG_NAME_MDL][ALG_NAME_TRANS] = t
 
         # compute a transformation matrix for class-independent PCA
         #
@@ -2367,7 +2254,7 @@ class PCA:
 
             # weight by the prior
             #
-            gsum += self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_PRIOR][i] * \
+            gsum += self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][i] * \
                 _sum
 
         score = gsum / float(npts)
@@ -2410,13 +2297,13 @@ class PCA:
 
         # check for model validity
         #
-        if model[PCA_MDL_KEY_NAME] != PCA_NAME:
+        if model[ALG_NAME_ALG] != PCA_NAME:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "incorrect model name"))
             return None, None
 
-        if not model[PCA_MDL_KEY_MODEL]:
+        if not model[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "model parameter is empty"))
@@ -2428,8 +2315,8 @@ class PCA:
 
         # transform data to new environment
         #
-        t =  model[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_TRANS]
-        mu = model[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_MEANS]
+        t =  model[ALG_NAME_MDL][ALG_NAME_TRANS]
+        mu = model[ALG_NAME_MDL][ALG_NAME_MEANS]
 
         # calculate number of classes
         #
@@ -2462,7 +2349,7 @@ class PCA:
                 #
                 # mean of class k
                 #
-                prior =  model[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_PRIOR][k]
+                prior =  model[ALG_NAME_MDL][ALG_NAME_PRIORS][k]
 
                 # mean of class k
                 #
@@ -2535,13 +2422,12 @@ class LDA:
 
         # initialize a parameter dictionary
         #
-        self.params_d[LDA_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[LDA_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the names
         #
-        self.model_d[LDA_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[LDA_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -2579,7 +2465,7 @@ class LDA:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -2616,18 +2502,18 @@ class LDA:
 
         # case: (ml) equal priors
         #
-        mode_prior = self.params_d[LDA_PRM_KEY_PARAM][LDA_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
+        if mode_prior == ALG_NAME_PRIORS_ML:
 
             # compute the priors for each class
             #
             priors = np.full(shape = num_classes,
                             fill_value = (float(1.0) / float(num_classes)))
-            self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_PRIOR] = priors
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         # if the priors are based on occurrences
         #
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
 
             # create an array of priors by finding the the number of points
             # in each class and dividing by the total number of samples
@@ -2643,13 +2529,13 @@ class LDA:
             #
             sum = float(1.0) / float(npts)
             priors = priors * sum
-            self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_PRIOR] = priors
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         else:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "unknown value for priors"))
-            self.model_d[LDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate the means of each class:
@@ -2659,7 +2545,7 @@ class LDA:
         for elem in new_data:
             means.append(np.mean(elem, axis = 0))
 
-        self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_MEANS] = means
+        self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS] = means
 
         # calculate the global mean
         #
@@ -2685,9 +2571,9 @@ class LDA:
             # calculation of within class scatter
             #
             sw += priors[i]*nct.compute(d, \
-            ctype = self.params_d[LDA_PRM_KEY_PARAM][LDA_PRM_KEY_CTYPE],
-            center= self.params_d[LDA_PRM_KEY_PARAM][LDA_PRM_KEY_CENTER],
-            scale= self.params_d[LDA_PRM_KEY_PARAM][LDA_PRM_KEY_SCALE])
+            ctype = self.params_d[nct.PRM_CTYPE],
+            center= self.params_d[nct.PRM_CENTER],
+            scale= self.params_d[nct.PRM_SCALE])
 
             # between class scatter calculation
             #
@@ -2702,7 +2588,7 @@ class LDA:
             print("Error: %s (line: %s) %s: %s" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__,
                    "singular matrix"))
-            self.model_d[LDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
 
             return None, None
 
@@ -2730,7 +2616,7 @@ class LDA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "negative eigenvalues"))
-                self.model_d[LDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
         try:
@@ -2742,14 +2628,14 @@ class LDA:
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "singular matrix model is none"))
 
-            self.model_d[LDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
 
             return None, None
 
         # calculation of the transformation matrix
         #
         t = eigvecs @ eigval_in
-        self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_TRANS] = t
+        self.model_d[ALG_NAME_MDL][ALG_NAME_TRANS] = t
 
         # compute a transformation matrix for LDA
         #
@@ -2766,7 +2652,7 @@ class LDA:
 
             # weight by the prior
             #
-            gsum += self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_PRIOR][i] * \
+            gsum += self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][i] * \
                 _sum
 
         score = gsum / float(npts)
@@ -2809,13 +2695,13 @@ class LDA:
 
         # check for model validity
         #
-        if model[LDA_MDL_KEY_NAME] != LDA_NAME:
+        if model[ALG_NAME_ALG] != LDA_NAME:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "incorrect model name"))
             return None, None
 
-        if not model[LDA_MDL_KEY_MODEL]:
+        if not model[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__,
                    "model parameter is empty"))
@@ -2827,8 +2713,8 @@ class LDA:
 
         # transform data to new environment
         #
-        t =  model[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_TRANS]
-        mu = model[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_MEANS]
+        t =  model[ALG_NAME_MDL][ALG_NAME_TRANS]
+        mu = model[ALG_NAME_MDL][ALG_NAME_MEANS]
         num_classes = len(mu)
         mt = []
         for i in range(len(mu)):
@@ -2862,7 +2748,7 @@ class LDA:
                 #
                 # mean of class k
                 #
-                prior =  model[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_PRIOR][k]
+                prior =  model[ALG_NAME_MDL][ALG_NAME_PRIORS][k]
 
                 # mean of class k
                 #
@@ -2943,13 +2829,12 @@ class QDA:
 
         # initialize a parameter dictionary
         #
-        self.params_d[QDA_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[QDA_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the names
         #
-        self.model_d[QDA_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[QDA_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -2986,7 +2871,7 @@ class QDA:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3010,12 +2895,14 @@ class QDA:
 
         # number of components
         #
-        n_comp= int(self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_COMP])
+        n_comp= int(self.params_d[ALG_NAME_NCMP])
+        if n_comp == -1:
+            n_comp = new_data[0].shape[1]
         if not(0 < n_comp <= new_data[0].shape[1]):
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "features out of range"))
-            self.model_d[QDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate number of classes
@@ -3033,18 +2920,18 @@ class QDA:
 
         # case: (ml) equal priors
         #
-        mode_prior = self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
+        if mode_prior == ALG_NAME_PRIORS_ML:
 
             # save priors for each class
             #
-            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = \
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = \
                 np.full(shape = num_classes,
                         fill_value = (float(1.0) / float(num_classes)))
 
         # if the priors are based on occurrences : nct.PRIORs_MAP
         #
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
 
             # create an array of priors by finding the the number of points
             # in each class and dividing by the total number of samples
@@ -3059,13 +2946,13 @@ class QDA:
             # final calculation of priors
             #
             sum = float(1.0) / float(npts)
-            self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR] = priors * sum
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors * sum
 
         else:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "unknown value for priors"))
-            self.model_d[QDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate the means of each class:
@@ -3074,7 +2961,7 @@ class QDA:
         means = []
         for elem in new_data:
             means.append(np.mean(elem, axis = 0))
-        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS] = means
+        self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS] = means
 
         # calculate the cov:
         #  note this is a list of matrices, and each matrix for a class
@@ -3089,9 +2976,9 @@ class QDA:
 
 
             covar = nct.compute(element,
-                ctype= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CTYPE],
-                center= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_CENTER],
-                scale= self.params_d[QDA_PRM_KEY_PARAM][QDA_PRM_KEY_SCALE])
+                ctype= self.params_d[nct.PRM_CTYPE],
+                center= self.params_d[nct.PRM_CENTER],
+                scale= self.params_d[nct.PRM_SCALE])
 
             # eigen vector and eigen value decomposition
             # for each class
@@ -3109,7 +2996,7 @@ class QDA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "negative eigenvalues"))
-                self.model_d[QDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
             try:
@@ -3119,7 +3006,7 @@ class QDA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "singular matrix model is none"))
-                self.model_d[QDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
             # calculation of transformation matrix
@@ -3127,7 +3014,7 @@ class QDA:
             trans = eigvecs @ eigvals_in
             t.append(trans)
 
-        self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS] = t
+        self.model_d[ALG_NAME_MDL][ALG_NAME_TRANS] = t
 
         # compute a goodness of fit measure: use the average weighted
         # mean-square-error computed across the entire data set
@@ -3144,7 +3031,7 @@ class QDA:
 
             # weight by the prior
             #
-            gsum += self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][i] * \
+            gsum += self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][i] * \
                 sum
         score = gsum / float(npts)
 
@@ -3186,13 +3073,13 @@ class QDA:
 
         # check for model validity
         #
-        if model[QDA_MDL_KEY_NAME] != QDA_NAME:
+        if model[ALG_NAME_ALG] != QDA_NAME:
             print("Error: %s (line: %s) %s: %s" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__,
                    "incorrect model name"))
             return None, None
 
-        if not model[QDA_MDL_KEY_MODEL]:
+        if not model[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "model parameter is empty"))
@@ -3204,8 +3091,8 @@ class QDA:
 
         # transform data and mean to new space
         #
-        t =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_TRANS]
-        mu = model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS]
+        t =  model[ALG_NAME_MDL][ALG_NAME_TRANS]
+        mu = model[ALG_NAME_MDL][ALG_NAME_MEANS]
 
         # calculate number of classes
         #
@@ -3244,7 +3131,7 @@ class QDA:
                 #
                 # priors of class k
                 #
-                prior =  model[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_PRIOR][k]
+                prior =  model[ALG_NAME_MDL][ALG_NAME_PRIORS][k]
 
                 # mean of class k
                 #
@@ -3316,13 +3203,12 @@ class QLDA:
 
         # initialize a parameter dictionary
         #
-        self.params_d[QLDA_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[QLDA_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the names
         #
-        self.model_d[QLDA_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[QLDA_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_MDL] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -3359,7 +3245,7 @@ class QLDA:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3396,18 +3282,18 @@ class QLDA:
 
         # case: (ml) equal priors
         #
-        mode_prior = self.params_d[QLDA_PRM_KEY_PARAM][QLDA_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
+        if mode_prior == ALG_NAME_PRIORS_ML:
 
             # compute the priors for each class
             #
             priors = np.full(shape = num_classes,
                         fill_value = (float(1.0) / float(num_classes)))
-            self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_PRIOR] = priors
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         # if the priors are based on occurrences
         #
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
 
             # create an array of priors by finding the the number of points
             # in each class and dividing by the total number of samples
@@ -3423,13 +3309,13 @@ class QLDA:
             #
             sum = float(1.0) / float(npts)
             priors = priors * sum
-            self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_PRIOR] = priors
+            self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         else:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "unknown value for priors"))
-            self.model_d[QLDA_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate the means of each class:
@@ -3438,7 +3324,7 @@ class QLDA:
         means = []
         for elem in new_data:
             means.append(np.mean(elem, axis = 0))
-        self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_MEANS] = means
+        self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS] = means
 
         # calculate the global mean
         #
@@ -3474,9 +3360,9 @@ class QLDA:
             # calculation of within class scatter for each class
             #
             sw = priors[i] * nct.compute(d, \
-            ctype = self.params_d[QLDA_PRM_KEY_PARAM][QLDA_PRM_KEY_CTYPE],
-            center = self.params_d[QLDA_PRM_KEY_PARAM][QLDA_PRM_KEY_CENTER],
-            scale = self.params_d[QLDA_PRM_KEY_PARAM][QLDA_PRM_KEY_SCALE])
+            ctype = self.params_d[nct.PRM_CTYPE],
+            center = self.params_d[nct.PRM_CENTER],
+            scale = self.params_d[nct.PRM_SCALE])
 
             # check singularity
             #
@@ -3487,7 +3373,7 @@ class QLDA:
                 print("Error: %s (line: %s) %s: %s" %
                       (__FILE__, ndt.__LINE__, ndt.__NAME__,
                        "singular matrix"))
-                self.model_d[QLDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
 
                 return None, None
 
@@ -3511,7 +3397,7 @@ class QLDA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "negative eigenvalues"))
-                self.model_d[QLDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
             try:
@@ -3522,7 +3408,7 @@ class QLDA:
                 print("Error: %s (line: %s) %s: %s" %
                     (__FILE__, ndt.__LINE__, ndt.__NAME__,
                     "singular matrix model is none"))
-                self.model_d[QLDA_MDL_KEY_MODEL].clear()
+                self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
             # calculation of transformation matrix
@@ -3530,7 +3416,7 @@ class QLDA:
             trans = eigvecs @ eigvals_in
             t.append(trans)
 
-        self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_TRANS] = t
+        self.model_d[ALG_NAME_MDL][ALG_NAME_TRANS] = t
 
         transf = np.identity(new_data[0].shape[1])
         gsum = float(0.0)
@@ -3544,7 +3430,7 @@ class QLDA:
 
             # weight by the prior
             #
-            gsum += self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_PRIOR][i] * \
+            gsum += self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][i] * \
                 sum
         score = gsum / float(npts)
 
@@ -3587,13 +3473,13 @@ class QLDA:
 
         # check for model validity
         #
-        if model[QLDA_MDL_KEY_NAME] != QLDA_NAME:
+        if model[ALG_NAME_ALG] != QLDA_NAME:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "incorrect model name"))
             return None, None
 
-        if not model[QLDA_MDL_KEY_MODEL]:
+        if not model[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "model parameter is empty"))
@@ -3606,19 +3492,16 @@ class QLDA:
 
         # transform data and mean to new space
         #
-        t =  model[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_TRANS]
-        mu = model[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_MEANS]
+        t =  model[ALG_NAME_MDL][ALG_NAME_TRANS]
+        mu = model[ALG_NAME_MDL][ALG_NAME_MEANS]
 
         # get the number of classes
         #
         mt = []
         num_classes = len(mu)
         for i in range(len(mu)):
-            #mu[i]= mu[i] @ t[i]
             m_new = mu[i]@t[i]
             mt.append(m_new)
-
-
 
         # pre-compute the scaling term
         #
@@ -3648,7 +3531,7 @@ class QLDA:
                 #
                 # priors of class k
                 #
-                prior =  model[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_PRIOR][k]
+                prior =  model[ALG_NAME_MDL][ALG_NAME_PRIORS][k]
 
                 # mean of class k
                 #
@@ -3723,13 +3606,14 @@ class NB:
 
         # initialize a parameter dictionary
         #
-        self.params_d[NB_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[NB_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[NB_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[NB_MDL_KEY_MODEL] = GaussianNB()
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        #TODO: tmp but needs to be changed since default should be set in the parameter
+        self.model_d[ALG_NAME_IMP] = NB_IMPLS[0]
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -3766,7 +3650,7 @@ class NB:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -3794,8 +3678,8 @@ class NB:
 
         # case: (ml) equal priors
         #
-        mode_prior = self.params_d[NB_PRM_KEY_PARAM][NB_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
+        if mode_prior == ALG_NAME_PRIORS_ML:
 
             # compute the priors for each class
             #
@@ -3804,7 +3688,7 @@ class NB:
 
         # if the priors are based on occurrences
         #
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
 
             # create an array of priors by finding the the number of points
             # in each class and dividing by the total number of samples
@@ -3839,13 +3723,20 @@ class NB:
                 labels.append(i)
         labels = np.array(labels)
 
-        # fit the model
-        #
-        self.model_d[NB_MDL_KEY_MODEL] = GaussianNB(priors = priors).fit(f_data, labels)
+        if ALG_NAME_IMP in self.params_d:
+            imp = self.params_d[ALG_NAME_IMP]
+        else:
+            imp = self.model_d[ALG_NAME_IMP]
+
+        if imp == "sklearn":
+            # fit the model
+            #
+            self.model_d[ALG_NAME_MDL] = GaussianNB(priors = priors).fit(f_data, labels)
+            self.model_d[ALG_NAME_IMP] = imp
 
         # prediction
         #
-        ypred = self.model_d[NB_MDL_KEY_MODEL].predict(f_data)
+        ypred = self.model_d[ALG_NAME_MDL].predict(f_data)
 
         # score calculation using auc ( f1 score f1_score(y_true, y_pred, average=None))
         #
@@ -3891,11 +3782,11 @@ class NB:
         if model is None:
             model = self.model_d
 
-        p_labels = model[NB_MDL_KEY_MODEL].predict(data)
+        p_labels = model[ALG_NAME_MDL].predict(data)
 
         # posterior calculation
         #
-        posteriors = model[NB_MDL_KEY_MODEL].predict_proba(data)
+        posteriors = model[ALG_NAME_MDL].predict_proba(data)
 
         # exit gracefully
         #
@@ -3940,12 +3831,11 @@ class GMM:
         self.model_d = defaultdict()
 
         # Initialize a parameter dictionary
-        self.params_d[GMM_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[GMM_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # Set the model; we will store a dictionary of trained GMMs per class
-        self.model_d[GMM_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[GMM_MDL_KEY_MODEL] = defaultdict(dict)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
 
     #---------------------------------------------------------------------------
     # Computational methods: train / predict
@@ -3985,7 +3875,7 @@ class GMM:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4006,12 +3896,15 @@ class GMM:
         num_classes = len(new_data)
 
         # Get the number of mixture components from the parameters
-        n_components= int(self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_COMP])
+        n_components= int(self.params_d[ALG_NAME_NCMP])
+
+        if n_components == -1:
+            n_components = new_data[0].shape[1]
         if not(0 < n_components <= new_data[0].shape[1]):
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "features out of range"))
-            self.model_d[GMM_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # calculate number of data points
@@ -4025,11 +3918,11 @@ class GMM:
         priors = np.empty((0,0))
 
         # Determine the prior mode from parameters
-        mode_prior = self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_PRIOR]
-        if mode_prior == ALG_PRIORS_ML:
+        mode_prior = self.params_d[ALG_NAME_PRIORS]
+        if mode_prior == ALG_NAME_PRIORS_ML:
             # Equal priors for each class
             priors = np.full(shape=num_classes, fill_value=(1.0 / num_classes))
-        elif mode_prior == ALG_PRIORS_MAP:
+        elif mode_prior == ALG_NAME_PRIORS_MAP:
             # Priors based on the relative frequency of each class
             counts = np.array([len(class_data) for class_data in new_data])
             priors = counts / float(npts)
@@ -4037,14 +3930,14 @@ class GMM:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "unknown value for priors"))
-            self.model_d[GMM_MDL_KEY_MODEL].clear()
+            self.model_d[ALG_NAME_MDL].clear()
             return None, None
 
         # Save the priors in the model dictionary
-        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_PRIOR] = priors
+        self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         random_state = \
-            int(self.params_d[GMM_PRM_KEY_PARAM][GMM_PRM_KEY_RANDOM])
+            int(self.params_d[ALG_NAME_RANDOM])
 
         # Train a GMM for each class
         class_models = {}
@@ -4055,8 +3948,8 @@ class GMM:
             class_models[idx] = gm
 
         # Save the trained class models and class labels
-        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_MODELS] = class_models
-        self.model_d[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_LABELS] = uni_label
+        self.model_d[ALG_NAME_MDL][ALG_NAME_CMODELS] = class_models
+        self.model_d[ALG_NAME_MDL][ALG_NAME_CLABELS] = uni_label
 
         # Prepare a full data matrix and labels for computing the training score
         f_data = np.vstack(new_data)
@@ -4133,9 +4026,9 @@ class GMM:
         # retrieving the priors, class models and class labels from the trained
         # model
         #
-        priors = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_PRIOR]
-        class_models = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_MODELS]
-        class_labels = model[GMM_MDL_KEY_MODEL][GMM_MDL_KEY_CLASS_LABELS]
+        priors = model[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        class_models = model[ALG_NAME_MDL][ALG_NAME_CMODELS]
+        class_labels = model[ALG_NAME_MDL][ALG_NAME_CLABELS]
         num_classes = len(class_models)
 
         p_labels = []
@@ -4211,13 +4104,12 @@ class KNN:
 
         # initialize a parameter dictionary
         #
-        self.params_d[KNN_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[KNN_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d[ALG_NAME_MDL] = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[KNN_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[KNN_MDL_KEY_MODEL] = KNeighborsClassifier()
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -4254,7 +4146,7 @@ class KNN:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4270,12 +4162,12 @@ class KNN:
 
         # fit the model
         #
-        n = int(self.params_d[KNN_PRM_KEY_PARAM][KNN_PRM_KEY_NEIGHB])
-        self.model_d[KNN_MDL_KEY_MODEL] = KNeighborsClassifier(n_neighbors = n).fit(samples, labels)
+        n = int(self.params_d[ALG_NAME_NNEARN])
+        self.model_d[ALG_NAME_MDL] = KNeighborsClassifier(n_neighbors = n).fit(samples, labels)
 
         # prediction
         #
-        ypred = self.model_d[KNN_MDL_KEY_MODEL].predict(samples)
+        ypred = self.model_d[ALG_NAME_MDL].predict(samples)
 
         # score calculation using auc ( f1 score )
         #
@@ -4322,11 +4214,11 @@ class KNN:
 
         samples = np.array(data.data)
 
-        p_labels = model[KNN_MDL_KEY_MODEL].predict(samples)
+        p_labels = model[ALG_NAME_MDL].predict(samples)
 
         # posterior calculation
         #
-        posteriors = model[KNN_MDL_KEY_MODEL].predict_proba(samples)
+        posteriors = model[ALG_NAME_MDL].predict_proba(samples)
 
         return p_labels, posteriors
     #
@@ -4369,13 +4261,12 @@ class KMEANS:
 
         # initialize a parameter dictionary
         #
-        self.params_d[KMEANS_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[KMEANS_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[KMEANS_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans()
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -4412,7 +4303,7 @@ class KMEANS:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4424,17 +4315,18 @@ class KMEANS:
 
         # fit the model
         #
-        n_cluster = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NCLUSTER])
-        random_state =int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_RANDOM])
-        n_init = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_NINIT])
-        m_iter = int(self.params_d[KMEANS_PRM_KEY_PARAM][KMEANS_PRM_KEY_MITER])
+        imp = self.params_d[ALG_NAME_IMP]
+        n_cluster = int(self.params_d[KMEANS_NAME_NCLUSTERS])
+        random_state =int(self.params_d[ALG_NAME_RANDOM])
+        n_init = int(self.params_d[KMEANS_NAME_NINIT])
+        m_iter = int(self.params_d[ALG_NAME_MAXITER])
 
-        self.model_d[KMEANS_MDL_KEY_MODEL] = KMeans(n_clusters=n_cluster,
+        self.model_d[ALG_NAME_MDL] = KMeans(n_clusters=n_cluster,
         random_state = random_state,
         n_init = n_init,
         max_iter = m_iter).fit(samples)
 
-        predicted_labels = self.model_d[KMEANS_MDL_KEY_MODEL].labels_
+        predicted_labels = self.model_d[ALG_NAME_MDL].labels_
 
         score = silhouette_score(samples, predicted_labels)
 
@@ -4478,11 +4370,11 @@ class KMEANS:
 
         data = np.array(data.data)
 
-        p_labels = model[KMEANS_MDL_KEY_MODEL].predict(data)
+        p_labels = model[ALG_NAME_MDL].predict(data)
 
         # cluster centers
         #
-        centers = model[KMEANS_MDL_KEY_MODEL].cluster_centers_
+        centers = model[ALG_NAME_MDL].cluster_centers_
 
         # posteriors calculation
         #
@@ -4540,13 +4432,12 @@ class RNF:
 
         # initialize a parameter dictionary
         #
-        self.params_d[RNF_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[RNF_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[RNF_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[RNF_MDL_KEY_MODEL] = RandomForestClassifier()
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -4583,7 +4474,7 @@ class RNF:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4600,18 +4491,18 @@ class RNF:
         # fit the model
         #
         n_estimators = \
-            int(self.params_d[RNF_PRM_KEY_PARAM][RNF_PRM_KEY_ESTIMATOR])
+            int(self.params_d[RNF_NAME_NEST])
 
         max_depth = \
-            int(self.params_d[RNF_PRM_KEY_PARAM][RNF_PRM_KEY_MAXDEPTH])
+            int(self.params_d[RNF_NAME_MAXDEPTH])
 
         criterion = \
-            self.params_d[RNF_PRM_KEY_PARAM][RNF_PRM_KEY_CRITERION]
+            self.params_d[RNF_NAME_CRITERION]
 
         random_state = \
-            int(self.params_d[RNF_PRM_KEY_PARAM][RNF_PRM_KEY_RANDOM])
+            int(self.params_d[ALG_NAME_RANDOM])
 
-        self.model_d[RNF_MDL_KEY_MODEL] = \
+        self.model_d[ALG_NAME_MDL] = \
             RandomForestClassifier(n_estimators = n_estimators,
                                    max_depth = max_depth,
                                    criterion = criterion,
@@ -4619,7 +4510,7 @@ class RNF:
 
         # prediction
         #
-        ypred = self.model_d[RNF_MDL_KEY_MODEL].predict(samples)
+        ypred = self.model_d[ALG_NAME_MDL].predict(samples)
 
         # score calculation using auc ( f1 score f1_score(y_true, y_pred, average=None))
         #
@@ -4666,11 +4557,11 @@ class RNF:
 
         samples = np.array(data.data)
 
-        p_labels = model[RNF_MDL_KEY_MODEL].predict(samples)
+        p_labels = model[ALG_NAME_MDL].predict(samples)
 
         # posterior calculation
         #
-        posteriors = model[RNF_MDL_KEY_MODEL].predict_proba(samples)
+        posteriors = model[ALG_NAME_MDL].predict_proba(samples)
 
         # exit gracefully
         #
@@ -4717,13 +4608,12 @@ class SVM:
 
         # initialize a parameter dictionary
         #
-        self.params_d[SVM_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[SVM_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[SVM_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[SVM_MDL_KEY_MODEL] = SVC(probability = True)
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -4760,7 +4650,7 @@ class SVM:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4776,18 +4666,18 @@ class SVM:
 
         # fit the model
         #
-        c = float(self.params_d[SVM_PRM_KEY_PARAM][SVM_PRM_KEY_C])
-        gamma =float(self.params_d[SVM_PRM_KEY_PARAM][SVM_PRM_KEY_GAMMA])
-        kernel = self.params_d[SVM_PRM_KEY_PARAM][SVM_PRM_KEY_KERNEL]
+        c = float(self.params_d[SVM_NAME_C])
+        gamma =float(self.params_d[SVM_NAME_GAMMA])
+        kernel = self.params_d[SVM_NAME_KERNEL]
 
-        self.model_d[SVM_MDL_KEY_MODEL] = SVC(C = c,
+        self.model_d[ALG_NAME_MDL] = SVC(C = c,
                         gamma = gamma,
                         kernel = kernel,
                         probability=True).fit(samples, labels)
 
         # prediction
         #
-        ypred = self.model_d[SVM_MDL_KEY_MODEL].predict(samples)
+        ypred = self.model_d[ALG_NAME_MDL].predict(samples)
 
         # score calculation using auc ( f1 score)
         #
@@ -4832,11 +4722,11 @@ class SVM:
 
         samples = np.array(data.data)
 
-        p_labels = model[SVM_MDL_KEY_MODEL].predict(samples)
+        p_labels = model[ALG_NAME_MDL].predict(samples)
 
         # posterior calculation
         #
-        posteriors = model[SVM_MDL_KEY_MODEL].predict_proba(samples)
+        posteriors = model[ALG_NAME_MDL].predict_proba(samples)
 
         # exit gracefully
         #
@@ -4889,13 +4779,12 @@ class MLP:
 
         # initialize a parameter dictionary
         #
-        self.params_d[MLP_PRM_KEY_NAME] = self.__class__.__name__
-        self.params_d[MLP_PRM_KEY_PARAM] = defaultdict(dict)
+        self.params_d = defaultdict(dict)
 
         # set the model
         #
-        self.model_d[MLP_MDL_KEY_NAME] = self.__class__.__name__
-        self.model_d[MLP_MDL_KEY_MODEL] = MLPClassifier()
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
 
@@ -4932,7 +4821,7 @@ class MLP:
             print("%s (line: %s) %s: training a model" %
                   (__FILE__, ndt.__LINE__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
+        if self.model_d[ALG_NAME_MDL]:
             print("Error: %s (line: %s) %s: %s" %
                 (__FILE__, ndt.__LINE__, ndt.__NAME__,
                 "Doesn't support training on pre-trained model"))
@@ -4948,20 +4837,21 @@ class MLP:
 
         # fit the model
         #
-        h_s = int(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_HSIZE])
-        act = self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_ACT]
-        b_s = self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_BSIZE]
-        sol = self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_SOLVER]
-        lr = self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_LR]
-        lr_init = float(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_LRINIT])
-        e_stop = bool(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_STOP])
-        sh = bool(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_SHUFFLE])
-        val= float(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_VAL])
-        m = float(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_MOMENTUM])
-        r_state = int(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_RANDOM])
-        m_iter = int(self.params_d[MLP_PRM_KEY_PARAM][MLP_PRM_KEY_MITER])
+        imp = self.params_d[ALG_NAME_IMP]
+        h_s = int(self.params_d[MLP_NAME_HSIZE])
+        act = self.params_d[MLP_NAME_ACT]
+        b_s = self.params_d[ALG_NAME_BSIZE]
+        sol = self.params_d[MLP_NAME_SOLVER]
+        lr = self.params_d[ALG_NAME_LR]
+        lr_init = float(self.params_d[ALG_NAME_LRINIT])
+        e_stop = bool(self.params_d[MLP_NAME_STOP])
+        sh = bool(self.params_d[MLP_NAME_SHUFFLE])
+        val= float(self.params_d[MLP_NAME_VAL])
+        m = float(self.params_d[MLP_NAME_MOMENTUM])
+        r_state = int(self.params_d[ALG_NAME_RANDOM])
+        m_iter = int(self.params_d[ALG_NAME_MAXITER])
 
-        self.model_d[MLP_MDL_KEY_MODEL] = \
+        self.model_d[ALG_NAME_MDL] = \
             MLPClassifier(hidden_layer_sizes = (h_s,),
                           activation = act,
                           solver = sol,
@@ -4977,7 +4867,7 @@ class MLP:
 
         # prediction
         #
-        ypred = self.model_d[MLP_MDL_KEY_MODEL].predict(samples)
+        ypred = self.model_d[ALG_NAME_MDL].predict(samples)
 
         # score calculation using auc ( f1 score )
         #
@@ -5022,11 +4912,11 @@ class MLP:
 
         samples = np.array(data.data)
 
-        p_labels = model[MLP_MDL_KEY_MODEL].predict(samples)
+        p_labels = model[ALG_NAME_MDL].predict(samples)
 
         # posterior calculation
         #
-        posteriors = model[MLP_MDL_KEY_MODEL].predict_proba(samples)
+        posteriors = model[ALG_NAME_MDL].predict_proba(samples)
 
         # exit gracefully
         #
@@ -5317,14 +5207,49 @@ class TRANSFORMER:
         self.dropout = float(self.params_d[TRANS_PRM_KEY_PARAM]
                                           [TRANS_PRM_KEY_DROPOUT])
 
-
         # create the model
         #
-        self.model_d[TRANS_MDL_KEY_MODEL] = ntt.NEDCTransformer(
-            input_dim=samples.shape[1], num_classes=len(np.unique(labels)),
-            d_model=self.embed_size, nhead=self.nheads,
-            num_layers=self.num_layers,dim_feedforward=self.MLP_dim,
-            dropout=self.dropout)
+        trans_model = ntt.NEDCTransformer(
+                                    input_dim=samples.shape[1],
+                                    num_classes=len(np.unique(labels)),
+                                    d_model=self.embed_size, nhead=self.nheads,
+                                    num_layers=self.num_layers,dim_feedforward=self.MLP_dim,
+                                    dropout=self.dropout)
+
+        # check if the model is pre-trained
+        #
+        if self.model_d[TRANS_MDL_KEY_MODEL]:
+
+            if dbgl.g == ndt.FULL:
+                print("Info: %s (line: %s) %s: %s" %
+                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                       "Got pre-trained model for transformer"))
+
+            # load the model's weights
+            #
+            trans_model.load_state_dict(self.model_d[TRANS_MDL_KEY_MODEL])
+
+            # move the model to the default device
+            # CPU/GPU based on their availability
+            #
+            trans_model = trans_model.to_device(trans_model)
+
+        else:
+
+            if dbgl_g == ndt.FULL:
+                print("Info: %s (line: %s) %s: %s" %
+                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                       "Training a new model for transformer"))
+
+                # assign an initial NEDCTransformer object
+                #
+                self.model_d[TRANS_MDL_KEY_MODEL] = model
+
+                # move the model to the default device
+                #
+                self.model_d[TRANS_MDL_KEY_MODEL] = \
+                    self.model_d[TRANS_MDL_KEY_MODEL] \
+                        .to_device(self.model_d[TRANS_MDL_KEY_MODEL])
 
         # get the epochs
         #
@@ -5335,14 +5260,12 @@ class TRANSFORMER:
         #
         accuracies = []
 
-
         # get the corss entropy loss function and ADAM optimizer
         #
         criterion = self.model_d[TRANS_MDL_KEY_MODEL]\
         .get_cross_entropy_loss_function()
         optimizer = self.model_d[TRANS_MDL_KEY_MODEL]\
         .get_adam_optimizer(lr=self.lr)
-
 
         # train the model
         #
@@ -5351,12 +5274,6 @@ class TRANSFORMER:
             # set the model to train mode
             #
             self.model_d[TRANS_MDL_KEY_MODEL].train()
-
-            # move the model to the default device
-            #
-            self.model_d[TRANS_MDL_KEY_MODEL] = \
-                self.model_d[TRANS_MDL_KEY_MODEL] \
-                    .to_device(self.model_d[TRANS_MDL_KEY_MODEL])
 
             # initialize the correct and total
             #
@@ -6151,11 +6068,6 @@ class QRBM:
         #
         samples = np.array(data.data)
 
-        # get the number of visible node which is the number of features
-        # in the dataset
-        #
-        self.n_visible = samples[0].shape[0]
-
         # get the trained model
         #
         model = self.model_d[QRBM_MDL_KEY_MODEL]
@@ -6185,11 +6097,15 @@ class QRBM:
 
 # define variables to configure the machine learning algorithms
 #
-ALGS = {EUCLIDEAN_NAME:EUCLIDEAN(), PCA_NAME:PCA(), LDA_NAME:LDA(),
+# ALGS = {EUCL_NAME:EUCLIDEAN(), PCA_NAME:PCA(), LDA_NAME:LDA(),
+#         QDA_NAME:QDA(), QLDA_NAME:QLDA(), NB_NAME:NB(), GMM_NAME:GMM(),
+#         KNN_NAME:KNN(), KMEANS_NAME:KMEANS(), RNF_NAME:RNF(), SVM_NAME:SVM(),
+#         MLP_NAME:MLP(), RBM_NAME:RBM(), TRANSF_NAME:TRANSFORMER(),
+#         QSVM_NAME:QSVM(), QNN_NAME:QNN(), QRBM_NAME:QRBM()}
+ALGS = {EUCL_NAME:EUCLIDEAN(), PCA_NAME:PCA(), LDA_NAME:LDA(),
         QDA_NAME:QDA(), QLDA_NAME:QLDA(), NB_NAME:NB(), GMM_NAME:GMM(),
-        KNN_NAME:KNN(), KMEANS_NAME:KMEANS(), RNF_NAME:RNF(), SVM_NAME:SVM(),
-        MLP_NAME:MLP(), RBM_NAME:RBM(), TRANSFORMER_NAME:TRANSFORMER(),
-        QSVM_NAME:QSVM(), QNN_NAME:QNN(), QRBM_NAME:QRBM()}
+        KNN_NAME:KNN(), KMEANS_NAME:KMEANS(), RNF_NAME: RNF(), SVM_NAME:SVM(),
+        MLP_NAME:MLP()}
 
 #
 # end of file
