@@ -220,19 +220,17 @@ def train(model:mlt.Alg, data:mltd.MLToolsData):
       the labels generated while calculating the goodness of fit score.    
     '''
 
-    print(model.alg_d.model_d)
-
     # train the model
     #
     check_return(model.train, data)
 
     # get the performance metrics of the model on the test data
     #
-    metrics, parameter_outcomes = predict(model, data)
+    metrics, parameter_output = predict(model, data)
 
     # return the trained model and the performance metrics
     #
-    return model, metrics, parameter_outcomes
+    return model, metrics, parameter_output
 #
 # end of function
 
@@ -270,12 +268,11 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
 
     # get the parameter outcomes
     #
-    # parameter_outcomes = model.get_info()
-    parameter_outcomes = ''
-
+    parameter_output = model.get_info()
+    
     # exit gracefully
     #
-    return metrics, parameter_outcomes
+    return metrics, parameter_output
 #
 # end of function
 

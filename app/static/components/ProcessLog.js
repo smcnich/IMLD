@@ -351,50 +351,6 @@ class ProcessLog extends HTMLElement {
     }
     //
     // end of method
-
-    // Function to write estimated parameters to process log
-    //
-    writeEstimatedParams(paramValues, param_names) {
-        /*
-        method: ProcessLog::writeEstimatedParams
-
-        args:
-        paramValues (Array): The values of the parameters to be logged.
-        param_names (Array): The names of the parameters corresponding to the values.
-
-        return:
-        None
-
-        description:
-        This method iterates over parameter names and their corresponding values, formatting and logging them.  
-        If a parameter represents a matrix (e.g., 'covariances'), it is parsed and logged row by row.  
-        Other parameters (e.g., 'means') are logged with an incrementing class index.
-        */
-        var class_index = 0;
-
-        param_names.forEach((name, index) => {
-            let name_padding;
-
-            if (name === 'covariances') {
-                var matrix = this.parseMatrix(paramValues[index]);
-                this.writeSingleValue(`Covariances`, `[${matrix[0]}]`);
-
-                for (let i = 1; i < matrix.length; i++) {
-                    name_padding = `<span style="color: white; user-select: none;">Covariancess:</span>`;
-                    this.writePlain(`${name_padding} [${matrix[i]}]`);
-                }
-            } else {
-                var matrix = this.parseMatrix(paramValues[index]); // Access value directly
-                
-                for (let i = 0; i < matrix.length; i++) {
-                    this.writeSingleValue(`Class ${class_index}`, `Means: [${matrix[i]}]`);
-                    class_index = class_index + 1;
-                }
-            }
-        });
-    }
-    //
-    // end of method
     
     // Function to write algorithm parameters to the log
     writeAlgorithmParams(paramValues, param_names) {
@@ -429,6 +385,46 @@ class ProcessLog extends HTMLElement {
             }
         })
     }
+    //
+    // end of method
+
+    writeEstimatedParams(logOutput) {
+        /*
+        method: ProcessLog::writeEstimatedParams
+    
+        args:
+            logOutput (String): The formatted log output returned from the Python function.
+    
+        return:
+            None
+    
+        description:
+            This method processes the formatted string from Python, converts new lines to HTML line breaks,
+            bolds all words before ":", and writes it to the log container.
+        */
+    
+        // Convert new lines to <br> for HTML display
+        logOutput = logOutput.replace(/\n/g, "<br>");
+
+        // Bold all words before ":"
+        logOutput = logOutput.replace(/(^|\b)([A-Za-z0-9\s]+?):/g, '<b>$2:</b>');
+    
+        // Add indentation for covariance rows that start with a bracket
+        logOutput = logOutput.replace(/<br>\s*\[/g, '<br><span style="color: white; user-select: none;">Covariancess:</span> [');
+
+        // Get the log object
+        //
+        let logObject = this.shadowRoot.querySelector('.scroll-object');
+  
+        // Append the log message to the log container
+        //
+        logObject.innerHTML += logOutput;
+  
+        // Scroll to the bottom of the log container
+        //
+        let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
+        logDiv.scrollTop = logDiv.scrollHeight;  
+    }    
     //
     // end of method
 

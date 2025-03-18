@@ -1441,6 +1441,36 @@ class Alg:
     #
     # end of method
 
+    def get_info(self):
+        """
+        method: get_info
+ 
+        arguments:
+         none
+ 
+        return:
+         a dictionary containing the algorithm information
+ 
+        description:
+         this method returns the information of the current algorithm.
+        """
+ 
+        # get the algorithm parameters
+        #
+        if hasattr(self.alg_d, 'get_info'):
+            parameter_outcomes = self.alg_d.get_info()
+        else:
+            parameter_outcomes = None
+ 
+        print(parameter_outcomes)
+
+        # exit gracefully
+        # return the parameter outcomes
+        #
+        return parameter_outcomes
+    #
+    # end of method
+
     #--------------------------------------------------------------------------
     #
     # scoring methods: score/report
@@ -2381,6 +2411,50 @@ class PCA:
         return labels, posteriors
     #
     # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+ 
+        arguments:
+         none
+ 
+        return:
+         a dictionary containing the algorithm information
+ 
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+ 
+        # get the algorithm means and covariances
+        #
+        data = {
+            "means": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_MEANS],
+            "covariances": self.model_d[PCA_MDL_KEY_MODEL][PCA_MDL_KEY_COV]
+        }
+
+        log_output = ""
+        class_index = 0
+
+        # Handle means (list of numpy arrays)
+        if 'means' in data:
+            for mean in data['means']:
+                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
+                class_index += 1
+
+        # Handle covariances (numpy 2D array)
+        if 'covariances' in data:
+            matrix = data['covariances']
+            log_output += f"Covariances: {matrix[0]}\n"
+
+            for row in matrix[1:]:
+                log_output += f"             {row}\n"  # Blank space for padding as per your requirement
+
+        # exit gracefully
+        #
+        return log_output
+    #
+    # end of method
 #
 # end of PCA
 
@@ -2779,6 +2853,41 @@ class LDA:
         return labels, posteriors
     #
     # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+ 
+        arguments:
+         none
+ 
+        return:
+         a dictionary containing the algorithm information
+ 
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+ 
+        # get the algorithm means and covariances
+        #
+        data = {
+            "means": self.model_d[LDA_MDL_KEY_MODEL][LDA_MDL_KEY_MEANS],
+        }
+        
+        log_output = ""
+        class_index = 0
+
+        # Handle means (list of numpy arrays)
+        if 'means' in data:
+            for mean in data['means']:
+                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
+                class_index += 1
+
+        # exit gracefully
+        #
+        return log_output
+    #
+    # end of method
 #
 # end of LDA
 
@@ -3160,6 +3269,50 @@ class QDA:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+ 
+        arguments:
+         none
+ 
+        return:
+         a dictionary containing the algorithm information
+ 
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+ 
+        # get the algorithm means and covariances
+        #
+        data = {
+            "means": self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_MEANS],
+            "covariances": self.model_d[QDA_MDL_KEY_MODEL][QDA_MDL_KEY_COV]
+        }
+
+        log_output = ""
+        class_index = 0
+
+        # Handle means (list of numpy arrays)
+        if 'means' in data:
+            for mean in data['means']:
+                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
+                class_index += 1
+
+        # Handle covariances (numpy 2D array)
+        if 'covariances' in data:
+            matrix = data['covariances']
+            log_output += f"Covariances: {matrix[0]}\n"
+
+            for row in matrix[1:]:
+                log_output += f"             {row}\n"  # Blank space for padding as per your requirement
+
+        # exit gracefully
+        #
+        return log_output
     #
     # end of method
 #
@@ -3563,6 +3716,41 @@ class QLDA:
         #
         return labels, posteriors
 
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+ 
+        arguments:
+         none
+ 
+        return:
+         a dictionary containing the algorithm information
+ 
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+ 
+        # get the algorithm means and covariances
+        #
+        data = {
+            "means": self.model_d[QLDA_MDL_KEY_MODEL][QLDA_MDL_KEY_MEANS],
+        }
+        
+        log_output = ""
+        class_index = 0
+
+        # Handle means (list of numpy arrays)
+        if 'means' in data:
+            for mean in data['means']:
+                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
+                class_index += 1
+
+        # exit gracefully
+        #
+        return log_output
     #
     # end of method
 

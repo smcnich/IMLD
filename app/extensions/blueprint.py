@@ -19,16 +19,6 @@ main = Blueprint('main', __name__)
 #
 model_cache = {}
 
-def convert_numpy(obj):
-    """Recursively converts NumPy arrays to lists for JSON serialization."""
-    if isinstance(obj, np.ndarray):
-        return obj.tolist()
-    elif isinstance(obj, list):
-        return [convert_numpy(item) for item in obj]
-    elif isinstance(obj, dict):
-        return {key: convert_numpy(value) for key, value in obj.items()}
-    return obj  # Return the object as-is if it's not a NumPy array
-
 def clean_cache():
 
     # get the current time
@@ -209,7 +199,7 @@ def train():
 
         # train the model
         #
-        model, metrics, parameter_outcomes = imld.train(model, data)
+        model, metrics, parameter_output = imld.train(model, data)
 
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
@@ -230,7 +220,7 @@ def train():
             # to work with on the front end
             # 'mapping_label': {value: key for key, value in data.mapping_label.items()},
             'metrics': metrics,
-            'parameter_outcomes': convert_numpy(parameter_outcomes)
+            'parameter_output': parameter_output
         }
 
         # save the model in the cache
@@ -277,13 +267,13 @@ def eval():
 
         # evaluate the model
         #
-        metrics, parameter_outcomes = imld.predict(model, data)
+        metrics, parameter_output = imld.predict(model, data)
 
         # format the response
         #
         response = {
             'metrics': metrics,
-            'parameter_outcomes': convert_numpy(parameter_outcomes)
+            'parameter_output': parameter_output
         }
 
         # return the jsonified response

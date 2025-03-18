@@ -154,15 +154,10 @@ EventBus.addEventListener('train', (event) => {
         trainPlot.decision_surface(data.decision_surface, 
                                    labelManager.getLabels());
 
-        // get the param values and corresponding param names
-        //
-        const paramValues = Object.values(data.parameter_outcomes).map(value => JSON.stringify(value));
-        const param_names = Object.keys(data.parameter_outcomes);
-
         //  write the estimated parameters to the process log
         //
         processLog.writePlain('');
-        processLog.writeEstimatedParams(paramValues, param_names);
+        processLog.writeEstimatedParams(data.parameter_output);
 
         // write the metrics to the process log
         //
@@ -278,15 +273,10 @@ EventBus.addEventListener('eval', (event) => {
     //
     .then((data) => {
 
-        // get the param values and corresponding param names
-        //
-        const paramValues = Object.values(data.parameter_outcomes).map(value => JSON.stringify(value));
-        const param_names = Object.keys(data.parameter_outcomes);
-
         //  write the estimated parameters to the process log
         //
         processLog.writePlain('');
-        processLog.writeEstimatedParams(paramValues, param_names);
+        processLog.writeEstimatedParams(data.parameter_output);
 
         // write the metrics to the process log
         //
