@@ -899,17 +899,6 @@ class Alg:
             "invalid parameter structure",
             f"dict, defaultdict expected, got '{type(parameters).__name__}')")
 
-        # check the algorithm name of the parameter file
-        #
-        if self.set(parameters[ALG_NAME_ALG]) is False:
-
-            # if the algorithm specified in the parameter file
-            # is not supported print error message
-            #
-            print("Error: %s (line: %s) %s: %s (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "unsupported algorithm name", parameters[ALG_NAME_ALG]))
-
         # set the parameters
         #
         self.alg_d.params_d = parameters
