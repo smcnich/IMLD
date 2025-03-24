@@ -34,8 +34,12 @@ LIST = [
 
 [EUCLIDEAN]
     name = "Euclidean Distance"
-    model_name = "EUCLIDEAN"
     [EUCLIDEAN.params]
+        [EUCLIDEAN.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["discriminant"]
+            default = "discriminant"
         [EUCLIDEAN.params.weights]
             name = "Weights"
             type = "class-based"
@@ -43,10 +47,14 @@ LIST = [
 
 [PCA]
     name = "Principle Component Analysis (PCA)"
-    model_name = "PCA"
     [PCA.params]
-        [PCA.params.prior]
-            name = "Prior"
+        [PCA.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["discriminant"]
+            default = "discriminant"
+        [PCA.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
@@ -73,10 +81,14 @@ LIST = [
 
 [LDA]
     name = "Linear Discriminant Analysis (LDA)"
-    model_name = "LDA"
     [LDA.params]
-        [LDA.params.prior]
-            name = "Prior"
+        [LDA.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["discriminant"]
+            default = "discriminant"
+        [LDA.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
@@ -95,13 +107,22 @@ LIST = [
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+        [LDA.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [0, 2] # range for IMLD since its 2D
+            default = 2 # default value for IMLD since its 2D
 
 [QDA]
     name = "Quadratic Components Analysis (QDA)"
-    model_name = "QDA"
     [QDA.params]
-        [QDA.params.prior]
-            name = "Prior"
+        [QDA.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["discriminant"]
+            default = "discriminant"
+        [QDA.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
@@ -128,10 +149,14 @@ LIST = [
 
 [QLDA]
     name = "Quadratic Linear Discriminant Analysis (QLDA)"
-    model_name = "QLDA"
     [QLDA.params]
-        [QLDA.params.prior]
-            name = "Prior"
+        [QLDA.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["discriminant"]
+            default = "discriminant"
+        [QLDA.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
@@ -150,23 +175,36 @@ LIST = [
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+        [QLDA.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [0, 2] # range for IMLD since its 2D
+            default = 2 # default value for IMLD since its 2D
 
 [NB]
     name = "Naive Bayes (NB)"
-    model_name = "NB"
     [NB.params]
-        [NB.params.prior]
-            name = "Prior"
+        [NB.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
+        [NB.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
 
 [GMM]
     name = "Gaussian Mixture Model (GMM)"
-    model_name = "GMM"
     [GMM.params]
-        [GMM.params.prior]
-            name = "Prior"
+        [GMM.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["em"]
+            default = "em"
+        [GMM.params.priors]
+            name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
@@ -179,7 +217,7 @@ LIST = [
             name = "Random State"
             type = "int"
             range = [0, "inf"]
-            default = 0
+            default = 27
 
 #------------------------------------------------------------------------------
 #
@@ -189,23 +227,31 @@ LIST = [
 
 [KNN]
     name = "K-Nearest Neighbors (KNN)"
-    model_name = "KNN"
     [KNN.params]
-        [KNN.params.neighbor]
+        [KNN.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
+        [KNN.params.k_nearest_neighbors]
             name = "Number of Neighbors"
             type = "int"
             range = [1, "inf"]
-            default = 1
+            default = 5
 
 [KMEANS]
     name = "K-Means (KMEANS)"
-    model_name = "KMEANS"
     [KMEANS.params]
+        [KMEANS.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
         [KMEANS.params.n_cluster]
             name = "Number of Clusters"
             type = "int"
             range = [1, "inf"]
-            default = 8
+            default = 2
         [KMEANS.params.n_init]
             name = "Number of Initializations"
             type = "int"
@@ -215,8 +261,8 @@ LIST = [
             name = "Random State"
             type = "int"
             range = [0, "inf"]
-            default = 0
-        [KMEANS.params.max_iter]
+            default = 27
+        [KMEANS.params.max_iters]
             name = "Maximum Iterations"
             type = "int"
             range = [1, "inf"]
@@ -224,9 +270,13 @@ LIST = [
 
 [RNF]
     name = "Random Forest (RNF)"
-    model_name = "RNF"
     [RNF.params]
-        [RNF.params.estimator]
+        [RNF.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
+        [RNF.params.n_estimators]
             name = "Number of Estimators"
             type = "int"
             range = [1, "inf"]
@@ -235,7 +285,7 @@ LIST = [
             name = "Maximum Depth"
             type = "int"
             range = [1, "inf"]
-            default = 10
+            default = 5
         [RNF.params.criterion]
             name = "Criterion"
             type = "select"
@@ -245,12 +295,16 @@ LIST = [
             name = "Random State"
             type = "int"
             range = [0, "inf"]
-            default = 0
+            default = 27
 
 [SVM]
     name = "Support Vector Machines (SVM)"
-    model_name = "SVM"
     [SVM.params]
+        [SVM.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
         [SVM.params.c]
             name = "Regularization Parameter (c)"
             type = "float"
@@ -275,8 +329,12 @@ LIST = [
 
 [MLP]
     name = "Multi-Layer Perceptron (MLP)"
-    model_name = "MLP"
     [MLP.params]
+        [MLP.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
         [MLP.params.hidden_size]
             name = "Hidden Size"
             type = "int"
@@ -306,12 +364,12 @@ LIST = [
             name = "Initial Learning Rate"
             type = "float"
             range = [0, 1]
-            default = 0.009
+            default = 0.001
         [MLP.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
-            default = 0
+            default = 27
         [MLP.params.momentum]
             name = "Momentum"
             type = "float"
@@ -322,16 +380,16 @@ LIST = [
             type = "float"
             range = [0, 1]
             default = 0.1
-        [MLP.params.max_iter]
+        [MLP.params.max_iters]
             name = "Maximum Iterations"
             type = "int"
             range = [1, "inf"]
-            default = 20
+            default = 100
         [MLP.params.shuffle]
             name = "Shuffle"
             type = "select"
             options = [true, false]
-            default = false
+            default = true
         [MLP.params.early_stopping]
             name = "Early Stopping"
             type = "select"
@@ -340,44 +398,52 @@ LIST = [
 
 [RBM]
     name = "Restricted Boltzmann Machine (RBM)"
-    model_name = "RBM"
     [RBM.params]
+        [RBM.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
         [RBM.params.learning_rate]
             name = "Learning Rate"
             type = "float"
             range = [0, 1]
             default = 0.1
-        [RBM.params.n_iter]
-            name = "Number of Iterations"
+        [RBM.params.batch_size]
+            name = "Batch Size"
             type = "int"
             range = [1, "inf"]
-            default = 5
+            default = 0
         [RBM.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 0
-        [RBM.params.batch_size]
-            name = "Batch Size"
-            type = "int"
-            range = [1, "inf"]
-            default = 32
         [RBM.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [1, "inf"]
-            default = 200
+            default = 2
+        [RBM.params.max_iters]
+            name = "Maximum Iterations"
+            type = "int"
+            range = [1, "inf"]
+            default = 100
 
 [TRANSFORMER]
     name = "Transformer"
-    model_name = "TRANSFORMER"
     [TRANSFORMER.params]
+        [TRANSFORMER.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["pytorch"]
+            default = "pytorch"
         [TRANSFORMER.params.epoch]
             name = "Epoch"
             type = "int"
             range = [1, "inf"]
             default = 50
-        [TRANSFORMER.params.lr]
+        [TRANSFORMER.params.learning_rate]
             name = "Learning Rate"
             type = "float"
             range = [0, 1]
@@ -402,7 +468,7 @@ LIST = [
             type = "int"
             range = [1, "inf"]
             default = 2
-        [TRANSFORMER.params.MLP_dim]
+        [TRANSFORMER.params.mlp_dim]
             name = "MLP Dimension"
             type = "int"
             range = [1, "inf"]
@@ -412,6 +478,11 @@ LIST = [
             type = "float"
             range = [0, 1]
             default = 0.1
+        [TRANSFORMER.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 27
 
 #------------------------------------------------------------------------------
 #

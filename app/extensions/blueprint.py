@@ -191,7 +191,7 @@ def train():
 
         # create the model given the parameters
         #
-        model = imld.create_model(algo, {"name": algo, "params": params})
+        model = imld.create_model(algo, params)
 
         # create the data object
         #
