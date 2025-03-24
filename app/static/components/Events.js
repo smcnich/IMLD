@@ -156,8 +156,10 @@ EventBus.addEventListener('train', (event) => {
 
         //  write the estimated parameters to the process log
         //
-        processLog.writePlain('');
-        processLog.writeEstimatedParams(data.parameter_output);
+        if (data.parameter_output != null) {
+            processLog.writePlain('');
+            processLog.writeEstimatedParams(data.parameter_output);
+        }
 
         // write the metrics to the process log
         //
