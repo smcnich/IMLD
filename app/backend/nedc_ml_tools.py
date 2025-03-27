@@ -3,7 +3,10 @@
 # file: $NEDC_NFC/class/python/nedc_ml_tools/nedc_ml_tools.py
 #
 # revision history:
-# 
+#
+# 20250322 (SP): fixed model_d format issue
+# 20250322 (JP): fixed error messages
+# 20250321 (PM): fixed RBM
 # 20250318 (JP): more refactoring
 # 20250304 (JP): reviewed and refactored
 # 20250228 (AM): added GMM
@@ -369,7 +372,7 @@ QLDA_IMPLS = [IMP_NAME_DISCRIMINANT]
 # the parameter block (param_d) for QLDA contains:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'QLDA',
+#   'implementation_name': 'discriminant',
 #   'priors': 'ml',
 #   'ctype': 'full',
 #   'center': 'none',
@@ -406,9 +409,9 @@ NB_IMPLS = [IMP_NAME_SKLEARN]
 # the parameter block (param_d) for NB looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'NB',
-#   'priors': 'ml'
-#   'average': 'none'
+#   'implementation_name': 'sklearn',
+#   'priors': 'ml',
+#   'average': 'none',
 #   'multi_class': 'ovr'
 #   }
 #  })
@@ -434,10 +437,10 @@ GMM_IMPLS = ["em"]
 # the parameter block (param_d) for GMM looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'GMM',
+#   'implementation_name': 'em',
 #   'priors': 'ml',
 #   'n_components': -1 (all),
-#   'random_state': 27,
+#   'random_state': 27
 #   }
 #  })
 #
@@ -492,7 +495,7 @@ KMEANS_IMPLS = [IMP_NAME_SKLEARN]
 # the parameter block (param_d) for KMEANS looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'sklearn"
+#   'implementation_name': 'sklearn',
 #   'n_clusters': 2,
 #   'n_init': 3,
 #   'random_state': 27,
@@ -521,7 +524,7 @@ RNF_IMPLS = [IMP_NAME_SKLEARN]
 # the parameter block (param_d) for RNF looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'RNF',
+#   'implementation_name': 'sklearn',
 #   'n_estimators': 100,
 #   'max_depth': 5,
 #   'criterion': 'gini'
@@ -612,11 +615,16 @@ MLP_IMPLS = [IMP_NAME_SKLEARN]
 RBM_NAME = "RBM"
 RBM_IMPLS = [IMP_NAME_SKLEARN]
 
+RBM_NAME_NITER = "max_iters"
+RBM_NAME_VERBOSE = "verbose"
+RBM_NAME_CLASSIFIER = "classifier"
+
 # the parameter block (param_d) for RBM looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'sklearn"
-#   'classifier: '????'
+#   'implementation_name': 'sklearn',
+#   'classifier: 'KNN',
+#   'k_nearest_neighbors = 2,
 #   'learning_rate': 0.1,
 #   'batch_size': 0,
 #   'verbose': 0,
@@ -647,15 +655,15 @@ TRANSF_IMPLS = [IMP_NAME_PYTORCH]
 # the parameter block (param_d) for TRANSFORMER looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'pytorch',"
-#   'epoch': 50
-#   'learning_rater': 0.001
-#   'batch_size': 32
-#   'embed_size': 32
-#   'nheads': 2
-#   'num_layers': 2
-#   'mlp_dim': 64
-#   'dropout': 0.1
+#   'implementation_name': 'pytorch',
+#   'epoch': 50,
+#   'learning_rater': 0.001,
+#   'batch_size': 32,
+#   'embed_size': 32,
+#   'nheads': 2,
+#   'num_layers': 2,
+#   'mlp_dim': 64,
+#   'dropout': 0.1,
 #   'random_state': 27
 #   }
 #  })
@@ -681,14 +689,14 @@ QSVM_IMPLS = [IMP_NAME_QISKIT]
 # the parameter block (param_d) for QSVM looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': '[qiskit]'
-#   'provider_name': 'qiskit'
-#   'hardware': 'cpu'
-#   'encoder_name': 'zz'
-#   'n_qubits': 4
-#   'featuremap_reps': 2
-#   'entanglement': 'full'
-#   'kernel': 'fidelity'
+#   'implementation_name': 'qiskit',
+#   'provider_name': 'qiskit',
+#   'hardware': 'cpu',
+#   'encoder_name': 'zz',
+#   'n_qubits': 4,
+#   'featuremap_reps': 2,
+#   'entanglement': 'full',
+#   'kernel': 'fidelity',
 #   'shots': 1024
 #   }
 #  })
@@ -714,17 +722,17 @@ QNN_IMPLS = [IMP_NAME_QISKIT]
 # the parameter block (param_d) for QNN looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'qiskit"
-#   'provider_name': 'qiskit'
-#   'hardware': 'cpu'
-#   'encoder_name': 'zz'
-#   'n_qubits': 2
-#   'entanglement': 'full'
-#   'featuremap_reps': 2
-#   'ansatz_reps': 2
-#   'ansatz_name': 'real_amplitudes'
-#   'optim_name': 'cobyla'
-#   'optim_max_steps': 50
+#   'implementation_name': 'qiskit',
+#   'provider_name': 'qiskit',
+#   'hardware': 'cpu',
+#   'encoder_name': 'zz',
+#   'n_qubits': 2,
+#   'entanglement': 'full',
+#   'featuremap_reps': 2,
+#   'ansatz_reps': 2,
+#   'ansatz_name': 'real_amplitudes',
+#   'optim_name': 'cobyla',
+#   'optim_max_steps': 50,
 #   'meas_type': 'sampler'
 #   }
 #  })
@@ -750,12 +758,12 @@ QRBM_IMPLS = [IMP_NAME_DWAVE]
 # the parameter block (param_d) for QRBM looks like this:
 #
 #  defaultdict(<class 'dict'>, {
-#   'implementation_name': 'dwave'
-#   'provider_name': 'dwave'
-#   'encoder_name': 'bqm'
-#   'n_hidden': 2
-#   'shots': 2
-#   'chain_strength': 2
+#   'implementation_name': 'dwave',
+#   'provider_name': 'dwave',
+#   'encoder_name': 'bqm',
+#   'n_hidden': 2,
+#   'shots': 2,
+#   'chain_strength': 2,
 #   'k_nearest_neighbors': 2
 #   }
 #  })
@@ -854,8 +862,8 @@ class Alg:
 
             # print informational error message
             #
-            print("Error: %s (line: %s) %s: %s (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "unknown algorithm name", alg_name))
 
             # exit ungracefully: algorithm setting failed
@@ -885,8 +893,8 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: setting parameters" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: setting parameters" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # check that the argument is a valid dictionary
         #
@@ -925,8 +933,8 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: getting the algorithm name" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: getting the algorithm name" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # check if an algorithm is set
         #
@@ -935,8 +943,8 @@ class Alg:
             # print error message if the algorithm
             # was not set
             #
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "no algorithm has been set"))
 
             # exit ungracefully: algorithm is not set
@@ -1024,16 +1032,16 @@ class Alg:
             fp = open(fname, nft.MODE_READ_BINARY)
             model = pickle.load(fp)
         except:
-            print("Error: %s (line: %s) %s: %s (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "error loading model file", fname))
             return None
 
         # check the type of data
         #
         if not isinstance(model, (dict, defaultdict)):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "unknown model type"))
             return None
 
@@ -1041,15 +1049,15 @@ class Alg:
         # ('algorithm_name', 'implementation_name', 'model')
         #
         if len(model) != int(3):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "unknown model format"))
             return None
 
         if model[ALG_NAME_ALG] != self.alg_d.__class__.__name__:
-            print("Error: %s (line: %s) %s: %s, "
+            print("Error: %s (line: %s) %s::%s: %s, "
                   "Model Name: %s, Set Algorithm: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "the current set algorithm and model name does not match",
                    model[ALG_NAME_ALG],
                    self.alg_d.__class__.__name__))
@@ -1083,31 +1091,36 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: loading parameters (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
+            print("%s (line: %s) %s::%s: loading parameters (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
+                   fname))
 
         # check that an algorithm has been set
         #
         if self.alg_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "no algorithm has been set"))
             return None
 
+        # expand the filename
+        #
+        ffname = nft.get_fullpath(fname)
+
         # make sure the file is a valid parameter file
         #
-        if nft.get_version(fname) is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+        if nft.get_version(ffname) is None:
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "invalid parameter file (invalid version)"))
             return None
 
         # attempt to load the parameters
         #
-        params = nft.load_parameters(fname, self.alg_d.__class__.__name__)
+        params = nft.load_parameters(ffname, self.alg_d.__class__.__name__)
         if params is None:
-            print("Error: %s (line: %s) %s: %s [%s]" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s [%s]" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "unable to parse parameter file", fname))
             return None
 
@@ -1138,14 +1151,15 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: saving model (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
+            print("%s (line: %s) %s::%s: saving model (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
+                   fname))
 
         # check that there is a valid model
         #
         if self.alg_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "invalid model"))
             return False
 
@@ -1156,8 +1170,8 @@ class Alg:
             pickle.dump(self.alg_d.model_d, fp)
             fp.close()
         except:
-            print("Error: %s (line: %s) %s: %s (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "error writing model file", fname))
             return False
 
@@ -1185,22 +1199,22 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: saving parameters" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: saving parameters" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # check if an algorithm has been set
         #
         if self.alg_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "no algorithm has been set"))
             return False
 
         # check if params_d is empty
         #
         if self.alg_d.params_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "parameter block is empty"))
             return False
 
@@ -1209,8 +1223,9 @@ class Alg:
         try:
             fp = open(fname, nft.MODE_WRITE_TEXT)
         except:
-            print("Error: %s (line: %s) %s: error opening file (%s)" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__, fname))
+            print("Error: %s (line: %s) %s::%s: error opening file (%s)" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
+                   fname))
 
         # write a bare bones parameter file:
         #  start with the version information
@@ -1280,14 +1295,14 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # check if the algorithm has been configured
         #
         if self.alg_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "no algorithm has been set"))
 
             # exit ungracefully: algorithm not set
@@ -1298,8 +1313,8 @@ class Alg:
         # instance
         #
         if not isinstance(data, MLToolsData):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "data is not type of MLToolsData"))
 
             # exit ungracefully: incompatible object type
@@ -1332,14 +1347,14 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # check if the algorithm has been configured
         #
         if self.alg_d is None:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "no algorithm has been set"))
 
             # exit ungracefully: algorithm not set
@@ -1349,8 +1364,8 @@ class Alg:
         # check if data variable is an MLToolsData instance
         #
         if not isinstance(data, MLToolsData):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "data is not type of MLToolsData"))
 
             # exit ungracefully: incompatible object type
@@ -1389,8 +1404,8 @@ class Alg:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: generating a confusion matrix" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: generating a confusion matrix" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # build a labels matrix
         #
@@ -1541,8 +1556,8 @@ class Alg:
         # display informational message
         #
         if dbgl_g > ndt.BRIEF:
-            print("%s (line: %s) %s: scoring the results" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: scoring the results" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # get the reference and hypothesis field member data
         #
@@ -1599,9 +1614,10 @@ class Alg:
             prec = precision_score(r_labels, h_labels, average=average)
             f1 = f1_score(r_labels, h_labels, average=average)
 
-        # (ISSUE_PM: simplify this?) exit gracefully: operation successfully completed
-        #
-        return None if isPrint else conf_matrix, sens, spec, prec, acc, err, f1
+        if isPrint:
+            return None
+
+        return conf_matrix, sens, spec, prec, acc, err, f1
     #
     # end of method
 
@@ -1626,8 +1642,8 @@ class Alg:
         # display informational message
         #
         if dbgl_g > ndt.BRIEF:
-            print("%s (line: %s) %s: scoring the results" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: scoring the results" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__))
 
         # print the date and time
         #
@@ -1644,14 +1660,6 @@ class Alg:
         #
         self.print_confusion_matrix(cnf, fp)
         fp.write(nft.DELIM_NEWLINE)
-
-        # (ISSUE_PM: remove commented code?) generate a master list of labels:
-        #  we have to do this because some of the labels might not appear
-        #  in the data
-        #
-        # lbls = []
-        # for i in range(num_classes):
-        #     lbls.append(ALG_FMT_LBL % i)
 
         # generate and print the classification report
         #
@@ -1703,7 +1711,7 @@ class Alg:
     # end of method
 
 #
-# end of Alg
+# end of class (Alg)
 
 #******************************************************************************
 #
@@ -1753,7 +1761,10 @@ class EUCLIDEAN:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = NB_IMPLS[0]
         self.model_d[ALG_NAME_MDL] = defaultdict(dict)
+
+
     #
     # end of method
 
@@ -1808,13 +1819,15 @@ class EUCLIDEAN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "Doesn't support training on pre-trained model"))
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__,
+                   "doesn't support training on pre-trained model"))
             return None, None
 
         # get sorted_labels and sorted_samples
@@ -1838,7 +1851,20 @@ class EUCLIDEAN:
         #
         impl = self.params_d[ALG_NAME_IMP]
 
-        if impl == "discriminant":
+        if ALG_NAME_IMP in self.params_d:
+            impl = self.params_d[ALG_NAME_IMP]
+        else:
+            impl = self.model_d[ALG_NAME_IMP]
+
+        # check if the implementation is valid
+        #
+        if impl not in EUCL_IMPLS:
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__, "unknown implementation"))
+            return None
+
+        if impl == IMP_NAME_DISCRIMINANT:
 
             # scoring
             #
@@ -1857,6 +1883,7 @@ class EUCLIDEAN:
                     acc += 1
 
             self.model_d[ALG_NAME_IMP] = impl
+            self.model_d[ALG_NAME_MDL][ALG_NAME_WEIGHTS] = weights
 
         score = acc / len(data.data)
 
@@ -1886,8 +1913,9 @@ class EUCLIDEAN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         # check if model is none
         #
@@ -1897,15 +1925,15 @@ class EUCLIDEAN:
         # check for model validity
         #
         if model[ALG_NAME_ALG] != EUCL_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "incorrect model name"))
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__, "incorrect model name"))
             return None, None
 
         if not model[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "model parameter is empty"))
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, EUCLIDEAN.__CLASS_NAME__,
+                   ndt.__NAME__, "model parameter is empty"))
             return None, None
 
         means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
@@ -1934,7 +1962,7 @@ class EUCLIDEAN:
     #
     # end of method
 #
-# end of EUCLIDEAN
+# end of class (EUCLIDEAN)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: PCA
@@ -2022,13 +2050,13 @@ class PCA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "Doesn't support training on pre-trained model"))
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
+                   "doesn't support training on pre-trained model"))
             return None, None
 
         # get sorted_labels and sorted_samples
@@ -2109,8 +2137,8 @@ class PCA:
             self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors * _sum
 
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2145,8 +2173,8 @@ class PCA:
 
         #if not( 0 < n_comp <= len(data.data[0])):
         if not( 0 < n_comp <= new_data[0].shape[1]):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
                    "features out of range"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2164,11 +2192,11 @@ class PCA:
         eigvals = eigvals[sorted_indexes[0:n_comp]]
         eigvecs = eigvecs[:,sorted_indexes[0:n_comp]]
         if any(eigvals < 0):
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "negative eigenvalues"))
-                self.model_d[ALG_NAME_MDL].clear()
-                return None, None
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
+                   "negative eigenvalues"))
+            self.model_d[ALG_NAME_MDL].clear()
+            return None, None
 
         # This steps (below) normalize the eigenvectors by scaling
         # them with the inverse square root of eigenvalues.
@@ -2179,8 +2207,8 @@ class PCA:
             eigval_in = np.linalg.inv(np.diag(eigvals ** (1/2)))
 
         except np.linalg.LinAlgError:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
                    "singular matrix model is none"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2243,8 +2271,8 @@ class PCA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -2254,14 +2282,14 @@ class PCA:
         # check for model validity
         #
         if model[ALG_NAME_ALG] != PCA_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
                    "incorrect model name"))
             return None, None
 
         if not model[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, PCA.__CLASS_NAME__, ndt.__NAME__,
                    "model parameter is empty"))
             return None, None
 
@@ -2381,8 +2409,9 @@ class PCA:
             matrix = data['covariances']
             log_output += f"Covariances: {matrix[0]}\n"
  
+            # Blank space for padding as per your requirement
             for row in matrix[1:]:
-                log_output += f"             {row}\n"  # Blank space for padding as per your requirement
+                log_output += f"             {row}\n"
  
         # exit gracefully
         #
@@ -2468,12 +2497,12 @@ class LDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -2539,8 +2568,8 @@ class LDA:
             self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors
 
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2597,8 +2626,8 @@ class LDA:
             sw_in = np.linalg.inv(sw)
 
         except np.linalg.LinAlgError:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "singular matrix"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2624,8 +2653,8 @@ class LDA:
         eigvals = eigvals[sorted_indexes[0:reduced_dimension]]
         eigvecs = eigvecs[:,sorted_indexes[0:reduced_dimension]]
         if any(eigvals < 0):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "negative eigenvalues"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2638,8 +2667,8 @@ class LDA:
             eigval_in = np.linalg.inv(np.diag(eigvals**(1/2)))
 
         except np.linalg.LinAlgError:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "singular matrix model is none"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -2703,8 +2732,8 @@ class LDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -2714,14 +2743,14 @@ class LDA:
         # check for model validity
         #
         if model[ALG_NAME_ALG] != LDA_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "incorrect model name"))
             return None, None
 
         if not model[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, LDA.__CLASS_NAME__, ndt.__NAME__,
                    "model parameter is empty"))
             return None, None
 
@@ -2910,7 +2939,7 @@ class QDA:
 
         arguments:
          data: a list of numpy float matrices of feature vectors
-         write_train_labels: a boolean to whether write the train data
+         write_train_labels: a boolean whether to write the train data
          fname_train_labels: the filename of the train file
 
         return:
@@ -2924,30 +2953,30 @@ class QDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
-        # (ISSUE_PM: add comments here)
+        # getting the number of classes/labels
         #
         data = data.sort()
         uni_label = np.unique(data.labels)
         new_data =[]
         for i in range(len(uni_label)):
 
-            # (ISSUE_PM: add comments here)
+            # loop over the labels to store same label data into a list
             #
             class_data =[]
             for j in range(len(data.labels)):
                 if uni_label[i] == data.labels[j]:
                     class_data.append(data.data[j])
 
-            # (ISSUE_PM: add comments here)
+            # adding smae label data list into another list
             #
             new_data.append(np.array(class_data))
 
@@ -2961,8 +2990,8 @@ class QDA:
         if n_comp == -1:
             n_comp = new_data[0].shape[1]
         if not(0 < n_comp <= new_data[0].shape[1]):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__,
                    "features out of range"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -3007,11 +3036,11 @@ class QDA:
             sum = float(1.0) / float(npts)
             self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS] = priors * sum
 
-        # (ISSUE_PM: need a comment here)
+        # returning None due to unknown prior modes
         #
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -3029,7 +3058,7 @@ class QDA:
         transformation_mats = []
         for i, element in enumerate(new_data):
 
-            # (ISSUE_PM: need a comment here)
+            # getting the covariance matrix for each class data
             #
             covar = nct.compute(element,
                 ctype= self.params_d[nct.PRM_CTYPE],
@@ -3049,9 +3078,9 @@ class QDA:
             eigvals = eigvals[sorted_indexes[0:n_comp]]
             eigvecs = eigvecs[:,sorted_indexes[0:n_comp]]
             if any(eigvals < 0):
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "negative eigenvalues"))
+                print("Error: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__,
+                       ndt.__NAME__, "negative eigenvalues"))
                 self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
@@ -3064,9 +3093,9 @@ class QDA:
                 eigvals_in = np.linalg.inv(np.diag(eigvals**(1/2)))
 
             except np.linalg.LinAlgError as e:
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "singular matrix model is none"))
+                print("Error: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__,
+                       ndt.__NAME__, "singular matrix model is none"))
                 self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
@@ -3075,7 +3104,7 @@ class QDA:
             transf_mat = np.dot(eigvecs, eigvals_in)
             transformation_mats.append(transf_mat)
 
-        # (ISSUE_PM: need a comment here)
+        # Storing the transformation matrices into the model dictionary
         #
         self.model_d[ALG_NAME_MDL][ALG_NAME_TRANS] = transformation_mats
 
@@ -3131,8 +3160,8 @@ class QDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -3142,14 +3171,14 @@ class QDA:
         # check for model validity
         #
         if model[ALG_NAME_ALG] != QDA_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__,
                    "incorrect model name"))
             return None, None
 
         if not model[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QDA.__CLASS_NAME__, ndt.__NAME__,
                    "model parameter is empty"))
             return None, None
 
@@ -3309,12 +3338,12 @@ class QLDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__, ndt.__NAME__,
                    "Doesn't support training on pre-trained model"))
             return None, None
 
@@ -3381,8 +3410,8 @@ class QLDA:
         # case: unknown parameter setting
         #
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -3437,9 +3466,9 @@ class QLDA:
                 sw_in = np.linalg.inv(sw)
 
             except np.linalg.LinAlgError:
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "singular matrix"))
+                print("Error: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__,
+                       ndt.__NAME__, "singular matrix"))
                 self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
@@ -3459,9 +3488,9 @@ class QLDA:
             eigvals = eigvals[sorted_indexes[0:l]]
             eigvecs = eigvecs[:,sorted_indexes[0:l]]
             if any(eigvals < 0):
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "negative eigenvalues"))
+                print("Error: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__,
+                       ndt.__NAME__, "negative eigenvalues"))
                 self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
@@ -3474,9 +3503,9 @@ class QLDA:
                 eigvals_in = np.linalg.inv(np.diag(eigvals**(1/2)))
 
             except np.linalg.LinAlgError:
-                print("Error: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "singular matrix model is none"))
+                print("Error: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__,
+                       ndt.__NAME__, "singular matrix model"))
                 self.model_d[ALG_NAME_MDL].clear()
                 return None, None
 
@@ -3536,8 +3565,9 @@ class QLDA:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         # check if model is none
         #
@@ -3547,14 +3577,14 @@ class QLDA:
         # check for model validity
         #
         if model[ALG_NAME_ALG] != QLDA_NAME:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                   "incorrect model name"))
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__,
+                   ndt.__NAME__, "incorrect model name"))
             return None, None
 
         if not model[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, QLDA.__CLASS_NAME__, ndt.__NAME__,
                    "model parameter is empty"))
             return None, None
 
@@ -3677,16 +3707,11 @@ class NB:
         self.params_d = defaultdict(dict)
         self.model_d = defaultdict()
 
-        # initialize a parameter dictionary
-        #
-        self.params_d = defaultdict(dict)
-
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
-        #(ISSUE_PM: address this TODO?) TODO: tmp but needs to be changed since default should be set in the parameter
         self.model_d[ALG_NAME_IMP] = NB_IMPLS[0]
-        self.model_d[ALG_NAME_MDL] = {}
+        self.model_d[ALG_NAME_MDL] = defaultdict(dict)
     #
     # end of method
 
@@ -3717,12 +3742,12 @@ class NB:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, NB.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, NB.__CLASS_NAME__, ndt.__NAME__,
                    "Doesn't support training on pre-trained model"))
             return None, None
 
@@ -3779,8 +3804,8 @@ class NB:
             priors = priors * sum
 
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, NB.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             return None
 
@@ -3802,22 +3827,29 @@ class NB:
         #
         labels = np.array(labels)
 
-        # (ISSUE_PM: needs comment)
+        # use the implementation from the parameters
         #
+        # NOTE: this is for backward compatability
         if ALG_NAME_IMP in self.params_d:
-            imp = self.params_d[ALG_NAME_IMP]
+            impl = self.params_d[ALG_NAME_IMP]
         else:
-            imp = self.model_d[ALG_NAME_IMP]
+            impl = self.model_d[ALG_NAME_IMP]
 
-        # (ISSUE_PM: needs comment)
+        if impl not in NB_IMPLS:
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, NB.__CLASS_NAME__, ndt.__NAME__,
+                   "unknown implementation"))
+            return None
+
+        # check for the implementation name
         #
-        if imp == IMP_NAME_SKLEARN:
+        if impl == IMP_NAME_SKLEARN:
 
             # fit the model
             #
             self.model_d[ALG_NAME_MDL] = \
                 GaussianNB(priors = priors).fit(f_data, labels)
-            self.model_d[ALG_NAME_IMP] = imp
+            self.model_d[ALG_NAME_IMP] = impl
 
         # prediction
         #
@@ -3856,8 +3888,8 @@ class NB:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, NB.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -3879,7 +3911,7 @@ class NB:
     #
     # end of method
 #
-# end of NB
+# end of class (NB)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: GMM
@@ -3957,12 +3989,12 @@ class GMM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, GMM.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, GMM.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -3989,8 +4021,8 @@ class GMM:
             n_components = new_data[0].shape[1]
 
         if not(0 < n_components <= new_data[0].shape[1]):
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, GMM.__CLASS_NAME__, ndt.__NAME__,
                    "features out of range"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -4020,8 +4052,8 @@ class GMM:
             priors = counts / float(npts)
 
         else:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, GMM.__CLASS_NAME__, ndt.__NAME__,
                    "unknown value for priors"))
             self.model_d[ALG_NAME_MDL].clear()
             return None, None
@@ -4129,8 +4161,8 @@ class GMM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, GMM.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -4138,8 +4170,8 @@ class GMM:
         if model is None:
             model = self.model_d
 
-        # retrieving the priors, class models and class labels from the trained
-        # model
+        # retrieving the priors, class models and class labels
+        # from the trained model
         #
         priors = model[ALG_NAME_MDL][ALG_NAME_PRIORS]
         class_models = model[ALG_NAME_MDL][ALG_NAME_CMODELS]
@@ -4185,7 +4217,7 @@ class GMM:
     #
     # end of method
 #
-# end of GMM
+# end of class (GMM)
 
 #******************************************************************************
 #
@@ -4235,6 +4267,7 @@ class KNN:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
@@ -4266,12 +4299,12 @@ class KNN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, KNN.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, KNN.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -4326,8 +4359,8 @@ class KNN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, KNN.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -4346,7 +4379,7 @@ class KNN:
     #
     # end of method
 #
-# end of KNN
+# end of class (KNN)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: KMEANS
@@ -4390,7 +4423,9 @@ class KMEANS:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = {}
+        
     #
     # end of method
 
@@ -4421,12 +4456,13 @@ class KMEANS:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, KMEANS.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, KMEANS.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -4478,8 +4514,9 @@ class KMEANS:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, KMEANS.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         # check if model is none
         #
@@ -4510,7 +4547,7 @@ class KMEANS:
     #
     # end of method
 #
-# end of KMEANS
+# end of class (KMEANS)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: RNF
@@ -4554,6 +4591,7 @@ class RNF:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
@@ -4585,12 +4623,12 @@ class RNF:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, RNF.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, RNF.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -4652,8 +4690,8 @@ class RNF:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, RNF.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -4674,7 +4712,7 @@ class RNF:
     #
     # end of method
 #
-# end of RNF
+# end of class (RNF)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: SVM
@@ -4718,6 +4756,7 @@ class SVM:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
@@ -4749,12 +4788,12 @@ class SVM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, SVM.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, SVM.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -4812,8 +4851,8 @@ class SVM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, SVM.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -4834,7 +4873,7 @@ class SVM:
     #
     # end of method
 #
-# end of SVM
+# end of class (SVM)
 
 #******************************************************************************
 #
@@ -4884,6 +4923,7 @@ class MLP:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = {}
     #
     # end of method
@@ -4915,12 +4955,12 @@ class MLP:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__))
 
         if self.model_d[ALG_NAME_MDL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -4997,8 +5037,8 @@ class MLP:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -5020,7 +5060,7 @@ class MLP:
     # end of method
 
 #
-# end of MLP
+# end of class (MLP)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: RBM
@@ -5064,6 +5104,7 @@ class RBM:
         # set the model
         #
         self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_SKLEARN
         self.model_d[ALG_NAME_MDL] = []
     #
     # end of method
@@ -5095,12 +5136,12 @@ class RBM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, RBM.__CLASS_NAME__, ndt.__NAME__))
 
-        if self.model_d[ALG_MDL_KEY_MODEL]:
-            print("Error: %s (line: %s) %s: %s" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__,
+        if self.model_d[ALG_NAME_MDL]:
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, RBM.__CLASS_NAME__, ndt.__NAME__,
                    "doesn't support training on pre-trained model"))
             return None, None
 
@@ -5114,21 +5155,30 @@ class RBM:
 
         # fit the model
         #
-        n_comp = int(self.params_d[RBM_NAME_PARAM][RBM_NAME_COMP])
-        n_iter = int(self.params_d[RBM_NAME_PARAM][RBM_NAME_NITER])
-        random_state = int(self.params_d[RBM_NAME_PARAM][RBM_NAME_RANDOM])
-        lr = float(self.params_d[RBM_NAME_PARAM][RBM_NAME_LR])
-        b_size = int(self.params_d[RBM_NAME_PARAM][RBM_NAME_BSIZE])
-        verbose = bool(self.params_d[RBM_NAME_PARAM][RBM_NAME_VERBOSE])
-        classifier = str(self.params_d[RBM_NAME_PARAM][ALG_NAME_CLASSIF])
+        n_comp = int(self.params_d[ALG_NAME_NCMP])
+        n_iter = int(self.params_d[RBM_NAME_NITER])
+        random_state = int(self.params_d[ALG_NAME_RANDOM])
+        lr = float(self.params_d[ALG_NAME_LR])
+        b_size = int(self.params_d[ALG_NAME_BSIZE])
+        verbose = bool(self.params_d[RBM_NAME_VERBOSE])
+        classifier = str(self.params_d[RBM_NAME_CLASSIFIER])
         rbm= BernoulliRBM(n_components=n_comp, learning_rate=lr,
                           batch_size=b_size, n_iter=n_iter,
                           verbose=verbose, random_state=random_state)
-
+        
+        # set classifier's param_d
+        #
+        ALGS[classifier].params_d = self.params_d
+        
+        # train the classifier model
+        #
+        ALGS[classifier].train(data = data, write_train_labels = False,
+              fname_train_labels = "train_labels.csv")
+        
         self.model_d[ALG_NAME_MDL] = \
             Pipeline(steps = [
                 ('rbm', rbm),
-                ('classifier', ALGS[classifier].model_d[ALG_MDL_KEY_MODEL])
+                ('classifier', ALGS[classifier].model_d[ALG_NAME_MDL])
             ]).fit(samples, labels)
 
         # prediction
@@ -5168,8 +5218,8 @@ class RBM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, RBM.__CLASS_NAME__, ndt.__NAME__))
 
         # check if model is none
         #
@@ -5191,7 +5241,7 @@ class RBM:
     #
     # end of method
 #
-# end of RBM
+# end of class (RBM)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: TRANSFORMER
@@ -5264,8 +5314,9 @@ class TRANSFORMER:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, TRANSFORMER.__CLASS_NAME__,
+                   ndt.__NAME__))
 
         # get the samples
         #
@@ -5303,9 +5354,9 @@ class TRANSFORMER:
         #
         if self.model_d[ALG_NAME_MDL]:
             if dbgl_g > ndt.NONE:
-                print("Info: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "got pre-trained model for transformer"))
+                print("Info: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, TRANSFORMER.__CLASS_NAME__,
+                       ndt.__NAME__, "loading a pre-trained model"))
 
             # load the model's weights
             #
@@ -5314,9 +5365,9 @@ class TRANSFORMER:
 
         else:
             if dbgl_g > ndt.NONE:
-                print("Info: %s (line: %s) %s: %s" %
-                      (__FILE__, ndt.__LINE__, ndt.__NAME__,
-                       "training a new model for transformer"))
+                print("Info: %s (line: %s) %s::%s: %s" %
+                      (__FILE__, ndt.__LINE__, TRANSFORMER.__CLASS_NAME__,
+                       ndt.__NAME__, "training a new model"))
 
         # move the model to the default device
         # CPU/GPU based on their availability
@@ -5439,8 +5490,7 @@ class TRANSFORMER:
         # convert the model to state_dict, so that it can be saved by using
         # Alg.save_model()
         #
-        state_dict = self.model_d[
-            ALG_NAME_MDL].state_dict()
+        state_dict = self.model_d[ALG_NAME_MDL].state_dict()
 
         # assign the model to the model_d['model']
         #
@@ -5479,8 +5529,9 @@ class TRANSFORMER:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, TRANSFORMER.__CLASS_NAME__,
+                   ndt.__NAME__))
         # get the samples
         #
         samples = np.array(data.data)
@@ -5562,7 +5613,7 @@ class TRANSFORMER:
     #
     # end of method
 #
-# end of TRANSFORMER
+# end of class (TRANSFORMER)
 
 #******************************************************************************
 #
@@ -5640,8 +5691,8 @@ class QSVM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, QSVM.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -5714,8 +5765,8 @@ class QSVM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, QSVM.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -5739,7 +5790,7 @@ class QSVM:
     #
     # end of method
 #
-# end of QSVM
+# end of class (QSVM)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: QNN
@@ -5811,8 +5862,8 @@ class QNN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, QNN.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -5894,8 +5945,8 @@ class QNN:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, QNN.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -5919,7 +5970,7 @@ class QNN:
     #
     # end of method
 #
-# end of QNN
+# end of class (QNN)
 
 #------------------------------------------------------------------------------
 # ML Tools Class: QRBM
@@ -5991,8 +6042,8 @@ class QRBM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: training a model" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, QRBM.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -6067,8 +6118,8 @@ class QRBM:
         # display an informational message
         #
         if dbgl_g == ndt.FULL:
-            print("%s (line: %s) %s: entering predict" %
-                  (__FILE__, ndt.__LINE__, ndt.__NAME__))
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, QRBM.__CLASS_NAME__, ndt.__NAME__))
 
         # get the samples
         #
@@ -6092,7 +6143,7 @@ class QRBM:
     #
     # end of method
 #
-# end of QRBM
+# end of class (QRBM)
 
 #******************************************************************************
 #
@@ -6125,3 +6176,4 @@ ALGS = {EUCL_NAME:EUCLIDEAN(),
 
 #
 # end of file
+
