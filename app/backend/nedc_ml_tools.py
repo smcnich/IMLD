@@ -854,7 +854,7 @@ class Alg:
         # attempt to set the name only
         #
         if alg_name in ALGS:
-            self.alg_d = ALGS[alg_name]
+            self.alg_d = ALGS[alg_name]()
 
         # if the algorithm is not set print an error message and exit
         #
@@ -1700,8 +1700,6 @@ class Alg:
             parameter_outcomes = self.alg_d.get_info()
         else:
             parameter_outcomes = None
-  
-        print(parameter_outcomes)
  
         # exit gracefully
         # return the parameter outcomes
@@ -6196,26 +6194,26 @@ class QRBM:
 
 # define variables to configure the machine learning algorithms
 #
-ALGS = {EUCL_NAME:EUCLIDEAN(),
-        PCA_NAME:PCA(),
-        LDA_NAME:LDA(),
-        QDA_NAME:QDA(),
-        QLDA_NAME:QLDA(),
-        NB_NAME:NB(),
-        GMM_NAME:GMM(),
+ALGS = {EUCL_NAME:EUCLIDEAN,
+        PCA_NAME:PCA,
+        LDA_NAME:LDA,
+        QDA_NAME:QDA,
+        QLDA_NAME:QLDA,
+        NB_NAME:NB,
+        GMM_NAME:GMM,
 
-        KNN_NAME:KNN(),
-        KMEANS_NAME:KMEANS(),
-        RNF_NAME:RNF(),
-        SVM_NAME:SVM(),
+        KNN_NAME:KNN,
+        KMEANS_NAME:KMEANS,
+        RNF_NAME:RNF,
+        SVM_NAME:SVM,
 
-        MLP_NAME:MLP(),
-        RBM_NAME:RBM(),
-        TRANSF_NAME:TRANSFORMER(),
+        MLP_NAME:MLP,
+        RBM_NAME:RBM,
+        TRANSF_NAME:TRANSFORMER,
 
-        QSVM_NAME:QSVM(),
-        QNN_NAME:QNN(),
-        QRBM_NAME:QRBM()}
+        QSVM_NAME:QSVM,
+        QNN_NAME:QNN,
+        QRBM_NAME:QRBM}
 
 #
 # end of file
