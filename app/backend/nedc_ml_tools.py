@@ -2388,31 +2388,31 @@ class PCA:
          this method returns the means and covariances of the current algorithm.
         """
   
-        # get the algorithm means and covariances
-        #
-        data = {
-            "means": self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS],
-            "covariances": self.model_d[ALG_NAME_MDL][ALG_NAME_COV]
-        }
- 
         log_output = ""
         class_index = 0
  
         # Handle means (list of numpy arrays)
-        if 'means' in data:
-            for mean in data['means']:
-                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
-                class_index += 1
- 
+        for mean in self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]:
+            rounded_mean = np.round(mean, decimals=4)  # Round to 4 decimal places
+            log_output += f"Class {class_index} Means: {rounded_mean.tolist()}\n"
+            class_index += 1
+
+        num_classes = len(self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS])  # Get number of classes
+
+        # Iterate through priors
+        log_output += "Priors: ["
+        for k in range(num_classes):
+            prior = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][k]  # Access prior
+            log_output += f"{prior:.4f}, "  # Format to 4 decimal places
+
+        log_output = log_output.rstrip(", ") + "]\n"  # Remove last comma and add closing bracket
+
         # Handle covariances (numpy 2D array)
-        if 'covariances' in data:
-            matrix = data['covariances']
-            log_output += f"Covariances: {matrix[0]}\n"
- 
-            # Blank space for padding as per your requirement
-            for row in matrix[1:]:
-                log_output += f"             {row}\n"
- 
+        rounded_cov = np.round(self.model_d[ALG_NAME_MDL][ALG_NAME_COV], decimals=4)  # Round entire matrix
+        log_output += f"Covariances: {rounded_cov[0].tolist()}\n"
+        for row in rounded_cov[1:]:
+            log_output += f"             {row.tolist()}\n"
+
         # exit gracefully
         #
         return log_output
@@ -2845,22 +2845,26 @@ class LDA:
         description:
          this method returns the means and covariances of the current algorithm.
         """
-  
-        # get the algorithm means and covariances
-        #
-        data = {
-            "means": self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS],
-        }
          
         log_output = ""
         class_index = 0
  
         # Handle means (list of numpy arrays)
-        if 'means' in data:
-            for mean in data['means']:
-                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
-                class_index += 1
- 
+        for mean in self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]:
+            rounded_mean = np.round(mean, decimals=4)  # Round to 4 decimal places
+            log_output += f"Class {class_index} Means: {rounded_mean.tolist()}\n"
+            class_index += 1
+
+        num_classes = len(self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS])  # Get number of classes
+
+        # Iterate through priors
+        log_output += "Priors: ["
+        for k in range(num_classes):
+            prior = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][k]  # Access prior
+            log_output += f"{prior:.4f}, "  # Format to 4 decimal places
+
+        log_output = log_output.rstrip(", ") + "]\n"  # Remove last comma and add closing bracket
+
         # exit gracefully
         #
         return log_output
@@ -3667,6 +3671,45 @@ class QLDA:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+         
+        log_output = ""
+        class_index = 0
+ 
+        # Handle means (list of numpy arrays)
+        for mean in self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]:
+            rounded_mean = np.round(mean, decimals=4)  # Round to 4 decimal places
+            log_output += f"Class {class_index} Means: {rounded_mean.tolist()}\n"
+            class_index += 1
+
+        num_classes = len(self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS])  # Get number of classes
+
+        # Iterate through priors
+        log_output += "Priors: ["
+        for k in range(num_classes):
+            prior = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS][k]  # Access prior
+            log_output += f"{prior:.4f}, "  # Format to 4 decimal places
+
+        log_output = log_output.rstrip(", ") + "]\n"  # Remove last comma and add closing bracket
+
+        # exit gracefully
+        #
+        return log_output
     #
     # end of method
 #
