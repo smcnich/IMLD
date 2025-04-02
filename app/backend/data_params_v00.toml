@@ -32,7 +32,7 @@ LIST = [
     method = "gaussian"
     [two_gaussian.params]
         [two_gaussian.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [two_gaussian.params.meancov1.params]
                 [two_gaussian.params.meancov1.params.npts1]
@@ -51,7 +51,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
         [two_gaussian.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [two_gaussian.params.meancov2.params]
                 [two_gaussian.params.meancov2.params.npts2]
@@ -76,7 +76,7 @@ LIST = [
     method = "gaussian"
     [four_gaussian.params]
         [four_gaussian.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [four_gaussian.params.meancov1.params]
                 [four_gaussian.params.meancov1.params.npts1]
@@ -95,7 +95,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
         [four_gaussian.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [four_gaussian.params.meancov2.params]
                 [four_gaussian.params.meancov2.params.npts2]
@@ -114,7 +114,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
         [four_gaussian.params.meancov3]
-            name = "Mean and Covariance 3"
+            name = "Mean & Covariance 3"
             type = "group"
             [four_gaussian.params.meancov3.params]
                 [four_gaussian.params.meancov3.params.npts3]
@@ -133,7 +133,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
         [four_gaussian.params.meancov4]
-            name = "Mean and Covariance 4"
+            name = "Mean & Covariance 4"
             type = "group"
             [four_gaussian.params.meancov4.params]
                 [four_gaussian.params.meancov4.params.npts4]
@@ -158,7 +158,7 @@ LIST = [
     method = "gaussian"
     [overlapping_gaussian.params]
         [overlapping_gaussian.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [overlapping_gaussian.params.meancov1.params]
                 [overlapping_gaussian.params.meancov1.params.npts1]
@@ -177,7 +177,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
         [overlapping_gaussian.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [overlapping_gaussian.params.meancov2.params]
                 [overlapping_gaussian.params.meancov2.params.npts2]
@@ -202,7 +202,7 @@ LIST = [
     method = "gaussian"
     [two_ellipses.params]
         [two_ellipses.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [two_ellipses.params.meancov1.params]
                 [two_ellipses.params.meancov1.params.npts1]
@@ -221,7 +221,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
         [two_ellipses.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [two_ellipses.params.meancov2.params]
                 [two_ellipses.params.meancov2.params.npts2]
@@ -246,7 +246,7 @@ LIST = [
     method = "gaussian"
     [four_ellipses.params]
         [four_ellipses.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [four_ellipses.params.meancov1.params]
                 [four_ellipses.params.meancov1.params.npts1]
@@ -265,7 +265,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
         [four_ellipses.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [four_ellipses.params.meancov2.params]
                 [four_ellipses.params.meancov2.params.npts2]
@@ -284,7 +284,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
         [four_ellipses.params.meancov3]
-            name = "Mean and Covariance 3"
+            name = "Mean & Covariance 3"
             type = "group"
             [four_ellipses.params.meancov3.params]
                 [four_ellipses.params.meancov3.params.npts3]
@@ -303,7 +303,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
         [four_ellipses.params.meancov4]
-            name = "Mean and Covariance 4"
+            name = "Mean & Covariance 4"
             type = "group"
             [four_ellipses.params.meancov4.params]
                 [four_ellipses.params.meancov4.params.npts4]
@@ -328,7 +328,7 @@ LIST = [
     method = "gaussian"
     [rotated_ellipses.params]
         [rotated_ellipses.params.meancov1]
-            name = "Mean and Covariance 1"
+            name = "Mean & Covariance 1"
             type = "group"
             [rotated_ellipses.params.meancov1.params]
                 [rotated_ellipses.params.meancov1.params.npts1]
@@ -347,7 +347,7 @@ LIST = [
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
         [rotated_ellipses.params.meancov2]
-            name = "Mean and Covariance 2"
+            name = "Mean & Covariance 2"
             type = "group"
             [rotated_ellipses.params.meancov2.params]
                 [rotated_ellipses.params.meancov2.params.npts2]
@@ -397,7 +397,7 @@ LIST = [
                     range = [0, "inf"]
                     default = 0.850
         [toroidal.params.meancov1]
-            name = "Mean and Covariance (Mass)"
+            name = "Mean & Covariance (Mass)"
             type = "group"
             [toroidal.params.meancov1.params]
                 [toroidal.params.meancov1.params.npts1]
