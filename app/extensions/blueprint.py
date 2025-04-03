@@ -201,11 +201,15 @@ def train():
         #
         model, metrics, parameter_output = imld.train(model, data)
 
+        print('Before DS')
+
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
         #
         x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
                                                  yrange=yrange)
+
+        print('After DS')
 
         # format the response
         #

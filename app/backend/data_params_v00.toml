@@ -421,6 +421,16 @@ LIST = [
     dist_name = "yin_yang"
     method = "yin_yang"
     [yin_yang.params]
+        [yin_yang.params.means]
+            name = "Means"
+            type = "matrix"
+            dimensions = [2, 1]
+            default = [[0.0], [0.0]]
+        [yin_yang.params.radius]
+            name = "Radius"
+            type = "float"
+            range = [0, "inf"]
+            default = 1.5
         [yin_yang.params.npts_yin]
             name = "Number of Points (Yin)"
             type = "int"
@@ -431,12 +441,7 @@ LIST = [
             type = "int"
             range = [0, "inf"]
             default = 5000
-        [yin_yang.params.radius]
-            name = "Radius"
-            type = "float"
-            range = [0, "inf"]
-            default = 1.5
-        [yin_yang.params.ovlp]
+        [yin_yang.params.overlap]
             name = "Overlap"
             type = "float"
             range = [0, 1]

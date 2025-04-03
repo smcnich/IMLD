@@ -4201,6 +4201,7 @@ class GMM:
             #
             pred_label = np.argmax(likelihoods)
             p_labels.append(class_labels[pred_label])
+            print(likelihoods, np.sum(likelihoods))
             post = likelihoods / np.sum(likelihoods)
             posteriors.append(post)
 
