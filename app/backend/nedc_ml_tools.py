@@ -1702,7 +1702,6 @@ class Alg:
             parameter_outcomes = None
  
         # exit gracefully
-        # return the parameter outcomes
         #
         return parameter_outcomes
     #
@@ -1957,6 +1956,35 @@ class EUCLIDEAN:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format means for log output
+        #
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        for class_index, mean in enumerate(means):
+            log_output.append(f"Class {class_index} Means: {np.round(mean, decimals=4).tolist()}")
+
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -2386,34 +2414,30 @@ class PCA:
          this method returns the means and covariances of the current algorithm.
         """
   
-        # get the algorithm means and covariances
+        # create empty log output
         #
-        data = {
-            "means": self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS],
-            "covariances": self.model_d[ALG_NAME_MDL][ALG_NAME_COV]
-        }
- 
-        log_output = ""
-        class_index = 0
- 
-        # Handle means (list of numpy arrays)
-        if 'means' in data:
-            for mean in data['means']:
-                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
-                class_index += 1
- 
-        # Handle covariances (numpy 2D array)
-        if 'covariances' in data:
-            matrix = data['covariances']
-            log_output += f"Covariances: {matrix[0]}\n"
- 
-            # Blank space for padding as per your requirement
-            for row in matrix[1:]:
-                log_output += f"             {row}\n"
- 
+        log_output = []
+
+        # format means for log output
+        #
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        for class_index, mean in enumerate(means):
+            log_output.append(f"Class {class_index} Means: {np.round(mean, decimals=4).tolist()}")
+
+        # format priors for log output
+        #
+        priors = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        log_output.append(f"Priors: [{', '.join(f'{p:.4f}' for p in priors)}]")
+
+        # format covariance matrix for log output
+        #
+        rounded_cov = np.round(self.model_d[ALG_NAME_MDL][ALG_NAME_COV], decimals=4)
+        log_output.append(f"Covariances: {rounded_cov[0].tolist()}")
+        log_output.extend(f"             {row.tolist()}" for row in rounded_cov[1:])
+
         # exit gracefully
         #
-        return log_output
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -2843,25 +2867,25 @@ class LDA:
         description:
          this method returns the means and covariances of the current algorithm.
         """
-  
-        # get the algorithm means and covariances
+        
+        # create empty log output
         #
-        data = {
-            "means": self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS],
-        }
-         
-        log_output = ""
-        class_index = 0
- 
-        # Handle means (list of numpy arrays)
-        if 'means' in data:
-            for mean in data['means']:
-                log_output += f"Class {class_index} Means: {mean.tolist()}\n"
-                class_index += 1
- 
+        log_output = []
+
+        # format means for log output
+        #
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        for class_index, mean in enumerate(means):
+            log_output.append(f"Class {class_index} Means: {np.round(mean, decimals=4).tolist()}")
+
+        # format priors for log output
+        #
+        priors = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        log_output.append(f"Priors: [{', '.join(f'{p:.4f}' for p in priors)}]")
+
         # exit gracefully
         #
-        return log_output
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -3256,6 +3280,41 @@ class QDA:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format means for log output
+        #
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        for class_index, mean in enumerate(means):
+            log_output.append(f"Class {class_index} Means: {np.round(mean, decimals=4).tolist()}")
+
+        # format priors for log output
+        #
+        priors = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        log_output.append(f"Priors: [{', '.join(f'{p:.4f}' for p in priors)}]")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -3665,6 +3724,41 @@ class QLDA:
         # exit gracefully
         #
         return labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format means for log output
+        #
+        means = self.model_d[ALG_NAME_MDL][ALG_NAME_MEANS]
+        for class_index, mean in enumerate(means):
+            log_output.append(f"Class {class_index} Means: {np.round(mean, decimals=4).tolist()}")
+
+        # format priors for log output
+        #
+        priors = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        log_output.append(f"Priors: [{', '.join(f'{p:.4f}' for p in priors)}]")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -4213,6 +4307,43 @@ class GMM:
         # exit gracefully
         #
         return p_labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the means and covariances of the current algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format priors for log output
+        #
+        priors = self.model_d[ALG_NAME_MDL][ALG_NAME_PRIORS]
+        log_output.append(f"Priors: [{', '.join(f'{p:.4f}' for p in priors)}]")
+
+        class_models = self.model_d[ALG_NAME_MDL][ALG_NAME_CMODELS]
+        class_labels = self.model_d[ALG_NAME_MDL][ALG_NAME_CLABELS]
+
+        # format class labels for log output
+        #
+        class_labels = self.model_d[ALG_NAME_MDL][ALG_NAME_CLABELS]
+        log_output.append(f"Class Labels: {class_labels.tolist()}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #

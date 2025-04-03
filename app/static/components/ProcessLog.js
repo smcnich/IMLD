@@ -372,7 +372,7 @@ class ProcessLog extends HTMLElement {
         */
 
         param_names.forEach((name, index) => {
-            if (JSON.stringify(paramValues[index]).includes('[')) {
+            if (Array.isArray(paramValues[index]) && paramValues[index].every(row => Array.isArray(row))) {
                 var matrix = this.parseMatrix(JSON.stringify(paramValues[index]));
                 this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name}`, `[${matrix[0]}]`);
 
