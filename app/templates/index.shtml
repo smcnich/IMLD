@@ -55,7 +55,6 @@
   <script src="static/components/FormContainer.js"></script>
   <script src="static/components/HelpComponents.js"></script>
   <script type="module" src="static/components/ClassesComponents.js"></script>
-  <script type="module" src="static/components/PatternsComponents.js"></script>
 
  </head>
  <style>

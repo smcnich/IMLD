@@ -373,9 +373,8 @@ class Toolbar_DropdownSettings extends HTMLElement {
         <div class="toolbar-item">
           <button class="toolbar-button">${label}</button>
           <div class="dropdown-menu" id="dropdown-menu">
-            <toolbar-popup-button label="Set Ranges"></toolbar-popup-button>
+            <toolbar-set-ranges label="Set Ranges"></toolbar-set-ranges>
             <toolbar-set-gaussian label="Set Gaussian"></toolbar-set-gaussian>
-            <toolbar-popup-button label="Set Color"></toolbar-popup-button>
             <toolbar-checkbox-button label="Normalize Data"></toolbar-checkbox-button>
           </div>
         </div>
@@ -487,38 +486,6 @@ class Toolbar_OpenFileButton extends HTMLElement {
     button.addEventListener('click', () => {
 
       this.fileInput.click(); // Trigger the file input click
-
-      // // Check the label to determine the action
-      // //
-      // switch (label) {
-
-      //   case 'Load Train Data':
-      //     this.type = 'data';
-      //     this.plotID = 'train';
-      //     this.fileInput.click();
-      //     break;
-        
-      //   case 'Load Eval Data':
-      //     this.type = 'data';
-      //     this.plotID = 'eval';
-      //     this.fileInput.click();
-      //     break;
-
-      //   case 'Load Parameters':
-      //     this.type = 'params';
-      //     this.plotID = null;
-      //     this.fileInput.click();
-      //     break;
-
-      //   case 'Load Model':
-      //     this.type = 'model';
-      //     this.plotID = null;
-      //     this.fileInput.click();
-      //     break;
-          
-      //   default:
-      //     break;
-      //}
     });
 
     // Add the file input change listener and pass the label explicitly
@@ -1248,9 +1215,363 @@ class Toolbar_SetGaussian extends HTMLElement {
 
       // set the defaults through the form object
       //
-      const paramsDict = this.form.submitForm().formValues;
+      const [paramsDict, _] = this.form.submitForm();
 
       EventBus.dispatchEvent(new CustomEvent('setGaussianParams', {
+        detail: paramsDict
+      }));
+
+      // close the popup
+      //
+      this.closePopup();
+    };
+
+  }
+  //
+  // end of method
+
+  // Toggle the visibility of the popup
+  togglePopup() {
+    // Create popup and overlay element
+    //
+    const popup = this.shadowRoot.getElementById('popup');
+    const overlay = this.shadowRoot.getElementById('overlay');
+
+    // Toggle popup state
+    //
+    this.isPopupOpen = !this.isPopupOpen;
+
+    // Show popup and overlap and ensure they are both visible
+    if (this.isPopupOpen) {
+      popup.classList.add('show');
+      overlay.classList.add('show');
+      popup.style.display = 'block';
+      overlay.style.display = 'block';
+    } else {
+      // Close popup if already open
+      //
+      this.closePopup();
+    }
+  }
+  //
+  // end of method
+
+  // Close the popup and overlay
+  closePopup() {
+    // Create popup and overlay element
+    const popup = this.shadowRoot.getElementById('popup');
+    const overlay = this.shadowRoot.getElementById('overlay');
+
+    // Remove show class from popup and overlay
+    popup.classList.remove('show');
+    overlay.classList.remove('show');
+
+    // Hide popup and overlay after transition ends
+    //
+    setTimeout(() => {
+      popup.style.display = 'none';
+      overlay.style.display = 'none';
+    }, 100);
+
+    // Set popup state to closed
+    //
+    this.isPopupOpen = false;
+  }
+  //
+  // end of method
+}
+
+class Toolbar_SetRanges extends HTMLElement {
+  constructor() {
+    super();
+    this.attachShadow({ mode: 'open' });
+    this.isPopupOpen = false; // Track the popup state
+  }
+
+  connectedCallback() {
+    this.render();
+
+    // Add event listeners for interactivity
+    //
+    this.addEventListeners();
+  }
+
+  render() {
+
+    this.shadowRoot.innerHTML = `
+      <style>
+
+      /* Button styles */
+      .toolbar-popup-button {
+        background-color: white;
+        color: black;
+        font-family: 'Inter', sans-serif;
+        font-weight: 100;
+        font-size: 1em;
+        padding: 5px 30px;
+        border: none;
+        cursor: pointer;
+        min-width: 220px;
+        white-space: nowrap;
+        text-align: left;
+      }
+
+      .toolbar-popup-button:hover {
+        background-color: #c9c9c9;
+      }
+
+      /* Popup styling */
+      .popup {
+        display: none; /* Initially hidden */
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0); /* Start scaled down */
+        width: 45vw; /* Set a fixed width */
+        max-width: 90%; /* Allow the width to shrink if needed */
+        max-height: 80vh; /* Limit the height to 80% of the viewport height */
+        padding: 15px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        background-color: white;
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        z-index: 1000; /* Ensure it's on top */
+        opacity: 0; /* Start fully transparent */
+        transition: opacity 0.1s ease, transform 0.2s ease; /* Transition for opening/closing */
+        overflow: auto; /* Allow scrolling inside the popup if the content overflows */
+      }
+
+      .popup.show {
+        display: block; /* Show when needed */
+        opacity: 1; /* Fully opaque when shown */
+        transform: translate(-50%, -50%) scale(1); /* Scale to original size */
+      }
+
+      .popup h2 {
+        font-family: 'Inter', sans-serif;
+        font-size: 1.2em;
+        margin: 0 0 8px 0;
+      }
+
+      /* Close button styling */
+      .close-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: transparent;
+        border: none;
+        font-size: 16px;
+        cursor: pointer;
+        color: #333;
+      }
+
+      /* Overlay styling */
+      .overlay {
+        display: none; /* Initially hidden */
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+        z-index: 999; /* Ensure it's below the popup */
+      }
+
+      .overlay.show {
+        display: block; /* Show overlay when needed */
+      }
+
+      .button-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5vw;
+        width: 100%;
+        margin: 1vh 0 0.1vw;
+      }
+
+      .button, .reset {
+        flex: 1; /* Makes each button take up equal width */
+        padding: 0.2vh 0.4vw;
+        border-radius: 1vw; /* Makes buttons rounded */
+        background-color: #4CAF50; /* Sets button background color */
+        color: white;
+        border: none;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 1em;
+      }
+
+      .button:hover, .reset:hover {
+        background-color: #2a732e;
+      }
+
+    </style>
+
+
+    <!-- Button to trigger the popup -->
+    <button class="toolbar-popup-button">Set Ranges</button>
+    
+    <!-- Background overlay -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- Popup container -->
+    <div class="popup" id="popup">
+      <button class="close-btn" id="close-btn">X</button>
+      <h2>Set Plot Ranges</h2>
+      <div id="form-div">
+        <div class="button-container">
+          <button type="button" class="button" id="presetButton">Presets</button>
+          <button type="submit" class="button" id="submitButton">Submit</button>
+        </div>
+      </div>      
+    </div>
+  `;
+    
+    // Get elements within the shadow DOM
+    //
+    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
+    const popup = this.shadowRoot.getElementById('popup');
+    const closeBtn = this.shadowRoot.getElementById('close-btn');
+
+    // Create a style element
+    const style = `
+    /* Styling the main container for form inputs */
+    .form-container {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Styling for individual input containers */
+    .num-container {
+      border: 2px solid #ccc;
+      padding: 0.4vw;
+      border-radius: 0.4vw;
+      width: 100%;
+      margin: 0.4vh 0.15vw 0.1vw;
+      box-sizing: border-box;
+    }
+
+    /* Label styling for input fields */
+    .num-container label {
+      padding-left: 0.5vw;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9em;
+      font-weight: bold;
+      margin-bottom: 0.3vw;
+      display: block;
+    }
+
+    /* Grid layout for input fields */
+    .num-input {
+      display: grid;
+      gap: 0.5vw;
+    }
+
+    /* Input field styling */
+    input {
+      padding: 0.4vw;
+      border: 1px solid #ccc;
+      border-radius: 0.4vw;
+      font-size: 0.75em;
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    /* Input field focus state */
+    input:focus {
+      border-color: #7441BA;
+      border-width: 2px;
+      outline: none;
+    }
+  `;
+
+    // create a dynamic form container for the distribution key
+    //
+    this.form = new FormContainer({
+
+      "name": "set_ranges",
+      "params": {
+        "x": {
+          "name": "X-axis bounds",
+          "type": "matrix",
+          "dimensions": [1,2],
+          "default": [[-1, 1]]
+        },
+        "y": {
+          "name": "Y-axis bounds",
+          "type": "matrix",
+          "dimensions": [1,2],
+          "default": [[-1, 1]]
+        },
+      }
+    }, style);
+
+    // Append the form to the popup before the button container
+    // 
+    const formDiv = this.shadowRoot.getElementById('form-div');
+    formDiv.insertBefore(this.form, formDiv.firstChild);
+
+    // Show the popup when the button is clicked
+    //
+    button.onclick = (event) => {
+      // Prevent event propagation to avoid unintended behavior
+      //
+      event.stopPropagation();
+
+      // Call togglePopup method to show/hide popup
+      //
+      this.togglePopup();
+    };
+
+    // Close the popup when clicking the close button
+    //
+    closeBtn.onclick = (event) => {
+      // Prevent event propagation to avoid conflicts
+      //
+      event.stopPropagation();
+
+      // Call closePopup method to hide popup
+      //
+      this.closePopup();
+    };
+
+    // Stop event propagation on popup to avoid closing when clicking inside it
+    //
+    popup.onclick = (event) => {
+      event.stopPropagation(); // Stop event from bubbling up to parent listeners
+    };
+  }
+  //
+  // end of method
+
+  // Add event listeners for preset and clear button actions
+  //
+  addEventListeners() {
+
+    // Set up button to clear inputs and apply preset values
+    //
+    const presetButton = this.shadowRoot.querySelector('#presetButton');
+    const submitButton = this.shadowRoot.querySelector('#submitButton');
+
+    // Fetch and apply preset values when preset button is clicked
+    //
+    presetButton.onclick = () => {
+
+      // set the defaults through the form object
+      //
+      this.form.setDefaults();
+    };
+
+    // Fetch and apply preset values when preset button is clicked
+    //
+    submitButton.onclick = () => {
+
+      // set the defaults through the form object
+      //
+      const [paramsDict, _] = this.form.submitForm();
+
+      EventBus.dispatchEvent(new CustomEvent('setRanges', {
         detail: paramsDict
       }));
 
@@ -1324,3 +1645,4 @@ customElements.define('toolbar-openfile-button', Toolbar_OpenFileButton);
 customElements.define('toolbar-savefile-button', Toolbar_SaveFileButton);
 customElements.define('toolbar-popup-button', Toolbar_PopupButton);
 customElements.define('toolbar-set-gaussian', Toolbar_SetGaussian);
+customElements.define('toolbar-set-ranges', Toolbar_SetRanges);

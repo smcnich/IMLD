@@ -13,6 +13,7 @@ const EVAL_URL = `${baseURL}api/eval/`;
 const LOADMODEL_URL = `${baseURL}api/load_model/`;
 const DATAGEN_URL = `${baseURL}api/data_gen/`;
 const SAVEMODEL_URL = `${baseURL}api/save_model`;
+const SETBOUNDS_URL = `${baseURL}api/set_bounds/`;
 
 // get the component instances from the HTML document
 //
@@ -33,15 +34,16 @@ let textFile;
 // create a status for drawing
 //
 let canDraw = false;
+let drawLabel = null;
 
 // create an Object to store the plot bounds
 //
-const bounds = {
+let bounds = {
     'x': [-1, 1],
     'y': [-1, 1]
 };
 
-const gaussParams = {
+let gaussParams = {
     'numPoints': 15,
     'cov': [[0.025, 0], [0, 0.025]]
 }
@@ -75,7 +77,8 @@ EventBus.addEventListener('train', (event) => {
     //
     const start = Date.now()
 
-    // Add a full-width separator
+    // add a full-width separator
+    //
     processLog.addFullWidthSeparator();
 
     // get the data from the event
@@ -676,46 +679,6 @@ EventBus.addEventListener('updateLabels', (event) => {
     mainToolbar.updateClassList(event.detail.labels);
 });
 
-EventBus.addEventListener('setBounds', (event) => {
-    /*
-    eventListener: setBounds
-
-    dispatcher: Plot
-    */
-
-    const force = event.detail.force || false;
-
-    const x = event.detail.x;
-    const y = event.detail.y;
-
-    if (force) {
-        bounds.x = x;
-        bounds.y = y;
-    }
-
-    else {
-
-        if (x[0] < bounds.x[0]) {
-            bounds.x[0] = x[0];
-        }
-
-        if (x[1] > bounds.x[1]) {
-            bounds.x[1] = x[1];
-        }
-
-        if (y[0] < bounds.y[0]) {
-            bounds.y[0] = y[0];
-        }
-
-        if (y[1] > bounds.y[1]) {
-            bounds.y[1] = y[1];
-        }
-    }
-
-    trainPlot.setBounds(bounds.x, bounds.y);
-    evalPlot.setBounds(bounds.x, bounds.y);
-});
-
 EventBus.addEventListener('addClass', (event) => {
     /*
     eventListener: addClass
@@ -1155,7 +1118,8 @@ EventBus.addEventListener('enableDraw', (event) => {
                 // if that checkbox is not the one that was just clicked,
                 // uncheck it
                 //
-                if (checkbox.getAttribute('label') !== className) {
+                if ((checkbox.getAttribute('label') !== className) ||
+                    (checkbox.getAttribute('type') !== type)) {
                     checkbox.disable();
                 }
             }); 
@@ -1164,16 +1128,16 @@ EventBus.addEventListener('enableDraw', (event) => {
 
     // set the draw status
     //
-    canDraw = true;
+    canDraw = type;
 
     // get the label from the label manager
     //
-    const label = labelManager.getLabelByName(className);
+    drawLabel = labelManager.getLabelByName(className);
 
     // enable drawing on the train and eval plots
     //
-    trainPlot.enableDraw(type, label, gaussParams.numPoints, gaussParams.cov);
-    evalPlot.enableDraw(type, label, gaussParams.numPoints, gaussParams.cov);
+    trainPlot.enableDraw(type, drawLabel, gaussParams.numPoints, gaussParams.cov);
+    evalPlot.enableDraw(type, drawLabel, gaussParams.numPoints, gaussParams.cov);
 })
 //
 // end of event listener
@@ -1196,12 +1160,158 @@ EventBus.addEventListener('disableDraw', () => {
     // set the draw status
     //
     canDraw = false;
+    drawLabel = null;
 
     // disable drawing on the train and eval plots
     //
     trainPlot.disableDraw();
     evalPlot.disableDraw();
-})
+});
+//
+// end of event listener
+
+EventBus.addEventListener('setGaussianParams', (event) => {
+    /*
+    eventListener: setGaussianParams
+
+    dispatcher: ToolbarComponents::Toolbar_SetGaussian
+
+    args:
+     event.detail.numPoints (Number): the number of points in the gaussian
+     event.detail.cov (Array): the covariance of the gaussian
+
+    description:
+     set the gaussian draw parameters for when the user manually sets them. the
+     parameters will be called when the user draws gaussian
+    */
+
+    // set the gaussian parameters
+    //
+    gaussParams.numPoints = event.detail.numPoints;
+    gaussParams.cov = event.detail.cov;
+
+    // if drawing is enabled, update the gaussian parameters
+    if (canDraw === "gaussian") {
+        let oldLabel = drawLabel;
+        EventBus.dispatchEvent(new CustomEvent('disableDraw'));
+        EventBus.dispatchEvent(new CustomEvent('enableDraw', {
+            detail: {
+                type: 'gaussian',
+                className: oldLabel.name
+            }
+        }));
+    }
+});
+//
+// end of event listener
+
+EventBus.addEventListener('setRanges', (event) => {
+    /*
+    eventListener: setRanges
+
+    dispatcher: ToolbarComponents::Toolbar_SetRanges
+
+    args:
+     event.detail.x (Array): the x range of the plot
+     event.detail.y (Array): the y range of the plot
+
+    description:
+     this event listener is triggered when the user zooms in on the plot.
+     the event listener sets the ranges of the plot to the new ranges
+    */
+
+    // get the matrices as singular arrays
+    let x = event.detail.x[0];
+    let y = event.detail.y[0];
+
+
+    if (x[0] >= x[1]) {
+        processLog.writeError(
+`Invalid x range: ${x}. The smaller value must come first and cannot be equal.`);
+            return;
+    }
+
+    if (y[0] >= y[1]) {
+        processLog.writeError(
+`Invalid y range: ${y}. The smaller value must come first and cannot be equal.`);
+            return;
+    }
+
+    // set the bounds to the global var
+    //
+    bounds.x = x;
+    bounds.y = y;
+
+    // set the ranges of the plot
+    //
+    trainPlot.setBounds(bounds.x, bounds.y);
+    evalPlot.setBounds(bounds.x, bounds.y);
+
+    if (trainPlot.getDecisionSurface()) {
+
+        // suspend the application as loading
+        //
+        EventBus.dispatchEvent(new CustomEvent('suspend'));
+
+        // get the current time for benchmarking purposes
+        //
+        const start = Date.now()
+
+        // get the training data from the training plot
+        //
+        const plotData = trainPlot.getData();
+
+        // send the data to the server and get the response
+        //
+        fetch (SETBOUNDS_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'userID': userID,
+                'plotData': plotData,
+                'xrange': bounds.x,
+                'yrange': bounds.y
+            })
+        })
+
+        // parse the response
+        //
+        .then((response) => {
+
+            // if the response is ok, return the json
+            //
+            if (response.ok) {
+                return response.json();
+            }
+
+            // otherwise, throw an error
+            //
+            else {
+                return response.json().then((errorData) => {
+                    EventBus.dispatchEvent(new CustomEvent('continue'));
+                    processLog.writeError(errorData);
+                    throw new Error(errorData);
+                });
+            }
+        })
+
+        // get the data from the response
+        //
+        .then((data) => {
+
+            // plot the decision surface on the training plot
+            //
+            trainPlot.decision_surface(data.decision_surface, 
+                                    labelManager.getLabels());
+
+            // continue the application\
+            //
+            EventBus.dispatchEvent(new CustomEvent('continue'));
+        })
+    }
+});
 //
 // end of event listener
 
@@ -1371,29 +1481,6 @@ EventBus.addEventListener('continue', () => {
     //
     body.className = '';
 });
-
-EventBus.addEventListener('setGaussianParams', (event) => {
-    /*
-    eventListener: setGaussianParams
-
-    dispatcher: ToolbarComponents::Toolbar_SetGaussian
-
-    args:
-     event.detail.numPoints (Number): the number of points in the gaussian
-     event.detail.cov (Array): the covariance of the gaussian
-
-    description:
-     set the gaussian draw parameters for when the user manually sets them. the
-     parameters will be called when the user draws gaussian
-    */
-
-    // set the gaussian parameters
-    //
-    gaussParams.numPoints = event.detail.numPoints;
-    gaussParams.cov = event.detail.cov;
-});
-//
-// end of event listener
 
 // Event listeners that depend on the website being loaded
 // before being triggered

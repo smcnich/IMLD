@@ -471,28 +471,11 @@ class MainToolbar extends HTMLElement {
           </div>
         </div>
 
-        <!-- "View" menu with dropdown for matrix display options -->
-        <div class="menu">
-          <button class="menubutton">View</button>
-          <div class="dropdown">
-            <toolbar-checkbox-button label="Print Confusion Matrix"></toolbar-checkbox-button>
-          </div>
-        </div>
-
         <!-- "Classes" menu with options to add and delete classes -->
         <div class="menu">
           <button class="menubutton">Classes</button>
           <div class="dropdown" id="class-dropdown">
             <add-class-popup label="Add Class"></add-class-popup>
-          </div>
-        </div>
-
-        <!-- "Patterns" menu with options for point and Gaussian drawing -->
-        <div class="menu">
-          <button class="menubutton">Patterns</button>
-          <div class="dropdown">
-            <draw-points-checkbox label="Draw Points"></draw-points-checkbox>
-            <toolbar-checkbox-button label="Draw Gaussian"></toolbar-checkbox-button>
           </div>
         </div>
 

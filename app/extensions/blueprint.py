@@ -201,15 +201,11 @@ def train():
         #
         model, metrics, parameter_output = imld.train(model, data)
 
-        print('Before DS')
-
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
         #
         x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
                                                  yrange=yrange)
-
-        print('After DS')
 
         # format the response
         #
@@ -219,10 +215,6 @@ def train():
                 'y': y.tolist(), 
                 'z': z.tolist()
             },
-            # flip the mapping label to it is {label name : numeric value} as 
-            # opposed to {numeric value : label name} because that is easier
-            # to work with on the front end
-            # 'mapping_label': {value: key for key, value in data.mapping_label.items()},
             'metrics': metrics,
             'parameter_output': parameter_output
         }
@@ -286,6 +278,60 @@ def eval():
     
     except Exception as e:
         return jsonify(f'Failed to evaluate model: {str(e)}'), 500
+#
+# end of function
+    
+@main.route('/api/set_bounds/', methods=['POST'])
+def rebound():
+
+    # get the data from the request
+    #
+    data = request.get_json()
+
+    # get the data and algorithm parameters
+    #
+    userID = data['userID']
+    x = data['plotData']['x']
+    y = data['plotData']['y']
+    labels = data['plotData']['labels']
+    xrange = data['xrange']
+    yrange = data['yrange']
+
+    try:
+
+        # get the model from the cache
+        #
+        model = model_cache[userID]['model']
+
+        # create the data object
+        #
+        data = imld.create_data(x, y, labels)
+
+        # get the x y and z values from the decision surface
+        # x and y will be 1D and z will be 2D
+        #
+        x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
+                                                 yrange=yrange)
+        
+        # format the response
+        #
+        response = {
+            'decision_surface': {
+                'x': x.tolist(), 
+                'y': y.tolist(), 
+                'z': z.tolist()
+            }
+        }
+        
+        # return the jsonified response
+        #
+        return jsonify(response)
+    
+    # Handle any exceptions and return an error message
+    #          
+    except Exception as e:
+        return \
+        jsonify(f'Failed to re-bound the decision surface: {str(e)}'), 500
 #
 # end of function
     

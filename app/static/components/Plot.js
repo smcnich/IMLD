@@ -123,6 +123,20 @@ class Plot extends HTMLElement {
   // end of method
 
   setBounds(x, y) {
+    /*
+    method: Plot::setBounds
+
+    args:
+     x (Array): the x axis bounds to set
+     y (Array): the y axis bounds to set
+
+    return:
+     None
+
+    description:
+     this method sets the x and y axis bounds of the plot.
+    */
+
     Plotly.relayout(this.plotDiv, {
       'xaxis.range': x,
       'yaxis.range': y
@@ -140,7 +154,7 @@ class Plot extends HTMLElement {
      Object: an object containing the x and y axis bounds of the plot
 
     description:
-     This method returns the x and y axis bounds of the plot as it currently appears
+     this method returns the x and y axis bounds of the plot as it currently appears
     */
 
     // get the x and y axis bounds
@@ -149,7 +163,6 @@ class Plot extends HTMLElement {
       x: this.layout.xaxis.range,
       y: this.layout.yaxis.range
     }
-
   }
   //
   // end of method
