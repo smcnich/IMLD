@@ -548,7 +548,19 @@ class Toolbar_OpenFileButton extends HTMLElement {
       }
 
       else if (label == 'Load Parameters') {
-        this.handleParamFileSelect(event);
+        
+        // dispatch the loadParameters event to the EventBus
+        // the event listener is in Events.js
+        //
+        EventBus.dispatchEvent(new CustomEvent('loadAlgParams', {
+          detail: {
+            'file': event.target.files[0]
+          }
+        }));
+
+        // reset the file input
+        //
+        event.target.value = '';
       }
       else if (label == 'Load Model') {
 
@@ -568,79 +580,6 @@ class Toolbar_OpenFileButton extends HTMLElement {
     });
 
   }
-
-  handleParamFileSelect(event) {
-    /*
-    method: Toolbar_OpenFileButton::handleFileSelect
-    
-    args:
-     event: the event listener event
-    
-    returns:
-     None
-    
-    description:
-     This method is called when a file is selected. It reads the file and
-     extracts the algorithm name and parameters.
-    */
-
-    // Get the selected file
-    //
-    const file = event.target.files[0];
-    
-    // if the file is valid
-    //
-    if (file) {
-      // create a filereader object
-      //
-      const reader = new FileReader();
-  
-      // when the reader is called (i.e. when the file is read)
-      //
-      reader.onload = (e) => {
-        // get the text from the file
-        //
-        const text = e.target.result;
-  
-        // Parse the JSON file
-        //
-        try {
-          const jsonData = JSON.parse(text);
-  
-          // Extract the first (and presumably only) value in the outermost dictionary
-          const [algoData] = Object.values(jsonData);
-
-          // Reformat the data to only include `name` and `params` at the root level
-          const formattedData = {
-            name: algoData.name,
-            params: algoData.params,
-          };
-
-          // Dispatch a custom event to load the parameter form
-          //
-          window.dispatchEvent(new CustomEvent('paramfileLoaded', {
-            detail: {
-              data: {
-                name: algoData.name,
-                params: formattedData
-              }
-            }
-          }));
-
-        } catch (err) {
-          console.error('Error parsing JSON:', err);
-        }
-      };
-  
-      // Read the file as text, this will trigger the onload event
-      //
-      reader.readAsText(file);
-
-      // reset the file input
-      //
-      event.target.value = '';
-    }
-  }  
 }
 
 class Toolbar_SaveFileButton extends HTMLElement {
@@ -719,12 +658,12 @@ class Toolbar_SaveFileButton extends HTMLElement {
             break;
 
           case 'Save Parameters As...':
-            this.openSaveParamsDialog();
+            EventBus.dispatchEvent(new CustomEvent('saveAlgParams'));
+            // this.openSaveParamsDialog();
             break;
 
           case 'Save Model As...':
             EventBus.dispatchEvent(new CustomEvent('saveModel'));
-            //this.openSaveModel();
             break;
 
           default:

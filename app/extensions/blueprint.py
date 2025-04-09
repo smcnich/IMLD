@@ -6,6 +6,7 @@ from collections import OrderedDict
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 import numpy as np
+import toml
 
 import nedc_ml_tools_data as mltd
 import nedc_imld_tools as imld
@@ -76,6 +77,39 @@ def get_data_params():
         json.dumps(OrderedDict(params)),  # Serialize ordered data to JSON
         mimetype='application/json'
     )
+
+@main.route('/api/load_alg_params/', methods=['POST'])
+def load_alg_params():
+
+    try:
+
+        # get the file from the request
+        #
+        file = request.files['file']
+
+        # read the file and use toml parser
+        #
+        content = file.read().decode('utf-8')
+        toml_data = toml.loads(content)
+
+        # Extract the algorithm data
+        #
+        algo_key = next(iter(toml_data))
+        algo_data = toml_data.get(algo_key, {})
+
+        # format the response
+        #
+        response = {
+            'algoName': algo_data.get('name'),  # Extract the name dynamically
+            'params': algo_data  # Extract the params dynamically
+        }
+
+        # return the jsonifyied response
+        #
+        return jsonify(response)
+    
+    except Exception as e:
+        return f'Failed to load algorithm parameters: {e}', 500
 
 @main.route('/api/save_model/', methods=['POST'])
 def save_model():

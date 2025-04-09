@@ -12,7 +12,9 @@ const TRAIN_URL = `${baseURL}api/train/`;
 const EVAL_URL = `${baseURL}api/eval/`;
 const LOADMODEL_URL = `${baseURL}api/load_model/`;
 const DATAGEN_URL = `${baseURL}api/data_gen/`;
-const SAVEMODEL_URL = `${baseURL}api/save_model`;
+const SAVEMODEL_URL = `${baseURL}api/save_model/`;
+const LOADALGPARAMS_URL = `${baseURL}api/load_alg_params/`;
+const SAVEALGPARAMS_URL = `${baseURL}api/save_alg_params/`;
 
 // get the component instances from the HTML document
 //
@@ -392,7 +394,7 @@ EventBus.addEventListener('loadModel', (event) => {
     /*
     eventListener: loadModel
 
-    dispatcher: ToolbarComponents::Toolbar_OpenFileButton::handleModelFileSelect
+    dispatcher: ToolbarComponents::Toolbar_OpenFileButton
 
     args:
      event.detail.file: the file containing the model to be loaded
@@ -530,6 +532,110 @@ EventBus.addEventListener('loadModel', (event) => {
             console.log('Error uploading model:', error);
         }
     }
+});
+//
+// end of event listener
+
+EventBus.addEventListener('loadAlgParams', (event) => {
+    /*
+    eventListener: loadAlgParams
+
+    dispatcher: ToolbarComponents::Toolbar_OpenFileButton
+
+    args:
+     event.detail.file: the file containing the model to be loaded
+
+    description:
+     this event listener is triggered when the user selects a algorithm parameter file
+     to be loaded. the model file is sent to the server to be loaded in the algorithm toolbar
+    */
+
+    // suspend the application as loading
+    //
+    EventBus.dispatchEvent(new CustomEvent('suspend'));
+
+    // get the selected model file
+    //
+    const file = event.detail.file;
+
+    // if the file is valid
+    //
+    if (file) {
+
+        try {
+
+            // write to the process log
+            //
+            processLog.addFullWidthSeparator();
+            processLog.writePlain('Loading algorithm parameters...');
+
+            // create a new form
+            // this is needed to send files to the backend
+            //
+            const request_body = new FormData();
+            request_body.append('file', file);
+
+            // send the data to the server and get the response
+            //
+            fetch(LOADALGPARAMS_URL, {
+                method: 'POST',
+                body: request_body
+            })
+            
+            // parse the response to make sure it is ok
+            //
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } 
+                else {
+                    return response.json().then((errorData) => {
+                        EventBus.dispatchEvent(new CustomEvent('continue'));
+                        processLog.writeError(errorData);
+                        throw new Error(errorData);
+                    });
+                }
+            })
+
+            // if the response is ok, populate the algorithm toolbar
+            //
+            .then((data) => {
+
+                // get the algorithm name and parameters from response
+                //
+                let algoName = data.algoName;
+                let params = data.params;
+
+                // set default values of the form container
+                //
+                algoTool.set_alg_params(algoName, params);
+
+                // write to process log
+                //
+                processLog.writePlain('Done loading algorithm parameters...');
+
+                // continue the application
+                //
+                EventBus.dispatchEvent(new CustomEvent('continue'));
+            });
+        }
+
+        // catch any errors
+        //
+        catch (error) {
+            console.log('Error loading algorithm parameters: ', error);
+        }
+    }
+});
+//
+// end of event listener
+
+EventBus.addEventListener('saveAlgParams', (event) => {
+
+    EventBus.dispatchEvent(new CustomEvent('suspend'));
+
+
+
 });
 //
 // end of event listener
