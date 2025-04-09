@@ -746,11 +746,6 @@ class FormContainer extends HTMLElement {
       // iterate over the parameters and get the input values
       //
       for (const [key, param] of Object.entries(params.params)) {
-        
-        param.name = param.name.replace(/\s*\(.*?\)\s*/g, '');
-        if (!param.name.includes("&")) {
-          param_names.push(param.name);
-        }
 
         // if the form is a group, recursively call the function
         // to get the input values of the group
@@ -782,6 +777,7 @@ class FormContainer extends HTMLElement {
           // check for withType used for load/save parameters
           //
           if (withType == 1){
+
             // create a dictionary for the type and input value
             //
             formValues[key] = {
@@ -789,6 +785,10 @@ class FormContainer extends HTMLElement {
               default: formValues[key]
             }
           }
+
+          // add the print name to the list of parameter names
+          //
+          param_names.push(param.name);
         }
   
         // if the form is a matrix, get the input values in a 2D array
@@ -818,6 +818,10 @@ class FormContainer extends HTMLElement {
               formValues[key][i].push(Number(inputs[i*cols + j].value));
             }
           }
+
+          // add the print name to the list of parameter names
+          //
+          param_names.push(param.name);
         } 
 
         // if the form is a select input, get the value of the select
@@ -829,6 +833,7 @@ class FormContainer extends HTMLElement {
           // check for withType used for load/save parameters
           //
           if (withType == 1) {
+            
             // create a dictionary of the type and input value
             //
             formValues[key] = {
@@ -836,11 +841,16 @@ class FormContainer extends HTMLElement {
               default: input.value
             }
           }
+
+          // submit just the input value
+          //
           else {
-            // submit just the input value
-            //
             formValues[key] = input.value;
           }
+
+          // add the print name to the list of parameter names
+          //
+          param_names.push(param.name);
         }
         
         // else, get the simple input value
@@ -851,6 +861,7 @@ class FormContainer extends HTMLElement {
           // check for withType used for load/save parameters
           //
           if (withType == 1) {
+
             // create a dictionary of the type and input value
             //
             formValues[key] = {
@@ -858,10 +869,12 @@ class FormContainer extends HTMLElement {
               default: Number(input.value)
             }
           }
+
+          // submit just the input value
+          //
           else {
-            // submit just the input value
-            //
             formValues[key] = Number(input.value);
+            param_names.push(param.name);  
           }
         }
       }

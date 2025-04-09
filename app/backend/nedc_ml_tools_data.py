@@ -107,7 +107,7 @@ def generate_toroidal(mean:list,
     #
     ring_radii = np.random.uniform(inner_rad, outer_rad,
                                    npts_ring).reshape(-1, 1)
-    class_1_data = mean + unit_vectors * ring_radii
+    class_1_data = np.array(mean).flatten() + unit_vectors * ring_radii
 
     # concatenate data w labels
     #
@@ -158,12 +158,14 @@ def generate_yin_yang(means:list,
     if ndim not in [2, 3]:
         raise ValueError("Please provide means for 2D or 3D data.")
     
+    print(ndim)
+
     # use the provided means for the x and y (and z if available)
     #
     if ndim == 2:
-        xmean, ymean = means
-    else:  # ndim == 3
-        xmean, ymean, zmean = means
+        xmean, ymean = np.array(means).flatten()
+    else:
+        xmean, ymean, zmean = np.array(means).flatten()
 
     # boundary, mean, and standard deviation of plot
     #
@@ -359,7 +361,8 @@ def generate_gaussian(params:list) -> tuple:
         
         # gaussian distribution for each class
         #
-        data = np.random.multivariate_normal(mean, cov, npts)
+        data = np.random.multivariate_normal(np.array(mean).flatten(), 
+                                             cov, npts)
         labels = [i] * npts
 
         # if this is the first iteration, set the class data and labels
@@ -502,13 +505,13 @@ class MLToolsData:
             if not isinstance(params, dict):
                 raise ValueError("Toroidal parameters must be a dictionary.")
             else:
-                X, y = generate_toroidal(*params)
+                X, y = generate_toroidal(**params)
 
         elif dist_name == YIN_YANG:
             if not isinstance(params, dict):
                 raise ValueError("Yin-Yang parameters must be a dictionary.")
             else:
-                X, y = generate_yin_yang(*params)
+                X, y = generate_yin_yang(**params)
 
         # exit gracefully:
         #  take the data and labels and create a new MLToolsData object

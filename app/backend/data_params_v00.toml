@@ -377,11 +377,20 @@ LIST = [
     dist_name = "toroidal"
     method = "toroidal"
     [toroidal.params]
-        [toroidal.params.npts_ring]
-            name = "Number of Points (Ring)"
-            type = "int"
-            range = [0, "inf"]
-            default = 2000
+        [toroidal.params.npts]
+            name = "Inner and Outer Radius"
+            type = "group"
+            [toroidal.params.npts.params]
+                [toroidal.params.npts.params.npts_ring]
+                    name = "Number of Points (Ring)"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 2000
+                [toroidal.params.npts.params.npts_mass]
+                    name = "Number of Points (Mass)"
+                    type = "int"
+                    range = [0, "inf"]
+                    default = 2000
         [toroidal.params.inner_outer_rad]
             name = "Inner and Outer Radius"
             type = "group"
@@ -400,17 +409,12 @@ LIST = [
             name = "Mean & Covariance (Mass)"
             type = "group"
             [toroidal.params.meancov1.params]
-                [toroidal.params.meancov1.params.npts1]
-                    name = "Number of Points"
-                    type = "int"
-                    range = [0, "inf"]
-                    default = 10000
-                [toroidal.params.meancov1.params.mean1]
+                [toroidal.params.meancov1.params.mean]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.0], [0.0]]
-                [toroidal.params.meancov1.params.cov1]
+                [toroidal.params.meancov1.params.cov]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
