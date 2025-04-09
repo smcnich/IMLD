@@ -111,6 +111,58 @@ def load_alg_params():
     except Exception as e:
         return f'Failed to load algorithm parameters: {e}', 500
 
+@main.route('/api/save_alg_params/', methods=['POST'])
+def save_alg_params():
+
+    try:
+
+        # get the data from the request
+        #
+        data = request.get_json()
+
+        # get the algo name and params
+        #
+        algo_name_raw = data.get('data', {}).get('name')
+        params = data.get('data', {}).get('params')
+
+        # Replace spaces and symbols for TOML-compliant table name
+        #
+        algo_key = algo_name_raw.replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
+
+        # Build nested TOML structure
+        #
+        toml_data = {
+            algo_key: {
+                "name": algo_name_raw,
+                "params": {}
+            }
+        }
+
+        # iterate through params to populate toml file
+        #
+        for param_name, param_info in params.items():
+            toml_data[algo_key]["params"][param_name] = {
+                "type": param_info.get("type", ""),
+                "default": str(param_info.get("default", ""))
+            }
+
+        # convert toml file to byte stream
+        #
+        toml_str = toml.dumps(toml_data)
+        file_data = io.BytesIO(toml_str.encode('utf-8'))
+
+        # return the toml file
+        #
+        return send_file(
+            file_data,
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name='alg.toml'
+        )
+    
+    except Exception as e:
+        return f'Failed to save algorithm parameters: {e}', 500
+
 @main.route('/api/save_model/', methods=['POST'])
 def save_model():
 

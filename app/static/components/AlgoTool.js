@@ -67,27 +67,51 @@ class AlgoTool extends HTMLElement {
     //
     await this.render();
 
-    // Add a global listener for getAlgoParams
+  }
+
+  save_alg_params(sender) {
+  /*
+  method: AlgoTool::save_alg_params
+
+  args:
+    sender (Object): The object where algorithm data should be saved
+
+  return:
+    None
+
+  description:
+    Collects algorithm parameters and saves them to the provided sender object
+  */
+
+    sender.data = {};
+
+    // Get the selected algorithm name from the AlgoTool component
     //
-    window.addEventListener('getAlgoParams', (event) => {
-      // get the event sender so the data can be sent back to the correct component
-      //
-      const sender = event.detail.ref;
+    const selectElement = this.shadowRoot.querySelector('.algo-select');
+    const algoName = selectElement.selectedOptions[0].textContent;
 
-      sender.data = {};
+    // save the data to the sender, to it can be saved 
+    //
+    [sender.data.params, sender.data.param_names] = this.form.submitForm(null, null, 1);
+    sender.data.name = algoName;
 
-      // Get the selected algorithm name from the AlgoTool component
-      const selectElement = this.shadowRoot.querySelector('.algo-select');
-      const algoName = selectElement.selectedOptions[0].textContent;
-
-      // save the data to the sender, to it can be saved 
-      //
-      [sender.data.params, param_names] = this.form.submitForm(null, null, 1);
-      sender.data.name = algoName;
-    });
   }
 
   set_alg_params(algoName, params) {
+  /*
+  method: AlgoTool::set_alg_params
+
+  args:
+    algoName (string): The name of the algorithm to select
+    params (Object): The parameters to set as defaults in the form
+
+  return:
+    None
+
+  description:
+    Sets the selected algorithm in the dropdown and updates the form
+    with the provided default parameters.
+  */
 
     // get the algorithm select element from shadow DOM
     //

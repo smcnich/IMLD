@@ -342,8 +342,8 @@ EventBus.addEventListener('saveModel', () => {
 
         })
 
-            // if the response is ok, return the json
-            //
+        // if the response is ok, return the json
+        //
         .then((blob) => {
 
             // If we are replacing a previously generated file we need to
@@ -630,11 +630,114 @@ EventBus.addEventListener('loadAlgParams', (event) => {
 //
 // end of event listener
 
-EventBus.addEventListener('saveAlgParams', (event) => {
+EventBus.addEventListener('saveAlgParams', () => {
+    /*
+    eventListener: saveAlgParams
 
+    dispatcher: EventBus::saveAlgParams
+
+    args:
+    sender: the object containing algorithm parameters to be saved
+
+    description:
+    This event listener is triggered when the algorithm parameters need to be saved. It suspends the application by dispatching a 'suspend' event, retrieves the algorithm parameters from the `algoTool` object, and sends a POST request to the server with the parameters.
+    If the server responds successfully, it creates and downloads a TOML file containing the parameters. If there is an error, the error is logged, and the application continues.
+    The event listener ensures that the download link for the TOML file is dynamically generated with the algorithm name, and that the application resumes once the process completes or fails.
+    */
+
+    // suspend the application as loading
+    //
     EventBus.dispatchEvent(new CustomEvent('suspend'));
 
+    try {        
 
+        // get the algorithm parameters
+        //
+        const sender = {};
+        algoTool.save_alg_params(sender);
+
+        // fetch for a response
+        //
+        fetch(SAVEALGPARAMS_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sender)
+        })
+
+        // parse the response
+        //
+        .then((response) => {
+
+            // if the response is ok, return the json
+            //
+            if (response.ok) {
+                return response.blob();
+            }
+
+            // otherwise, throw an error
+            //
+            else {
+                return response.json().then((errorData) => {
+                    EventBus.dispatchEvent(new CustomEvent('continue'));
+                    processLog.writeError(errorData);
+                    throw new Error(errorData);
+                });
+            }
+
+        })
+
+        // if the response is ok, return the json
+        //
+        .then((blob) => {
+
+            // If we are replacing a previously generated file we need to
+            // manually revoke the object URL to avoid memory leaks.
+            //
+            if (textFile !== null) {
+                window.URL.revokeObjectURL(textFile);
+            }
+
+            // create a download URL for the blob (csv file)
+            //
+            textFile = window.URL.createObjectURL(blob);          
+
+            // create a link element and add a download attribute
+            // connect the href to the download URL
+            // append the link to the document body
+            // this link is never displayed on the page.
+            // it acts as a dummy link that starts a download
+            //
+            var link = document.createElement('a');
+            link.setAttribute('download', `${sender.data.name}.toml`);
+            link.href = textFile;
+            document.body.appendChild(link);
+
+            // wait for the link to be added to the document
+            // then simulate a click event on the link
+            // the dummy link created above will start the download
+            // when a click event is dispatched
+            //
+            window.requestAnimationFrame(function() {
+                var event = new MouseEvent('click');
+                link.dispatchEvent(event);
+                document.body.removeChild(link);
+            }); 
+
+            // continue the application
+            //
+            EventBus.dispatchEvent(new CustomEvent('continue'));
+        });
+        
+    }
+
+    // catch any errors
+    //
+    catch (error) {
+        EventBus.dispatchEvent(new CustomEvent('continue'));
+        processLog.writeError('Could not save algorithm parameters.');
+    }  
 
 });
 //
