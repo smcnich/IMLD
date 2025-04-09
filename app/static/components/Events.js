@@ -280,10 +280,10 @@ EventBus.addEventListener('eval', (event) => {
     //
     .then((data) => {
 
-        //  write the estimated parameters to the process log
-        //
-        processLog.writePlain('');
-        processLog.writeEstimatedParams(data.parameter_output);
+        // //  write the estimated parameters to the process log
+        // //
+        // processLog.writePlain('');
+        // processLog.writeEstimatedParams(data.parameter_output);
 
         // write the metrics to the process log
         //
@@ -1343,6 +1343,11 @@ EventBus.addEventListener('enableDraw', (event) => {
     //
     drawLabel = labelManager.getLabelByName(className);
 
+    // remove decision surfaces if they exist
+    //
+    if (trainPlot.getDecisionSurface()) { trainPlot.clear_decision_surface(); }
+    if (evalPlot.getDecisionSurface()) { evalPlot.clear_decision_surface(); }
+
     // enable drawing on the train and eval plots
     //
     trainPlot.enableDraw(type, drawLabel, gaussParams.numPoints, gaussParams.cov);
@@ -1433,13 +1438,13 @@ EventBus.addEventListener('setRanges', (event) => {
     let x = event.detail.x[0];
     let y = event.detail.y[0];
 
-
+    // check if the x and y ranges are valid
+    //
     if (x[0] >= x[1]) {
         processLog.writeError(
 `Invalid x range: ${x}. The smaller value must come first and cannot be equal.`);
             return;
     }
-
     if (y[0] >= y[1]) {
         processLog.writeError(
 `Invalid y range: ${y}. The smaller value must come first and cannot be equal.`);
@@ -1456,15 +1461,13 @@ EventBus.addEventListener('setRanges', (event) => {
     trainPlot.setBounds(bounds.x, bounds.y);
     evalPlot.setBounds(bounds.x, bounds.y);
 
-    if (trainPlot.getDecisionSurface()) {
+    // if the decision surface is already plotted, update the plot
+    //
+    if (trainPlot.getDecisionSurface() || evalPlot.getDecisionSurface()) {
 
         // suspend the application as loading
         //
         EventBus.dispatchEvent(new CustomEvent('suspend'));
-
-        // get the current time for benchmarking purposes
-        //
-        const start = Date.now()
 
         // get the training data from the training plot
         //
@@ -1510,12 +1513,18 @@ EventBus.addEventListener('setRanges', (event) => {
         //
         .then((data) => {
 
-            // plot the decision surface on the training plot
+            // plot the decision surface on the correct plot
             //
-            trainPlot.decision_surface(data.decision_surface, 
-                                    labelManager.getLabels());
+            if (trainPlot.getDecisionSurface()) {
+                trainPlot.decision_surface(data.decision_surface, 
+                                        labelManager.getLabels());
+            }
+            if (evalPlot.getDecisionSurface()) {
+                evalPlot.decision_surface(data.decision_surface, 
+                                        labelManager.getLabels());
+            }
 
-            // continue the application\
+            // continue the application
             //
             EventBus.dispatchEvent(new CustomEvent('continue'));
         })
