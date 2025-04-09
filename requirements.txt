@@ -17,3 +17,4 @@ qiskit_aer==0.16.1
 qiskit_ibm_runtime==0.35.0
 qiskit_machine_learning==0.8.2
 dwave_neal==0.6.0
+toml==0.10.2

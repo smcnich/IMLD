@@ -6,6 +6,7 @@ from collections import OrderedDict
 from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 import numpy as np
+import toml
 
 import nedc_ml_tools_data as mltd
 import nedc_imld_tools as imld
@@ -76,6 +77,91 @@ def get_data_params():
         json.dumps(OrderedDict(params)),  # Serialize ordered data to JSON
         mimetype='application/json'
     )
+
+@main.route('/api/load_alg_params/', methods=['POST'])
+def load_alg_params():
+
+    try:
+
+        # get the file from the request
+        #
+        file = request.files['file']
+
+        # read the file and use toml parser
+        #
+        content = file.read().decode('utf-8')
+        toml_data = toml.loads(content)
+
+        # Extract the algorithm data
+        #
+        algo_key = next(iter(toml_data))
+        algo_data = toml_data.get(algo_key, {})
+
+        # format the response
+        #
+        response = {
+            'algoName': algo_data.get('name'),  # Extract the name dynamically
+            'params': algo_data  # Extract the params dynamically
+        }
+
+        # return the jsonifyied response
+        #
+        return jsonify(response)
+    
+    except Exception as e:
+        return f'Failed to load algorithm parameters: {e}', 500
+
+@main.route('/api/save_alg_params/', methods=['POST'])
+def save_alg_params():
+
+    try:
+
+        # get the data from the request
+        #
+        data = request.get_json()
+
+        # get the algo name and params
+        #
+        algo_name_raw = data.get('data', {}).get('name')
+        params = data.get('data', {}).get('params')
+
+        # Replace spaces and symbols for TOML-compliant table name
+        #
+        algo_key = algo_name_raw.replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
+
+        # Build nested TOML structure
+        #
+        toml_data = {
+            algo_key: {
+                "name": algo_name_raw,
+                "params": {}
+            }
+        }
+
+        # iterate through params to populate toml file
+        #
+        for param_name, param_info in params.items():
+            toml_data[algo_key]["params"][param_name] = {
+                "type": param_info.get("type", ""),
+                "default": str(param_info.get("default", ""))
+            }
+
+        # convert toml file to byte stream
+        #
+        toml_str = toml.dumps(toml_data)
+        file_data = io.BytesIO(toml_str.encode('utf-8'))
+
+        # return the toml file
+        #
+        return send_file(
+            file_data,
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name='alg.toml'
+        )
+    
+    except Exception as e:
+        return f'Failed to save algorithm parameters: {e}', 500
 
 @main.route('/api/save_model/', methods=['POST'])
 def save_model():
