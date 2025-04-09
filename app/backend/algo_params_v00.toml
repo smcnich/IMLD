@@ -23,7 +23,8 @@ LIST = [
     "SVM",
     "MLP",
     "RBM",
-    "TRANSFORMER"
+    "TRANSFORMER",
+    "QSVM"
 ]
 
 #------------------------------------------------------------------------------
@@ -247,7 +248,7 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
-        [KMEANS.params.n_cluster]
+        [KMEANS.params.n_clusters]
             name = "Number of Clusters"
             type = "int"
             range = [1, "inf"]
@@ -318,7 +319,7 @@ LIST = [
         [SVM.params.kernel]
             name = "Kernel"
             type = "select"
-            options = ["linear", "poly", "rbf", "sigmoid, precomputed"]
+            options = ["linear", "poly", "rbf", "sigmoid", "precomputed"]
             default = "linear"
 
 #------------------------------------------------------------------------------
@@ -404,6 +405,11 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+        [RBM.params.classifier]
+            name = "Classifier"
+            type = "select"
+            options = ["KNN"]
+            default = "KNN"
         [RBM.params.learning_rate]
             name = "Learning Rate"
             type = "float"
@@ -413,6 +419,11 @@ LIST = [
             name = "Batch Size"
             type = "int"
             range = [1, "inf"]
+            default = 0
+        [RBM.params.verbose]
+            name = "Verbose"
+            type = "select"
+            options = [0]
             default = 0
         [RBM.params.random_state]
             name = "Random State"
@@ -489,6 +500,55 @@ LIST = [
 # Section 4: quantum computing-based models
 #
 #------------------------------------------------------------------------------
+
+[QSVM]
+    name = "Quantum Support Vector Machine (QVSM)"
+    [QVSM.params]
+        [QVSM.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["qiskit"]
+            default = "qiskit"
+        [QVSM.params.provider_name]
+            name = "Provider Name"
+            type = "select"
+            options = ["qiskit"]
+            default = "qiskit"
+        [QVSM.params.hardware]
+            name = "Hardware"
+            type = "select"
+            options = ["cpu"]
+            default = "cpu"
+        [QVSM.params.encoder_name]
+            name = "Encoder Name"
+            type = "select"
+            options = ["zz"]
+            default = "zz"
+        [QVSM.params.n_qubits]
+            name = "Number of Qubits"
+            type = "int"
+            range = [2, 4]
+            default = 4
+        [QVSM.params.featuremap_reps]
+            name = "Feature Map Repetitions"
+            type = "int"
+            range = [1, 2]
+            default = 2
+        [QVSM.params.entanglement]
+            name = "Entanglement"
+            type = "select"
+            options = ["full"]
+            default = "full"
+        [QVSM.params.kernel_name]
+            name = "Kernel Name"
+            type = "select"
+            options = ["fidelity"]
+            default = "fidelity"
+        [QVSM.params.shots]
+            name = "Number of Shots"
+            type = "int"
+            range = [1, 1024]
+            default = 1024
 
 # [QSVM]
 # name = "QSVM"

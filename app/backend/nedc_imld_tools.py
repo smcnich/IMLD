@@ -410,8 +410,8 @@ def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
     # xx and yy will be the x and y values of the grid in the form of 2D arrays.
     # xx acts as the rows of the grid, and yy acts as the columns of the grid
     #
-    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 500), 
-                         np.linspace(y_min, y_max, 500))
+    xx, yy = np.meshgrid(np.linspace(x_min, x_max, 100), 
+                         np.linspace(y_min, y_max, 100))
     
     # combine the xx and yy arrays to create a 3D array of the grid. this will effectively
     # create a list of all the points in the grid. the shape of the array will be (n, 2)
