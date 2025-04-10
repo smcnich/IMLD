@@ -451,7 +451,7 @@ class MainToolbar extends HTMLElement {
             <toolbar-savefile-button label="Save Train As..." plotId="train"></toolbar-savefile-button>
             <toolbar-savefile-button label="Save Eval As..." plotId="eval"></toolbar-savefile-button>
             <div class="separator"></div>
-            <toolbar-openfile-button label="Load Model"></toolbar-openfile-button>
+            <!-- <toolbar-openfile-button label="Load Model"></toolbar-openfile-button> -->
             <toolbar-openfile-button label="Load Parameters"></toolbar-openfile-button>
             <div class="separator"></div>
             <toolbar-savefile-button label="Save Model As..."></toolbar-savefile-button>
