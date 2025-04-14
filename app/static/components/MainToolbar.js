@@ -231,7 +231,6 @@ class MainToolbar extends HTMLElement {
 
     // First, check the popups in the current dropdown
     const openPopups = dropdown.querySelectorAll(PopupSelectors.join(','));
-    console.log('Open Popups: ', openPopups);
 
     // If any of the popups inside the dropdown are open, return true
     if (Array.from(openPopups).some(popup => popup.isPopupOpen)) {
@@ -240,13 +239,11 @@ class MainToolbar extends HTMLElement {
 
     // Check if there are any nested dropdowns inside the current dropdown
     const nestedDropdowns = dropdown.querySelectorAll(nestedDropdownSelectors.join(','));
-    console.log('Nested Dropdown: ', nestedDropdowns);
 
     // If there are nested dropdowns, check each one for open popups
     for (let nestedDropdown of nestedDropdowns) {
       // For each nested dropdown, check for popups in its shadow DOM
       const nestedPopups = nestedDropdown.shadowRoot.querySelectorAll(NestedPopupSelectors.join(','));
-      console.log('Nested Popups: ', nestedPopups);
 
       // If any nested popups are open, return true
       if (Array.from(nestedPopups).some(popup => popup.isPopupOpen)) {
