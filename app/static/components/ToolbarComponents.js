@@ -414,7 +414,7 @@ class Toolbar_DropdownSettings extends HTMLElement {
       dropdownMenu.addEventListener('mouseleave', () => {
 
         // Check if any popup inside the dropdown is open
-        const openPopups = dropdownMenu.querySelectorAll('toolbar-popup-button');
+        const openPopups = dropdownMenu.querySelectorAll('toolbar-set-ranges, toolbar-set-gaussian');
     
         // Check if any of the popups is open
         const isAnyPopupOpen = Array.from(openPopups).some(popup => popup.isPopupOpen);
