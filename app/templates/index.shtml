@@ -76,19 +76,17 @@
    let baseURL = window.location.origin;
 
    // get the path of the app from the URL 
-   // (imld/index.html for production or / for development)
+   // (/projects/imld/resources/app/ for production 
+   // or / for development)
    // 
-   const path = window.location.pathname.split('/');
+   const path = window.location.pathname;
 
    // Check if the app is in a subdirectory
    // will be in subdirectory if production
    // no subdirectory if development
    //
-   if (path.length > 1 && path[1]) {
-       baseURL += `/${path[1]}/`;
-   }
-   else {
-       baseURL += '/';
+   if (path !== '/') {
+       baseURL += `${path}`;
    }
   </script>
 
