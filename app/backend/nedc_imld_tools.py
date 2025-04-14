@@ -131,6 +131,33 @@ def create_data(x:list, y:list, labels:list) -> mltd.MLToolsData:
     # exit gracefully
     #
     return data
+#
+# end of method
+
+def normalize_data(x:list, y:list, xrange:list, yrange:list):
+
+    # convert x and y to NumPy arrays for math
+    #
+    x = np.array(x)
+    y = np.array(y)
+
+    # get the x and y bounds of the data
+    #
+    x_min, x_max = xrange
+    y_min, y_max = yrange
+
+    # normalize the data to the range mins and maxes
+    # base the normalization on the assumption that all
+    # data is generated for the range [-1, 1]
+    #
+    x = (x - (-1)) / (1 - (-1)) * (x_max - x_min) + x_min
+    y = (y - (-1)) / (1 - (-1)) * (y_max - y_min) + y_min
+
+    # exit gracefully
+    #
+    return x.tolist(), y.tolist()
+#
+# end of function
 
 def generate_data(dist_name:str, params:dict):
     '''
@@ -200,8 +227,6 @@ def generate_data(dist_name:str, params:dict):
 #
 # end of function
 
-# TODO: create the wrapper to train an algorithm, given data. make sure to
-#       include error checking. see nedc_ml_tools.py line 1478.
 def train(model:mlt.Alg, data:mltd.MLToolsData):
     '''
     function: train

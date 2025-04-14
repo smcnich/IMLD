@@ -16,6 +16,7 @@ const SAVEMODEL_URL = `${baseURL}api/save_model/`;
 const LOADALGPARAMS_URL = `${baseURL}api/load_alg_params/`;
 const SAVEALGPARAMS_URL = `${baseURL}api/save_alg_params/`;
 const SETBOUNDS_URL = `${baseURL}api/set_bounds/`;
+const NORMALIZE_URL = `${baseURL}api/normalize/`;
 
 // get the component instances from the HTML document
 //
@@ -37,6 +38,11 @@ let textFile;
 //
 let canDraw = false;
 let drawLabel = null;
+
+// set the normalize value
+//
+let normalize = false;
+const normalizeCache = {train: null, eval: null};
 
 // create an Object to store the plot bounds
 //
@@ -391,6 +397,146 @@ EventBus.addEventListener('saveModel', () => {
         processLog.writeError('Could not save model.');
     }    
 
+});
+
+EventBus.addEventListener('setNormalize', (event) => {
+
+    normalize = event.detail.status;
+
+    console.log(normalize);
+
+    if (normalize) {
+
+        const trainData = trainPlot.getData();
+        if (trainData) {
+
+            // suspend the application as loading
+            //
+            EventBus.dispatchEvent(new CustomEvent('suspend'));
+
+            // send the data to the server and get the response
+            //
+            fetch (NORMALIZE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'plotData': trainData
+                })
+            })
+
+            // parse the response
+            //
+            .then((response) => {
+
+                // if the response is ok, return the json
+                //
+                if (response.ok) {
+                    return response.json();
+                }
+
+                // otherwise, throw an error
+                //
+                else {
+                    return response.json().then((errorData) => {
+                        EventBus.dispatchEvent(new CustomEvent('continue'));
+                        processLog.writeError(errorData);
+                        throw new Error(errorData);
+                    });
+                }
+            })
+
+            // get the data from the response
+            //
+            .then((data) => {
+
+                // set the bounds for the plot
+                //
+                trainPlot.plot(data, labelManager);
+
+                // save the unnoramlized data to the cache
+                //
+                normalizeCache.train = trainData;
+
+                // continue the application
+                //
+                EventBus.dispatchEvent(new CustomEvent('continue'));
+            });
+        }
+
+        const evalData = evalPlot.getData();
+        if (evalData) {
+
+            // suspend the application as loading
+            //
+            EventBus.dispatchEvent(new CustomEvent('suspend'));
+
+            // send the data to the server and get the response
+            //
+            fetch (NORMALIZE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'plotData': evalData
+                })
+            })
+
+            // parse the response
+            //
+            .then((response) => {
+
+                // if the response is ok, return the json
+                //
+                if (response.ok) {
+                    return response.json();
+                }
+
+                // otherwise, throw an error
+                //
+                else {
+                    return response.json().then((errorData) => {
+                        EventBus.dispatchEvent(new CustomEvent('continue'));
+                        processLog.writeError(errorData);
+                        throw new Error(errorData);
+                    });
+                }
+            })
+
+            // get the data from the response
+            //
+            .then((data) => {
+
+                // set the bounds for the plot
+                //
+                evalPlot.plot(data, labelManager);
+
+                // save the unnoramlized data to the cache
+                //
+                normalizeCache.eval = evalData;
+
+                // continue the application
+                //
+                EventBus.dispatchEvent(new CustomEvent('continue'));
+            });
+        }
+    }
+
+    else {
+
+        if (normalizeCache.train) {
+            trainPlot.plot(normalizeCache.train, labelManager);
+            normalizeCache.train = null;
+        }
+
+        if (normalizeCache.eval) {
+            evalPlot.plot(normalizeCache.eval, labelManager);
+            normalizeCache.eval = null;
+        }
+
+    }
 });
 
 EventBus.addEventListener('loadModel', (event) => {
@@ -783,7 +929,10 @@ EventBus.addEventListener('dataGen', (event) => {
             },
             body: JSON.stringify({
                 'method': event.detail.method,
-                'params': event.detail.params
+                'params': event.detail.params,
+                'normalize': normalize,
+                'xrange': bounds.x,
+                'yrange': bounds.y
             })
         })
 

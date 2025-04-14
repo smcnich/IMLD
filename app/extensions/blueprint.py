@@ -433,12 +433,22 @@ def data_gen():
     if data:
         dist_name = data['method']
         paramsDict = data['params']
+        normalize = data['normalize']
+
+        if normalize:
+            xrange = data['xrange']
+            yrange = data['yrange']
 
     try:
 
         # generate values for labels, x, y
         #
         labels, x, y = imld.generate_data(dist_name, paramsDict)
+
+        # normalize the data if requested
+        #
+        if normalize:
+            x, y = imld.normalize_data(x, y, xrange, yrange)
 
         # Prepare the response data
         #
