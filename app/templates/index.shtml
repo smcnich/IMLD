@@ -85,9 +85,8 @@
    // will be in subdirectory if production
    // no subdirectory if development
    //
-   if (path !== '/') {
-       baseURL += `${path}`;
-   }
+   baseURL += `${path}`;
+
   </script>
 
   <!---------------------- define the html page header ----------------------->
