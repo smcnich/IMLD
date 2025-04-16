@@ -594,6 +594,7 @@ class ReportPopup extends HTMLElement {
     const textarea = this.shadowRoot.getElementById('issue-description');
     const wordCount = this.shadowRoot.getElementById('word-count');
     const maxWords = 250;
+    const form = this.shadowRoot.querySelector('form');
 
     // Show the popup when the button is clicked
     //
@@ -627,6 +628,11 @@ class ReportPopup extends HTMLElement {
       // prevent default form action when submitting
       //
       event.preventDefault();
+
+      if (!form.checkValidity()) {
+        form.reportValidity(); // This shows the browser's built-in error messages
+        return;
+      }
 
       // get the title and textarea values
       //
