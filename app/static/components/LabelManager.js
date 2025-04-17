@@ -361,6 +361,9 @@ export class LabelManager {
         // clear the list of classes
         //
         this.labels = [];
+        this.names = []
+        this.mappings = [];
+        this.map = {}; 
     }
     //
     // end of method
