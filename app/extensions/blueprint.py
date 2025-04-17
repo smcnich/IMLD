@@ -166,29 +166,37 @@ def save_alg_params():
 @main.route('/api/save_model/', methods=['POST'])
 def save_model():
 
-    # get the data from the request
-    #
-    data = request.get_json()
+    try:
 
-    # get the user id
-    #
-    userID = data['userID']
+        # get the data from the request
+        #
+        data = request.get_json()
 
-    # retrieve model with corresponding user id key
-    #
-    model = model_cache[userID]['model']
+        # get the user id
+        #
+        userID = data['userID']
+        print(userID)
 
-    model.mapping_label = data['label_mappings']
+        if userID not in model_cache or not model_cache[userID]:
+            raise ValueError(f'Model Cache missing.')
 
-    # Serialize the model using pickle and store it in a BytesIO stream
-    #
-    model_bytes = io.BytesIO()
-    pickle.dump(model, model_bytes)
-    model_bytes.seek(0)  # Reset the pointer to the beginning of the stream
-    
-    # Send the pickled model as a response, without writing to a file
-    #
-    return send_file(model_bytes, as_attachment=True, download_name=f'model.pkl', mimetype='application/octet-stream')
+        model = model_cache[userID]['model']
+
+        model.mapping_label = data['label_mappings']
+
+        # Serialize the model using pickle and store it in a BytesIO stream
+        #
+        model_bytes = io.BytesIO()
+        pickle.dump(model, model_bytes)
+        model_bytes.seek(0)  # Reset the pointer to the beginning of the stream
+        
+        # Send the pickled model as a response, without writing to a file
+        #
+        return send_file(model_bytes, as_attachment=True, download_name=f'model.pkl', mimetype='application/octet-stream')
+
+    except Exception as e:
+        response = {'error': str(e)}
+        return jsonify(response), 500
 
 @main.route('/api/load_model/', methods=['POST'])
 def load_model():

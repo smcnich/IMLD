@@ -344,7 +344,7 @@ EventBus.addEventListener('saveModel', () => {
             else {
                 return response.json().then((errorData) => {
                     EventBus.dispatchEvent(new CustomEvent('continue'));
-                    processLog.writeError(errorData);
+                    processLog.writeError('Could not save model.');
                     throw new Error(errorData);
                 });
             }
