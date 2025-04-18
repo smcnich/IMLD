@@ -175,7 +175,6 @@ def save_model():
         # get the user id
         #
         userID = data['userID']
-        print(userID)
 
         if userID not in model_cache or not model_cache[userID]:
             raise ValueError(f'Model Cache missing.')
