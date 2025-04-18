@@ -3,14 +3,14 @@ class AboutPopup extends HTMLElement {
   class: AboutPopup
 
   description:
-    This class creates a customizable About button that, when clicked, displays a popup containing 
-    information about the IMLD tool, including its purpose, features, and history. The popup provides 
-    a focused user experience by using an overlay to isolate content and includes functionality for 
-    closing it with a close button or by clicking outside the popup.
+   This class creates a customizable About button that, when clicked, displays a popup containing 
+   information about the IMLD tool, including its purpose, features, and history. The popup provides 
+   a focused user experience by using an overlay to isolate content and includes functionality for 
+   closing it with a close button or by clicking outside the popup.
 
-    The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-    independent of other components. It dynamically updates its contents using attributes such as 
-    'label' and 'version'.
+   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
+   independent of other components. It dynamically updates its contents using attributes such as 
+   'label' and 'version'.
   */
 
   constructor() {
@@ -18,14 +18,14 @@ class AboutPopup extends HTMLElement {
     method: AboutPopup::constructor
 
     args:
-      None
+     None
 
     returns:
-      AboutPopup instance
+     AboutPopup instance
 
     description:
-      Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
-      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
+     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
     // Call the parent HTMLElement constructor
@@ -34,7 +34,7 @@ class AboutPopup extends HTMLElement {
 
     // Attach a shadow DOM
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // Set initial popup status
     //
@@ -48,31 +48,32 @@ class AboutPopup extends HTMLElement {
     method: AboutPopup::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-      structure and styles, initializes attributes such as 'label' and 'version', and provides 
-      information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
+     structure and styles, initializes attributes such as 'label' and 'version', and provides 
+     information about the IMLD tool, including its interactive features and historical evolution.
     */
 
     // Retrieve the button label from attributes
     //
-    this.label = this.getAttribute('label') || 'About';
-    this.version = this.getAttribute('version') || '1.0';
+    this.label = this.getAttribute("label") || "About";
+    this.version = this.getAttribute("version") || "1.0";
 
-    this.imld_description = 'IMLD is an interactive tool for exploring different machine learning algorithms. It allows users to select, train, and evaluate different algorithms on 2D datasets, providing a hands-on way to understand and compare their performance visually. Originally developed in the 1980s, IMLD has evolved over decades, with this being its latest and most accessible iteration available on the internet.';
+    this.imld_description =
+      "IMLD is an interactive tool for exploring different machine learning algorithms. It allows users to select, train, and evaluate different algorithms on 2D datasets, providing a hands-on way to understand and compare their performance visually. Originally developed in the 1980s, IMLD has evolved over decades, with this being its latest and most accessible iteration available on the internet.";
 
     // Render the HTML and styles for the component
     //
     this.render();
   }
   //
-  // end of method  
-  
+  // end of method
+
   render() {
     /*
     method: AboutPopup::render
@@ -81,11 +82,11 @@ class AboutPopup extends HTMLElement {
      None
 
     return:
-    None
+     None
 
     description:
-      Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-      `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
+     `innerHTML`. This defines the layout and appearance of the component.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -207,13 +208,13 @@ class AboutPopup extends HTMLElement {
 
     // Get elements within the shadow DOM
     //
-    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
-    const popup = this.shadowRoot.getElementById('popup');
-    const closeBtn = this.shadowRoot.getElementById('close-btn');
+    const button = this.shadowRoot.querySelector(".toolbar-popup-button");
+    const popup = this.shadowRoot.getElementById("popup");
+    const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Show the popup when the button is clicked
     //
-    button.addEventListener('click', (event) => {
+    button.addEventListener("click", (event) => {
       // Prevent event propagation to avoid unintended behavior
       //
       event.stopPropagation();
@@ -225,7 +226,7 @@ class AboutPopup extends HTMLElement {
 
     // Close the popup when clicking the close button
     //
-    closeBtn.addEventListener('click', (event) => {
+    closeBtn.addEventListener("click", (event) => {
       // Prevent event propagation to avoid conflicts
       //
       event.stopPropagation();
@@ -237,7 +238,7 @@ class AboutPopup extends HTMLElement {
 
     // Stop event propagation on popup to avoid closing when clicking inside it
     //
-    popup.addEventListener('click', (event) => {
+    popup.addEventListener("click", (event) => {
       event.stopPropagation(); // Stop event from bubbling up to parent listeners
     });
   }
@@ -248,8 +249,8 @@ class AboutPopup extends HTMLElement {
   togglePopup() {
     // Create popup and overlay element
     //
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Toggle popup state
     //
@@ -257,10 +258,10 @@ class AboutPopup extends HTMLElement {
 
     // Show popup and overlap and ensure they are both visible
     if (this.isPopupOpen) {
-      popup.classList.add('show');
-      overlay.classList.add('show');
-      popup.style.display = 'block';
-      overlay.style.display = 'block';
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
     } else {
       // Close popup if already open
       //
@@ -273,18 +274,18 @@ class AboutPopup extends HTMLElement {
   // Close the popup and overlay
   closePopup() {
     // Create popup and overlay element
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
 
     // Hide popup and overlay after transition ends
     //
     setTimeout(() => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+      popup.style.display = "none";
+      overlay.style.display = "none";
     }, 100);
 
     // Set popup state to closed
@@ -302,14 +303,14 @@ class ReportPopup extends HTMLElement {
   class: AboutPopup
 
   description:
-    This class creates a customizable About button that, when clicked, displays a popup containing 
-    information about the IMLD tool, including its purpose, features, and history. The popup provides 
-    a focused user experience by using an overlay to isolate content and includes functionality for 
-    closing it with a close button or by clicking outside the popup.
+   This class creates a customizable About button that, when clicked, displays a popup containing 
+   information about the IMLD tool, including its purpose, features, and history. The popup provides 
+   a focused user experience by using an overlay to isolate content and includes functionality for 
+   closing it with a close button or by clicking outside the popup.
 
-    The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-    independent of other components. It dynamically updates its contents using attributes such as 
-    'label' and 'version'.
+   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
+   independent of other components. It dynamically updates its contents using attributes such as 
+   'label' and 'version'.
   */
 
   constructor() {
@@ -317,14 +318,14 @@ class ReportPopup extends HTMLElement {
     method: AboutPopup::constructor
 
     args:
-      None
+     None
 
     returns:
-      AboutPopup instance
+     AboutPopup instance
 
     description:
-      Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
-      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
+     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
     // Call the parent HTMLElement constructor
@@ -333,7 +334,7 @@ class ReportPopup extends HTMLElement {
 
     // Attach a shadow DOM
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // Set initial popup status
     //
@@ -347,28 +348,28 @@ class ReportPopup extends HTMLElement {
     method: AboutPopup::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-      structure and styles, initializes attributes such as 'label' and 'version', and provides 
-      information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
+     structure and styles, initializes attributes such as 'label' and 'version', and provides 
+     information about the IMLD tool, including its interactive features and historical evolution.
     */
 
     // Retrieve the button label from attributes
     //
-    this.label = this.getAttribute('label') || 'About';
+    this.label = this.getAttribute("label") || "About";
 
     // Render the HTML and styles for the component
     //
     this.render();
   }
   //
-  // end of method  
-  
+  // end of method
+
   render() {
     /*
     method: AboutPopup::render
@@ -377,11 +378,11 @@ class ReportPopup extends HTMLElement {
      None
 
     return:
-    None
+     None
 
     description:
-      Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-      `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
+     `innerHTML`. This defines the layout and appearance of the component.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -587,18 +588,18 @@ class ReportPopup extends HTMLElement {
 
     // Get elements within the shadow DOM
     //
-    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
-    const popup = this.shadowRoot.getElementById('popup');
-    const closeBtn = this.shadowRoot.getElementById('close-btn');
-    const submitButton = this.shadowRoot.getElementById('submitButton')
-    const textarea = this.shadowRoot.getElementById('issue-description');
-    const wordCount = this.shadowRoot.getElementById('word-count');
+    const button = this.shadowRoot.querySelector(".toolbar-popup-button");
+    const popup = this.shadowRoot.getElementById("popup");
+    const closeBtn = this.shadowRoot.getElementById("close-btn");
+    const submitButton = this.shadowRoot.getElementById("submitButton");
+    const textarea = this.shadowRoot.getElementById("issue-description");
+    const wordCount = this.shadowRoot.getElementById("word-count");
     const maxWords = 250;
-    const form = this.shadowRoot.querySelector('form');
+    const form = this.shadowRoot.querySelector("form");
 
     // Show the popup when the button is clicked
     //
-    button.addEventListener('click', (event) => {
+    button.addEventListener("click", (event) => {
       // Prevent event propagation to avoid unintended behavior
       //
       event.stopPropagation();
@@ -610,7 +611,7 @@ class ReportPopup extends HTMLElement {
 
     // Close the popup when clicking the close button
     //
-    closeBtn.addEventListener('click', (event) => {
+    closeBtn.addEventListener("click", (event) => {
       // Prevent event propagation to avoid conflicts
       //
       event.stopPropagation();
@@ -618,13 +619,11 @@ class ReportPopup extends HTMLElement {
       // Call closePopup method to hide popup
       //
       this.closePopup();
-
     });
 
     // Submit the report when clicking the submit button
     //
-    submitButton.addEventListener('click', async (event) => {
-
+    submitButton.addEventListener("click", async (event) => {
       // prevent default form action when submitting
       //
       event.preventDefault();
@@ -636,45 +635,47 @@ class ReportPopup extends HTMLElement {
 
       // get the title and textarea values
       //
-      const issuetitle = this.shadowRoot.getElementById('issue-title').value;
-      const textarea = this.shadowRoot.getElementById('issue-description').value;
+      const issuetitle = this.shadowRoot.getElementById("issue-title").value;
+      const textarea =
+        this.shadowRoot.getElementById("issue-description").value;
 
       try {
         // fetch the data to the issue log route in the backend
         //
         const response = await fetch(`${baseURL}/api/issue_log/`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             title: issuetitle,
             message: textarea,
           }),
         });
-    
+
         // send an error if the response is not received from fetch
         //
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         // close the popup if submitted successfully
         //
         this.closePopup();
       } catch (error) {
-
         // send an error message if cannot send to backend
         //
-        console.error('Error sending data to backend:', error);
+        console.error("Error sending data to backend:", error);
       }
-
     });
 
     // Word count functionality
     //
-    textarea.addEventListener('input', () => {
-      const words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0);
+    textarea.addEventListener("input", () => {
+      const words = textarea.value
+        .trim()
+        .split(/\s+/)
+        .filter((word) => word.length > 0);
       const currentWordCount = words.length;
 
       // Update word count display
@@ -684,9 +685,9 @@ class ReportPopup extends HTMLElement {
       // If word count exceeds the max, trim excess words
       //
       if (currentWordCount >= maxWords) {
-        const trimmedText = words.slice(0, maxWords).join(' ');
+        const trimmedText = words.slice(0, maxWords).join(" ");
         textarea.value = trimmedText;
-        
+
         // Reset word count display to 0 words left
         //
         wordCount.textContent = `Max words: 0`;
@@ -695,17 +696,20 @@ class ReportPopup extends HTMLElement {
 
     // Handle paste event to ensure word count doesn't go negative
     //
-    textarea.addEventListener('paste', (event) => {
+    textarea.addEventListener("paste", (event) => {
       setTimeout(() => {
-        const words = textarea.value.trim().split(/\s+/).filter(word => word.length > 0);
+        const words = textarea.value
+          .trim()
+          .split(/\s+/)
+          .filter((word) => word.length > 0);
         const currentWordCount = words.length;
 
         // If word count exceeds max, trim the text to maxWords
         //
         if (currentWordCount > maxWords) {
-          const trimmedText = words.slice(0, maxWords).join(' ');
+          const trimmedText = words.slice(0, maxWords).join(" ");
           textarea.value = trimmedText;
-          
+
           // Reset word count display to 0 words left
           //
           wordCount.textContent = `Max words: 0`;
@@ -719,7 +723,7 @@ class ReportPopup extends HTMLElement {
 
     // Stop event propagation on popup to avoid closing when clicking inside it
     //
-    popup.addEventListener('click', (event) => {
+    popup.addEventListener("click", (event) => {
       event.stopPropagation(); // Stop event from bubbling up to parent listeners
     });
   }
@@ -730,8 +734,8 @@ class ReportPopup extends HTMLElement {
   togglePopup() {
     // Create popup and overlay element
     //
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Toggle popup state
     //
@@ -739,10 +743,10 @@ class ReportPopup extends HTMLElement {
 
     // Show popup and overlap and ensure they are both visible
     if (this.isPopupOpen) {
-      popup.classList.add('show');
-      overlay.classList.add('show');
-      popup.style.display = 'block';
-      overlay.style.display = 'block';
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
     } else {
       // Close popup if already open
       //
@@ -755,18 +759,18 @@ class ReportPopup extends HTMLElement {
   // Close the popup and overlay
   closePopup() {
     // Create popup and overlay element
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
 
     // Hide popup and overlay after transition ends
     //
     setTimeout(() => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+      popup.style.display = "none";
+      overlay.style.display = "none";
     }, 100);
 
     // Set popup state to closed
@@ -784,14 +788,14 @@ class SharePopup extends HTMLElement {
   class: AboutPopup
 
   description:
-    This class creates a customizable About button that, when clicked, displays a popup containing 
-    information about the IMLD tool, including its purpose, features, and history. The popup provides 
-    a focused user experience by using an overlay to isolate content and includes functionality for 
-    closing it with a close button or by clicking outside the popup.
+   This class creates a customizable About button that, when clicked, displays a popup containing 
+   information about the IMLD tool, including its purpose, features, and history. The popup provides 
+   a focused user experience by using an overlay to isolate content and includes functionality for 
+   closing it with a close button or by clicking outside the popup.
 
-    The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-    independent of other components. It dynamically updates its contents using attributes such as 
-    'label' and 'version'.
+   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
+   independent of other components. It dynamically updates its contents using attributes such as 
+   'label' and 'version'.
   */
 
   constructor() {
@@ -799,14 +803,14 @@ class SharePopup extends HTMLElement {
     method: AboutPopup::constructor
 
     args:
-      None
+     None
 
     returns:
-      AboutPopup instance
+     AboutPopup instance
 
     description:
-      Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
-      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
+     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
     // Call the parent HTMLElement constructor
@@ -815,7 +819,7 @@ class SharePopup extends HTMLElement {
 
     // Attach a shadow DOM
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // Set initial popup status
     //
@@ -829,28 +833,28 @@ class SharePopup extends HTMLElement {
     method: AboutPopup::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-      structure and styles, initializes attributes such as 'label' and 'version', and provides 
-      information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
+     structure and styles, initializes attributes such as 'label' and 'version', and provides 
+     information about the IMLD tool, including its interactive features and historical evolution.
     */
 
     // Retrieve the button label from attributes
     //
-    this.label = this.getAttribute('label') || 'About';
+    this.label = this.getAttribute("label") || "About";
 
     // Render the HTML and styles for the component
     //
     this.render();
   }
   //
-  // end of method  
-  
+  // end of method
+
   render() {
     /*
     method: AboutPopup::render
@@ -859,11 +863,11 @@ class SharePopup extends HTMLElement {
      None
 
     return:
-    None
+     None
 
     description:
-      Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-      `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
+     `innerHTML`. This defines the layout and appearance of the component.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -1074,36 +1078,37 @@ class SharePopup extends HTMLElement {
 
     // Get elements within the shadow DOM
     //
-    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
-    const popup = this.shadowRoot.getElementById('popup');
-    const closeBtn = this.shadowRoot.getElementById('close-btn');
-    const copyBtn = this.shadowRoot.getElementById('copy-button');
+    const button = this.shadowRoot.querySelector(".toolbar-popup-button");
+    const popup = this.shadowRoot.getElementById("popup");
+    const closeBtn = this.shadowRoot.getElementById("close-btn");
+    const copyBtn = this.shadowRoot.getElementById("copy-button");
 
     // Allow for the link to be copied to clipboard when copy button pressed
     //
-    copyBtn.addEventListener('click', () => {
-
+    copyBtn.addEventListener("click", () => {
       // get the content of the link to IMLD
       //
-      const linkText = this.shadowRoot.getElementById('link').textContent;
+      const linkText = this.shadowRoot.getElementById("link").textContent;
 
       // write to the clipboard the link
       //
-      navigator.clipboard.writeText(linkText).then(() => {
-        // show popup alert on frontend if successful
-        //
-        alert('Link copied to clipboard!');
-      }).catch(err => {
-        // send error if unsuccessful
-        //
-        console.error('Failed to copy: ', err);
-      });
-
+      navigator.clipboard
+        .writeText(linkText)
+        .then(() => {
+          // show popup alert on frontend if successful
+          //
+          alert("Link copied to clipboard!");
+        })
+        .catch((err) => {
+          // send error if unsuccessful
+          //
+          console.error("Failed to copy: ", err);
+        });
     });
 
     // Show the popup when the button is clicked
     //
-    button.addEventListener('click', (event) => {
+    button.addEventListener("click", (event) => {
       // Prevent event propagation to avoid unintended behavior
       //
       event.stopPropagation();
@@ -1115,7 +1120,7 @@ class SharePopup extends HTMLElement {
 
     // Close the popup when clicking the close button
     //
-    closeBtn.addEventListener('click', (event) => {
+    closeBtn.addEventListener("click", (event) => {
       // Prevent event propagation to avoid conflicts
       //
       event.stopPropagation();
@@ -1127,7 +1132,7 @@ class SharePopup extends HTMLElement {
 
     // Stop event propagation on popup to avoid closing when clicking inside it
     //
-    popup.addEventListener('click', (event) => {
+    popup.addEventListener("click", (event) => {
       event.stopPropagation(); // Stop event from bubbling up to parent listeners
     });
   }
@@ -1138,8 +1143,8 @@ class SharePopup extends HTMLElement {
   togglePopup() {
     // Create popup and overlay element
     //
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Toggle popup state
     //
@@ -1147,10 +1152,10 @@ class SharePopup extends HTMLElement {
 
     // Show popup and overlap and ensure they are both visible
     if (this.isPopupOpen) {
-      popup.classList.add('show');
-      overlay.classList.add('show');
-      popup.style.display = 'block';
-      overlay.style.display = 'block';
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
     } else {
       // Close popup if already open
       //
@@ -1163,18 +1168,18 @@ class SharePopup extends HTMLElement {
   // Close the popup and overlay
   closePopup() {
     // Create popup and overlay element
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
 
     // Hide popup and overlay after transition ends
     //
     setTimeout(() => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+      popup.style.display = "none";
+      overlay.style.display = "none";
     }, 100);
 
     // Set popup state to closed
@@ -1192,14 +1197,14 @@ class ContactPopup extends HTMLElement {
   class: AboutPopup
 
   description:
-    This class creates a customizable About button that, when clicked, displays a popup containing 
-    information about the IMLD tool, including its purpose, features, and history. The popup provides 
-    a focused user experience by using an overlay to isolate content and includes functionality for 
-    closing it with a close button or by clicking outside the popup.
+   This class creates a customizable About button that, when clicked, displays a popup containing 
+   information about the IMLD tool, including its purpose, features, and history. The popup provides 
+   a focused user experience by using an overlay to isolate content and includes functionality for 
+   closing it with a close button or by clicking outside the popup.
 
-    The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-    independent of other components. It dynamically updates its contents using attributes such as 
-    'label' and 'version'.
+   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
+   independent of other components. It dynamically updates its contents using attributes such as 
+   'label' and 'version'.
   */
 
   constructor() {
@@ -1207,14 +1212,14 @@ class ContactPopup extends HTMLElement {
     method: AboutPopup::constructor
 
     args:
-      None
+     None
 
     returns:
-      AboutPopup instance
+     AboutPopup instance
 
     description:
-      Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
-      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
+     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
     // Call the parent HTMLElement constructor
@@ -1223,7 +1228,7 @@ class ContactPopup extends HTMLElement {
 
     // Attach a shadow DOM
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // Set initial popup status
     //
@@ -1237,28 +1242,28 @@ class ContactPopup extends HTMLElement {
     method: AboutPopup::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-      structure and styles, initializes attributes such as 'label' and 'version', and provides 
-      information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
+     structure and styles, initializes attributes such as 'label' and 'version', and provides 
+     information about the IMLD tool, including its interactive features and historical evolution.
     */
 
     // Retrieve the button label from attributes
     //
-    this.label = this.getAttribute('label') || 'About';
+    this.label = this.getAttribute("label") || "About";
 
     // Render the HTML and styles for the component
     //
     this.render();
   }
   //
-  // end of method  
-  
+  // end of method
+
   render() {
     /*
     method: AboutPopup::render
@@ -1267,11 +1272,11 @@ class ContactPopup extends HTMLElement {
      None
 
     return:
-    None
+     None
 
     description:
-      Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-      `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
+     `innerHTML`. This defines the layout and appearance of the component.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -1491,59 +1496,61 @@ class ContactPopup extends HTMLElement {
 
     // Get elements within the shadow DOM
     //
-    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
-    const popup = this.shadowRoot.getElementById('popup');
-    const closeBtn = this.shadowRoot.getElementById('close-btn');
-    const copyBtn1 = this.shadowRoot.getElementById('copy-button1');
-    const copyBtn2 = this.shadowRoot.getElementById('copy-button2');
+    const button = this.shadowRoot.querySelector(".toolbar-popup-button");
+    const popup = this.shadowRoot.getElementById("popup");
+    const closeBtn = this.shadowRoot.getElementById("close-btn");
+    const copyBtn1 = this.shadowRoot.getElementById("copy-button1");
+    const copyBtn2 = this.shadowRoot.getElementById("copy-button2");
 
     // Allow for the link to be copied to clipboard when copy button pressed
     //
-    copyBtn1.addEventListener('click', () => {
-
+    copyBtn1.addEventListener("click", () => {
       // get the content of the link to IMLD
       //
-      const linkText = this.shadowRoot.getElementById('link1').textContent;
+      const linkText = this.shadowRoot.getElementById("link1").textContent;
 
       // write to the clipboard the link
       //
-      navigator.clipboard.writeText(linkText).then(() => {
-        // show popup alert on frontend if successful
-        //
-        alert('Link copied to clipboard!');
-      }).catch(err => {
-        // send error if unsuccessful
-        //
-        console.error('Failed to copy: ', err);
-      });
-
+      navigator.clipboard
+        .writeText(linkText)
+        .then(() => {
+          // show popup alert on frontend if successful
+          //
+          alert("Link copied to clipboard!");
+        })
+        .catch((err) => {
+          // send error if unsuccessful
+          //
+          console.error("Failed to copy: ", err);
+        });
     });
 
     // Allow for the link to be copied to clipboard when copy button pressed
     //
-    copyBtn2.addEventListener('click', () => {
-
+    copyBtn2.addEventListener("click", () => {
       // get the content of the link to IMLD
       //
-      const linkText = this.shadowRoot.getElementById('link2').textContent;
+      const linkText = this.shadowRoot.getElementById("link2").textContent;
 
       // write to the clipboard the link
       //
-      navigator.clipboard.writeText(linkText).then(() => {
-        // show popup alert on frontend if successful
-        //
-        alert('Link copied to clipboard!');
-      }).catch(err => {
-        // send error if unsuccessful
-        //
-        console.error('Failed to copy: ', err);
-      });
-
+      navigator.clipboard
+        .writeText(linkText)
+        .then(() => {
+          // show popup alert on frontend if successful
+          //
+          alert("Link copied to clipboard!");
+        })
+        .catch((err) => {
+          // send error if unsuccessful
+          //
+          console.error("Failed to copy: ", err);
+        });
     });
 
     // Show the popup when the button is clicked
     //
-    button.addEventListener('click', (event) => {
+    button.addEventListener("click", (event) => {
       // Prevent event propagation to avoid unintended behavior
       //
       event.stopPropagation();
@@ -1555,7 +1562,7 @@ class ContactPopup extends HTMLElement {
 
     // Close the popup when clicking the close button
     //
-    closeBtn.addEventListener('click', (event) => {
+    closeBtn.addEventListener("click", (event) => {
       // Prevent event propagation to avoid conflicts
       //
       event.stopPropagation();
@@ -1567,7 +1574,7 @@ class ContactPopup extends HTMLElement {
 
     // Stop event propagation on popup to avoid closing when clicking inside it
     //
-    popup.addEventListener('click', (event) => {
+    popup.addEventListener("click", (event) => {
       event.stopPropagation(); // Stop event from bubbling up to parent listeners
     });
   }
@@ -1578,8 +1585,8 @@ class ContactPopup extends HTMLElement {
   togglePopup() {
     // Create popup and overlay element
     //
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Toggle popup state
     //
@@ -1587,10 +1594,10 @@ class ContactPopup extends HTMLElement {
 
     // Show popup and overlap and ensure they are both visible
     if (this.isPopupOpen) {
-      popup.classList.add('show');
-      overlay.classList.add('show');
-      popup.style.display = 'block';
-      overlay.style.display = 'block';
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
     } else {
       // Close popup if already open
       //
@@ -1603,18 +1610,18 @@ class ContactPopup extends HTMLElement {
   // Close the popup and overlay
   closePopup() {
     // Create popup and overlay element
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
 
     // Hide popup and overlay after transition ends
     //
     setTimeout(() => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+      popup.style.display = "none";
+      overlay.style.display = "none";
     }, 100);
 
     // Set popup state to closed
@@ -1629,7 +1636,7 @@ class ContactPopup extends HTMLElement {
 
 // Register the custom element
 //
-customElements.define('about-popup', AboutPopup);
-customElements.define('report-popup', ReportPopup);
-customElements.define('share-popup', SharePopup);
-customElements.define('contact-popup', ContactPopup);
+customElements.define("about-popup", AboutPopup);
+customElements.define("report-popup", ReportPopup);
+customElements.define("share-popup", SharePopup);
+customElements.define("contact-popup", ContactPopup);

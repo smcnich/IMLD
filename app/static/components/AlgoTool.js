@@ -5,12 +5,12 @@ class AlgoTool extends HTMLElement {
   class: AlgoTool 
 
   description:
-    this class is to contain the functionality, styling, and structure of the algorithm toolbar.
-    this class will include the dropdown menu for the algorithms, the parameters for the algorithms,
-    and the buttons to train and evaluate the algorithms. it will also contain the logic to populate
-    the dropdown menu with the algorithms and the parameters for the selected algorithm. finally, the
-    class will contain the logic to send the parameters to the server when the train or evaluate button
-    as well as retrieve the parameters from the server when the page is loaded.
+   this class is to contain the functionality, styling, and structure of the algorithm toolbar.
+   this class will include the dropdown menu for the algorithms, the parameters for the algorithms,
+   and the buttons to train and evaluate the algorithms. it will also contain the logic to populate
+   the dropdown menu with the algorithms and the parameters for the selected algorithm. finally, the
+   class will contain the logic to send the parameters to the server when the train or evaluate button
+   as well as retrieve the parameters from the server when the page is loaded.
   */
 
   constructor() {
@@ -18,15 +18,15 @@ class AlgoTool extends HTMLElement {
     method: AlgoTool::constructor
 
     args:
-      None
+     None
 
     returns:
-      AlgoTool instance
+     AlgoTool instance
 
     description:
-      This is the constructor for the AlgoTool class. It is called when a new instance of the class is created.
-      The constructor will create a shadow root for the component and set the name of the class. It will also
-      create a variable to hold the process log component and set the trainReady and evalReady flags to false.
+     This is the constructor for the AlgoTool class. It is called when a new instance of the class is created.
+     The constructor will create a shadow root for the component and set the name of the class. It will also
+     create a variable to hold the process log component and set the trainReady and evalReady flags to false.
     */
 
     // Call the parent constructor (HTMLElement)
@@ -35,7 +35,7 @@ class AlgoTool extends HTMLElement {
 
     // Create a shadow root for the component
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // get the name of the class
     //
@@ -54,81 +54,81 @@ class AlgoTool extends HTMLElement {
     method: AlgoTool::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      This method is called when the component is added to the DOM.
+     This method is called when the component is added to the DOM.
     */
 
     // render the component to the webpage
     //
     await this.render();
-
   }
 
   save_alg_params(sender) {
-  /*
-  method: AlgoTool::save_alg_params
+    /*
+    method: AlgoTool::save_alg_params
 
-  args:
+    args:
     sender (Object): The object where algorithm data should be saved
 
-  return:
+    return:
     None
 
-  description:
+    description:
     Collects algorithm parameters and saves them to the provided sender object
-  */
+    */
 
     sender.data = {};
 
     // Get the selected algorithm name from the AlgoTool component
     //
-    const selectElement = this.shadowRoot.querySelector('.algo-select');
+    const selectElement = this.shadowRoot.querySelector(".algo-select");
     const algoName = selectElement.selectedOptions[0].textContent;
 
-    // save the data to the sender, to it can be saved 
+    // save the data to the sender, to it can be saved
     //
-    [sender.data.params, sender.data.param_names] = this.form.submitForm(null, null, 1);
+    [sender.data.params, sender.data.param_names] = this.form.submitForm(
+      null,
+      null,
+      1
+    );
     sender.data.name = algoName;
-
   }
 
   set_alg_params(algoName, params) {
-  /*
-  method: AlgoTool::set_alg_params
+    /*
+    method: AlgoTool::set_alg_params
 
-  args:
-    algoName (string): The name of the algorithm to select
-    params (Object): The parameters to set as defaults in the form
+    args:
+     algoName (string): The name of the algorithm to select
+     params (Object): The parameters to set as defaults in the form
 
-  return:
-    None
+    return:
+     None
 
-  description:
-    Sets the selected algorithm in the dropdown and updates the form
-    with the provided default parameters.
-  */
+    description:
+     Sets the selected algorithm in the dropdown and updates the form
+     with the provided default parameters.
+    */
 
     // get the algorithm select element from shadow DOM
     //
-    const selectElement = this.shadowRoot.querySelector('.algo-select');
+    const selectElement = this.shadowRoot.querySelector(".algo-select");
 
     // loop through all options of select toolbar
     //
     for (const option of selectElement.options) {
-
       // see if option from file exists and matches
       //
       if (option.text == algoName) {
-
         // set to matching value and dispatch event to change toolbar and form container
         //
         selectElement.value = option.value;
-        selectElement.dispatchEvent(new Event('change'));
+        selectElement.dispatchEvent(new Event("change"));
         break;
       }
     }
@@ -143,15 +143,16 @@ class AlgoTool extends HTMLElement {
     method: AlgoTool::get_form
 
     args:
-      None
+     None
 
     return:
-      form (Object): The form object that is created by the FormContainer class
+     form (Object): The form object that is created by the FormContainer class
 
     description:
-      this method returns the form object that is created by the FormContainer class
+     this method returns the form object that is created by the FormContainer class
     */
-   return this.form;
+
+    return this.form;
   }
 
   get_algo() {
@@ -159,14 +160,15 @@ class AlgoTool extends HTMLElement {
     method: AlgoTool::get_algo
 
     args:
-      None
+     None
 
     return:
-      selectedValue (String): The name of the selected algorithm
+     selectedValue (String): The name of the selected algorithm
 
     description:
-      this method returns the name of the selected algorithm
+     this method returns the name of the selected algorithm
     */
+
     return this.selectedValue;
   }
 
@@ -175,22 +177,21 @@ class AlgoTool extends HTMLElement {
     method: async AlgoTool::fetch_params
 
     args:
-      none
+     none
 
     return:
-      data (Object): The algorithm parameters that are fetched from the server
+     data (Object): The algorithm parameters that are fetched from the server
 
     description:
-      fetch the algorithm parameters from the server. cache the parameters on the client so that this
-      method only needs to be run once on the load of the page
+     fetch the algorithm parameters from the server. cache the parameters on the client so that this
+     method only needs to be run once on the load of the page
     */
 
     try {
-
       // fetch the parameters from the Flask server. make sure to wait for the response
       //
       const response = await fetch(`${baseURL}api/get_alg_params/`);
-      
+
       // if the fetch fails, throw an error
       //
       if (!response.ok) {
@@ -204,12 +205,13 @@ class AlgoTool extends HTMLElement {
       // return the parameters
       //
       return data;
-    }
-
-    // if an error occurs during the fetch and process, log the error to the console
-    //
-    catch (error) {
-      console.error('There has been a problem with your fetch operation:', error);
+    } catch (error) {
+      // if an error occurs during the fetch and process, log the error to the console
+      //
+      console.error(
+        "There has been a problem with your fetch operation:",
+        error
+      );
     }
   }
   //
@@ -220,28 +222,27 @@ class AlgoTool extends HTMLElement {
     method: Template::render
     
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      This method renders the component to the webpage by setting the innerHTML of the
-      shadow root to what is in the string below.
+     This method renders the component to the webpage by setting the innerHTML of the
+     shadow root to what is in the string below.
     */
 
-    let options = '';
+    let options = "";
 
     // fetch the algorithm parameters from the server and render them
     // this is an async function so we need to use a promise to wait for the data
     //
     this.fetch_params().then((data) => {
-
       // iterate over each alg in the dictionary and create an option element
       //
       for (let key in data) {
-        options += `<option value="${key}">${data[key]['name']}</option>`;
-      };
+        options += `<option value="${key}">${data[key]["name"]}</option>`;
+      }
 
       // WRITE YOUR HTML AND CSS HERE
       this.shadowRoot.innerHTML = `
@@ -394,147 +395,149 @@ class AlgoTool extends HTMLElement {
 
       // get the algo select element to be used to monitor when the value changes
       //
-      const selectElement= this.shadowRoot.querySelector('.algo-select');
-      
+      const selectElement = this.shadowRoot.querySelector(".algo-select");
+
       // get the container which the parameters will be stored in so they can be
       // added when the algortihm is changed
       //
-      const paramsContainer = this.shadowRoot.querySelector('#paramBox');
+      const paramsContainer = this.shadowRoot.querySelector("#paramBox");
 
       // get the algo select element to be used to monitor when the value changes
       //
-      const submitButtons = this.shadowRoot.querySelectorAll('button');
+      const submitButtons = this.shadowRoot.querySelectorAll("button");
 
       // add an event listener to the submit buttons
       // to listen for when the button is clicked
       //
       submitButtons.forEach((button) => {
         button.onclick = () => {
-          
           // if the button is disabled, do not do anything
           //
-          if (button.className == 'disabled') {
+          if (button.className == "disabled") {
             return null;
           }
 
           // get the proper button id and route to send the data to
           //
-          let plot = button.getAttribute('id');
+          let plot = button.getAttribute("id");
 
           const [paramsDict, param_names] = this.form.submitForm();
 
           // if the plot is train, train the model
           // and set the trained flag to true
           //
-          if (plot == 'train') {
+          if (plot == "train") {
+            EventBus.dispatchEvent(
+              new CustomEvent("train", {
+                detail: {
+                  userID: userID,
+                  algo: this.selectedValue.toString(),
+                  algoname: this.selectedName.toString(),
+                  params: paramsDict,
+                  param_names: param_names,
+                },
+              })
+            );
 
-            EventBus.dispatchEvent(new CustomEvent('train', { 
-              detail: {
-                'userID': userID,
-                'algo': this.selectedValue.toString(),
-                'algoname': this.selectedName.toString(),
-                'params': paramsDict,
-                'param_names': param_names
-                }
-            }));
-            
-            EventBus.dispatchEvent(new CustomEvent('stateChange'));
+            EventBus.dispatchEvent(new CustomEvent("stateChange"));
           }
 
           // if the plot is eval, evaluate the model
           //
-          else if (plot == 'eval') {
-            EventBus.dispatchEvent(new CustomEvent('eval', { 
-              detail: {
-                'userID': userID
-                }
-            }));
+          else if (plot == "eval") {
+            EventBus.dispatchEvent(
+              new CustomEvent("eval", {
+                detail: {
+                  userID: userID,
+                },
+              })
+            );
 
-            EventBus.dispatchEvent(new CustomEvent('stateChange'));
+            EventBus.dispatchEvent(new CustomEvent("stateChange"));
           }
-        }
+        };
       });
-      
+
       // create an event listener that listens to when the value of the select element changes
       //
-      selectElement.addEventListener('change', (event) => {
-
+      selectElement.addEventListener("change", (event) => {
         // clear the params container so that the new params can be added
         //
-        paramsContainer.innerHTML = '';
+        paramsContainer.innerHTML = "";
 
         // get the selected value of the select element
         //
         this.selectedValue = event.target.value;
-        this.selectedName = event.target.options[event.target.selectedIndex].text;
+        this.selectedName =
+          event.target.options[event.target.selectedIndex].text;
 
         // Create a style element
         const style = `
-        /* Styling the main container for form inputs */
-        .form-container {
-          display: flex;
-          flex-direction: row;
-          width: 100%;
-        }
+          /* Styling the main container for form inputs */
+          .form-container {
+            display: flex;
+            flex-direction: row;
+            width: 100%;
+          }
 
-        .class-container {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-          width: 100%;
-        }
-    
-        /* Styling for individual input containers */
-        .num-container {
-          display: flex;
-          flex-direction: row;
-          justify-content: space-between;
-          border: 2px solid #ccc;
-          padding: 0.4vw;
-          border-radius: 0.4vw;
-          margin: 0.4vh 0.15vw 0.1vw;
-          box-sizing: border-box;
-          width: 100%;
-        }
-    
-        /* Label styling for input fields */
-        label {
-          padding-left: 0.5vw;
-          padding-right: 0.5vw;
-          padding-top: 0.30vw;
-          font-family: 'Inter', sans-serif;
-          font-size: 0.85em;
-          font-weight: bold;
-        }
-    
-        /* Input field styling */
-        input, select {
-          padding: 0.2vw;
-          border: 1px solid #ccc;
-          border-radius: 0.4vw;
-          font-size: 0.8em;
-          width: 35%;
-          background-color: white;
-          font-family: 'Inter', sans-serif;
-          font-size: 0.8em;
+          .class-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+          }
+      
+          /* Styling for individual input containers */
+          .num-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            border: 2px solid #ccc;
+            padding: 0.4vw;
+            border-radius: 0.4vw;
+            margin: 0.4vh 0.15vw 0.1vw;
+            box-sizing: border-box;
+            width: 100%;
+          }
+      
+          /* Label styling for input fields */
+          label {
+            padding-left: 0.5vw;
+            padding-right: 0.5vw;
+            padding-top: 0.30vw;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85em;
+            font-weight: bold;
+          }
+      
+          /* Input field styling */
+          input, select {
+            padding: 0.2vw;
+            border: 1px solid #ccc;
+            border-radius: 0.4vw;
+            font-size: 0.8em;
+            width: 35%;
+            background-color: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8em;
 
-          -ms-box-sizing:content-box;
-          -moz-box-sizing:content-box;
-          box-sizing:content-box;
-          -webkit-box-sizing:content-box; 
-        }
+            -ms-box-sizing:content-box;
+            -moz-box-sizing:content-box;
+            box-sizing:content-box;
+            -webkit-box-sizing:content-box; 
+          }
 
-        option {
-          font-family: 'Inter', sans-serif;
-          font-size: 0.8em;
-        }
-    
-        /* Input field focus state */
-        input:focus, select:focus {
-          border-color: #7441BA;
-          border-width: 2px;
-          outline: none;
-        }
+          option {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8em;
+          }
+      
+          /* Input field focus state */
+          input:focus, select:focus {
+            border-color: #7441BA;
+            border-width: 2px;
+            outline: none;
+          }
         `;
 
         // create a dynamic form container for the distribution key
@@ -544,9 +547,11 @@ class AlgoTool extends HTMLElement {
         // if the form is an instance of InvalidLabelsError, then the user
         // has not created training data yet. print to the process log that
         // the user needs to create training data before selecting an algorithm
-        // 
+        //
         if (this.form instanceof InvalidLabelsError) {
-          this.processLog.writePlain(`Please create training data before selecting ${this.selectedValue} algorithm`);
+          this.processLog.writePlain(
+            `Please create training data before selecting ${this.selectedValue} algorithm`
+          );
 
           // reset the form
           //
@@ -555,7 +560,7 @@ class AlgoTool extends HTMLElement {
           // reset the the value on the select element to default
           //
           event.target.selectedIndex = 0;
-          
+
           // end this function
           //
           return;
@@ -565,15 +570,13 @@ class AlgoTool extends HTMLElement {
         //
         paramsContainer.appendChild(this.form);
 
-        EventBus.dispatchEvent(new CustomEvent('stateChange'));
+        EventBus.dispatchEvent(new CustomEvent("stateChange"));
       });
       //
       // end of event listener
-    
     });
     //
     // end of fetch
-
   }
   //
   // end of method
@@ -596,12 +599,15 @@ class AlgoTool extends HTMLElement {
 
     // get the train button
     //
-    const trainButton = this.shadowRoot.querySelector('button#train');
+    const trainButton = this.shadowRoot.querySelector("button#train");
 
     // change the state accordingly
     //
-    if (state) { trainButton.className = ''; }
-    else { trainButton.className = 'disabled'; }
+    if (state) {
+      trainButton.className = "";
+    } else {
+      trainButton.className = "disabled";
+    }
   }
 
   change_eval_state(state) {
@@ -622,12 +628,15 @@ class AlgoTool extends HTMLElement {
 
     // get the eval button
     //
-    const evalButton = this.shadowRoot.querySelector('button#eval');
+    const evalButton = this.shadowRoot.querySelector("button#eval");
 
     // change the state accordingly
     //
-    if (state) { evalButton.className = ''; }
-    else { evalButton.className = 'disabled'; }
+    if (state) {
+      evalButton.className = "";
+    } else {
+      evalButton.className = "disabled";
+    }
   }
 }
 //
@@ -635,4 +644,4 @@ class AlgoTool extends HTMLElement {
 
 // Register the custom element so it can be used in the wepage HTML
 //
-customElements.define('algorithm-toolbar', AlgoTool); 
+customElements.define("algorithm-toolbar", AlgoTool);

@@ -5,12 +5,12 @@ class DataPopup extends HTMLElement {
   class: DataPopup
 
   description:
-    This class creates a customizable button that, when clicked, displays a popup form with options and parameters. 
-    It provides functionality for handling presets, clearing inputs, and submitting data. The popup includes 
-    an overlay to focus the user’s attention and can be closed by clicking outside or on a close button.
+   This class creates a customizable button that, when clicked, displays a popup form with options and parameters. 
+   It provides functionality for handling presets, clearing inputs, and submitting data. The popup includes 
+   an overlay to focus the user’s attention and can be closed by clicking outside or on a close button.
 
-    The DataPopup component is encapsulated using Shadow DOM to isolate styles and logic, ensuring it integrates 
-    seamlessly into different projects. It uses attributes such as 'label' and 'key' to dynamically set its contents.
+   The DataPopup component is encapsulated using Shadow DOM to isolate styles and logic, ensuring it integrates 
+   seamlessly into different projects. It uses attributes such as 'label' and 'key' to dynamically set its contents.
   */
   constructor() {
     /*
@@ -26,14 +26,14 @@ class DataPopup extends HTMLElement {
       Initializes the DataPopup component. The constructor creates the shadow DOM and sets 
       an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
-   
+
     // Call the parent HTMLElement constructor
     //
     super();
 
     // Attach a shadow DOM
     //
-    this.attachShadow({mode: 'open'});
+    this.attachShadow({ mode: "open" });
 
     // Set initial popup status
     //
@@ -47,31 +47,31 @@ class DataPopup extends HTMLElement {
     method: DataPopup::connectedCallback
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Invoked when the component is added to the DOM. This method triggers the rendering of the 
-      component's structure and styles, sets up event listeners for interaction, and ensures the 
-      popup behaves as intended.
+     Invoked when the component is added to the DOM. This method triggers the rendering of the 
+     component's structure and styles, sets up event listeners for interaction, and ensures the 
+     popup behaves as intended.
     */
 
-    const params = this.getAttribute('params');
+    const params = this.getAttribute("params");
     this.params = JSON.parse(params);
 
     // Retrieve the button label from attributes
     //
-    this.label = this.getAttribute('label') || 'Button';
+    this.label = this.getAttribute("label") || "Button";
 
     // Retrieve the data key from attributes
     //
-    this.key = this.getAttribute('key') || 'two_gaussian';
+    this.key = this.getAttribute("key") || "two_gaussian";
 
     // Retrieve the name from attributes
     //
-    this.name = this.getAttribute('name') || 'Two Gaussian';
+    this.name = this.getAttribute("name") || "Two Gaussian";
 
     // Render the HTML and styles for the component
     //
@@ -80,25 +80,24 @@ class DataPopup extends HTMLElement {
     // Add event listeners for interactivity
     //
     this.addEventListeners();
-    
-  } 
+  }
   //
-  // end of method   
-  
+  // end of method
+
   render() {
     /*
     method: DataPopup::render
 
     args:
-      None
+     None
 
     return:
-      None
+     None
 
     description:
-      Creates the HTML and styles for the DataPopup component. This method dynamically updates 
-      the button label and popup contents based on the component's attributes ('label' and 'key').
-      It also includes styling for the button, popup, and overlay.
+     Creates the HTML and styles for the DataPopup component. This method dynamically updates 
+     the button label and popup contents based on the component's attributes ('label' and 'key').
+     It also includes styling for the button, popup, and overlay.
     */
 
     this.shadowRoot.innerHTML = `
@@ -234,9 +233,9 @@ class DataPopup extends HTMLElement {
 
     // Get elements within the shadow DOM
     //
-    const button = this.shadowRoot.querySelector('.toolbar-popup-button');
-    const popup = this.shadowRoot.getElementById('popup');
-    const closeBtn = this.shadowRoot.getElementById('close-btn');
+    const button = this.shadowRoot.querySelector(".toolbar-popup-button");
+    const popup = this.shadowRoot.getElementById("popup");
+    const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Create a style element
     const style = `
@@ -296,8 +295,8 @@ class DataPopup extends HTMLElement {
     this.form = new FormContainer(this.params, style);
 
     // Append the form to the popup before the button container
-    // 
-    const formDiv = this.shadowRoot.getElementById('form-div');
+    //
+    const formDiv = this.shadowRoot.getElementById("form-div");
     formDiv.insertBefore(this.form, formDiv.firstChild);
 
     // Show the popup when the button is clicked
@@ -338,14 +337,13 @@ class DataPopup extends HTMLElement {
   addEventListeners() {
     // Set up button to clear inputs and apply preset values
     //
-    const clearButton = this.shadowRoot.querySelector('#clearButton');
-    const presetButton = this.shadowRoot.querySelector('#presetButton');
-    const submitButton = this.shadowRoot.querySelector('#submitButton');
-    
+    const clearButton = this.shadowRoot.querySelector("#clearButton");
+    const presetButton = this.shadowRoot.querySelector("#presetButton");
+    const submitButton = this.shadowRoot.querySelector("#submitButton");
+
     // Clear all input fields when clear button is clicked
     //
     clearButton.onclick = () => {
-      
       // clear the inputs through the form object
       //
       this.form.clearForm();
@@ -354,7 +352,6 @@ class DataPopup extends HTMLElement {
     // Fetch and apply preset values when preset button is clicked
     //
     presetButton.onclick = () => {
-
       // set the defaults through the form object
       //
       this.form.setDefaults();
@@ -363,28 +360,28 @@ class DataPopup extends HTMLElement {
     // Fetch and apply preset values when preset button is clicked
     //
     submitButton.onclick = () => {
-
       // set the defaults through the form object
       //
       const [paramsDict, param_names] = this.form.submitForm();
 
       // dispatch the dataGen event with the key and parameters
       //
-      EventBus.dispatchEvent(new CustomEvent('dataGen', {
-        detail: {
-          'plotID': this.label.toLocaleLowerCase(),
-          'method': this.method,
-          'params': paramsDict,
-          'param_names': param_names,
-          'name': this.name       
-        }
-      }));
+      EventBus.dispatchEvent(
+        new CustomEvent("dataGen", {
+          detail: {
+            plotID: this.label.toLocaleLowerCase(),
+            method: this.method,
+            params: paramsDict,
+            param_names: param_names,
+            name: this.name,
+          },
+        })
+      );
 
       // close the popup
       //
       this.closePopup();
     };
-
   }
   //
   // end of method
@@ -393,8 +390,8 @@ class DataPopup extends HTMLElement {
   togglePopup() {
     // Create popup and overlay element
     //
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Toggle popup state
     //
@@ -402,10 +399,10 @@ class DataPopup extends HTMLElement {
 
     // Show popup and overlap and ensure they are both visible
     if (this.isPopupOpen) {
-      popup.classList.add('show');
-      overlay.classList.add('show');
-      popup.style.display = 'block';
-      overlay.style.display = 'block';
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
     } else {
       // Close popup if already open
       //
@@ -418,18 +415,18 @@ class DataPopup extends HTMLElement {
   // Close the popup and overlay
   closePopup() {
     // Create popup and overlay element
-    const popup = this.shadowRoot.getElementById('popup');
-    const overlay = this.shadowRoot.getElementById('overlay');
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
-    popup.classList.remove('show');
-    overlay.classList.remove('show');
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
 
     // Hide popup and overlay after transition ends
     //
     setTimeout(() => {
-      popup.style.display = 'none';
-      overlay.style.display = 'none';
+      popup.style.display = "none";
+      overlay.style.display = "none";
     }, 100);
 
     // Set popup state to closed
@@ -447,26 +444,26 @@ class DataButton extends HTMLElement {
   class: DataButton
 
   description:
-    This class defines a custom web component that represents a button with a dropdown menu. 
-    The button is styled to match a toolbar and displays additional options (or "data-popup" components)
-    in a dropdown menu on hover. It is designed to work as part of a toolbar system where each button
-    is independent and displays dropdown content dynamically based on attributes.
+   This class defines a custom web component that represents a button with a dropdown menu. 
+   The button is styled to match a toolbar and displays additional options (or "data-popup" components)
+   in a dropdown menu on hover. It is designed to work as part of a toolbar system where each button
+   is independent and displays dropdown content dynamically based on attributes.
 
-    The class utilizes shadow DOM for encapsulation and includes CSS styling directly within the component.
+   The class utilizes shadow DOM for encapsulation and includes CSS styling directly within the component.
   */
   constructor() {
     /*
     method: DataButton::constructor
 
     args:
-      None
+     None
 
     returns:
-      DataButton instance
+     DataButton instance
 
     description:
-      This constructor initializes the component by calling the parent class (HTMLElement) constructor 
-      and attaches a shadow root in "open" mode, allowing external JavaScript to access the shadow DOM.
+     This constructor initializes the component by calling the parent class (HTMLElement) constructor 
+     and attaches a shadow root in "open" mode, allowing external JavaScript to access the shadow DOM.
     */
 
     // Call the parent constructor
@@ -475,7 +472,7 @@ class DataButton extends HTMLElement {
 
     // Attach shadow DOM for encapsulation
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
   }
   //
   // end of method
@@ -485,14 +482,14 @@ class DataButton extends HTMLElement {
     method: DataButton::connectedCallback
 
     args:
-      None
+     None
 
     returns:
-      None
+     None
 
     description:
-      Called when the component is added to the DOM. This method triggers the rendering of the component 
-      and adds event listeners to handle hover interactions for the dropdown menu.
+     Called when the component is added to the DOM. This method triggers the rendering of the component 
+     and adds event listeners to handle hover interactions for the dropdown menu.
     */
 
     // Render the component
@@ -511,22 +508,22 @@ class DataButton extends HTMLElement {
     method: DataButton::render
 
     args:
-      None
+     None
 
     returns:
-      None
+     None
 
     description:
-      This method generates the HTML and CSS content for the DataButton component. It reads attributes
-      (`label` for button text and `key` for parameter keys) and constructs the button and dropdown 
-      menu structure, including custom styling for the toolbar layout.
+     This method generates the HTML and CSS content for the DataButton component. It reads attributes
+     (`label` for button text and `key` for parameter keys) and constructs the button and dropdown 
+     menu structure, including custom styling for the toolbar layout.
     */
 
     // Get the label and key attributes
     //
-    const label = this.getAttribute('label') || 'Button'; // Get the label from the attribute
-    const key = this.getAttribute('key') || 'two_gaussian';
-    const params = this.getAttribute('params');
+    const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
+    const key = this.getAttribute("key") || "two_gaussian";
+    const params = this.getAttribute("params");
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -627,83 +624,84 @@ class DataButton extends HTMLElement {
 
     // get the dropdown menu element
     //
-    const dropMenu = this.shadowRoot.querySelector('.dropdown-menu');
+    const dropMenu = this.shadowRoot.querySelector(".dropdown-menu");
 
     // add the train data pop-up botton with the correct attributes
     // you have to do it this way because if you create the popups
     // in the HTML string above, the JSON parameters are not passed
     // correctly
     //
-    const train = document.createElement('data-popup');
-    train.setAttribute('label', 'Train');
-    train.setAttribute('key', key);
-    train.setAttribute('params', params);
-    train.setAttribute('name', label);
+    const train = document.createElement("data-popup");
+    train.setAttribute("label", "Train");
+    train.setAttribute("key", key);
+    train.setAttribute("params", params);
+    train.setAttribute("name", label);
     dropMenu.appendChild(train);
 
     // do the same for the eval pop-up botton. not allowed to name
     // a variable "eval" in some forms of JS, so add the underscore before
     //
-    const _eval = document.createElement('data-popup');
-    _eval.setAttribute('label', 'Eval');
-    _eval.setAttribute('key', key);
-    _eval.setAttribute('params', params);
-    _eval.setAttribute('name', label);
+    const _eval = document.createElement("data-popup");
+    _eval.setAttribute("label", "Eval");
+    _eval.setAttribute("key", key);
+    _eval.setAttribute("params", params);
+    _eval.setAttribute("name", label);
     dropMenu.appendChild(_eval);
   }
 
   // Add event listeners when hovering over the dropdown button
   //
   addHoverListeners() {
-
     // Create the button and dropdown menu reference
     //
-    const button = this.shadowRoot.querySelector('.toolbar-button');
-    const dropdownMenu = this.shadowRoot.getElementById('dropdown-menu');
+    const button = this.shadowRoot.querySelector(".toolbar-button");
+    const dropdownMenu = this.shadowRoot.getElementById("dropdown-menu");
 
     // Show the dropdown on hover
     //
-    button.addEventListener('mouseenter', () => {
-      dropdownMenu.classList.add('show'); // Display button
-      button.classList.add('active'); // Highlight button
+    button.addEventListener("mouseenter", () => {
+      dropdownMenu.classList.add("show"); // Display button
+      button.classList.add("active"); // Highlight button
     });
 
     // Hide the dropdown when not hovering over both the button and dropdown
     //
-    button.addEventListener('mouseleave', () => {
-
+    button.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
-      const openPopups = dropdownMenu.querySelectorAll('data-popup');
+      const openPopups = dropdownMenu.querySelectorAll("data-popup");
 
       // Check if any of the popups is open
-      const isAnyPopupOpen = Array.from(openPopups).some(popup => popup.isPopupOpen);
+      const isAnyPopupOpen = Array.from(openPopups).some(
+        (popup) => popup.isPopupOpen
+      );
 
-      if (!dropdownMenu.matches(':hover') && !isAnyPopupOpen) {
-        dropdownMenu.classList.remove('show'); // Hide dropdown
-        button.classList.remove('active'); // Remove highlight
+      if (!dropdownMenu.matches(":hover") && !isAnyPopupOpen) {
+        dropdownMenu.classList.remove("show"); // Hide dropdown
+        button.classList.remove("active"); // Remove highlight
       }
     });
 
     // Keep dropdown visible when hovering over it
     //
-    dropdownMenu.addEventListener('mouseenter', () => {
-      dropdownMenu.classList.add('show'); // Keep dropdown open
-      button.classList.add('active'); // Keep button highlighted
+    dropdownMenu.addEventListener("mouseenter", () => {
+      dropdownMenu.classList.add("show"); // Keep dropdown open
+      button.classList.add("active"); // Keep button highlighted
     });
 
     // Hide dropdown when leaving it
     //
-    dropdownMenu.addEventListener('mouseleave', () => {
-
+    dropdownMenu.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
-      const openPopups = dropdownMenu.querySelectorAll('data-popup');
-    
+      const openPopups = dropdownMenu.querySelectorAll("data-popup");
+
       // Check if any of the popups is open
-      const isAnyPopupOpen = Array.from(openPopups).some(popup => popup.isPopupOpen);
-    
+      const isAnyPopupOpen = Array.from(openPopups).some(
+        (popup) => popup.isPopupOpen
+      );
+
       if (!isAnyPopupOpen) {
-        dropdownMenu.classList.remove('show'); // Hide when not hovering over dropdown
-        button.classList.remove('active'); // Remove highlight when leaving dropdown
+        dropdownMenu.classList.remove("show"); // Hide when not hovering over dropdown
+        button.classList.remove("active"); // Remove highlight when leaving dropdown
       }
     });
   }
@@ -715,5 +713,5 @@ class DataButton extends HTMLElement {
 
 // Register the custom element
 //
-customElements.define('data-popup', DataPopup);
-customElements.define('data-button', DataButton);
+customElements.define("data-popup", DataPopup);
+customElements.define("data-button", DataButton);

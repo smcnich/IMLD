@@ -72,7 +72,6 @@ class Plot extends HTMLElement {
 
       <div id="plot"></div>
     `;
-
   }
   //
   // end of method
@@ -96,11 +95,11 @@ class Plot extends HTMLElement {
     //
     this.render();
 
-    this.plotDiv = this.querySelector('#plot');
+    this.plotDiv = this.querySelector("#plot");
 
     // get the plotId from the attribute to determine what data the specific instance plots
     //
-    this.plotId = this.getAttribute('plotId');
+    this.plotId = this.getAttribute("plotId");
 
     // create class atrributes for plotting
     //
@@ -110,14 +109,13 @@ class Plot extends HTMLElement {
 
     // Event listener for resizing the plot
     //
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       const update = {
         width: this.parentElement.clientWidth - 50,
-        height: this.parentElement.clientHeight - 50
+        height: this.parentElement.clientHeight - 50,
       };
       Plotly.relayout(this.plotDiv, update);
     });
-
   }
   //
   // end of method
@@ -138,8 +136,8 @@ class Plot extends HTMLElement {
     */
 
     Plotly.relayout(this.plotDiv, {
-      'xaxis.range': x,
-      'yaxis.range': y
+      "xaxis.range": x,
+      "yaxis.range": y,
     });
   }
 
@@ -161,8 +159,8 @@ class Plot extends HTMLElement {
     //
     return {
       x: this.layout.xaxis.range,
-      y: this.layout.yaxis.range
-    }
+      y: this.layout.yaxis.range,
+    };
   }
   //
   // end of method
@@ -185,7 +183,7 @@ class Plot extends HTMLElement {
   }
   //
   // end of method
-  
+
   getShapeName() {
     /*
     method: Plot::getShapeName
@@ -214,18 +212,25 @@ class Plot extends HTMLElement {
   }
 
   initPlot() {
-
     // Set configuration data for Plotly
     //
     this.config = {
       displayLogo: false,
-      modeBarButtonsToRemove: ['zoom2d', 'select2d', 'lasso2d', 'zoomIn2d',
-                               'zoomOut2d', 'toggleSpikelines', 'pan2d',
-                               'hoverClosestCartesian', 'autoScale2d',
-                               'hoverCompareCartesian'],
+      modeBarButtonsToRemove: [
+        "zoom2d",
+        "select2d",
+        "lasso2d",
+        "zoomIn2d",
+        "zoomOut2d",
+        "toggleSpikelines",
+        "pan2d",
+        "hoverClosestCartesian",
+        "autoScale2d",
+        "hoverCompareCartesian",
+      ],
       responsive: true,
       showLink: false,
-      cursor: 'pointer'
+      cursor: "pointer",
     };
 
     // Set layout data for Plotly
@@ -241,23 +246,23 @@ class Plot extends HTMLElement {
       yaxis: {
         zeroline: false,
         showline: true,
-        range: [-1, 1]
+        range: [-1, 1],
       },
       legend: {
         x: 0.5,
         y: -0.3,
-        xanchor: 'center',
-        yanchor: 'bottom',
-        orientation: 'h',
+        xanchor: "center",
+        yanchor: "bottom",
+        orientation: "h",
       },
-      margin: { 
+      margin: {
         t: 10,
         b: 10,
         l: 40,
-        r: 10
+        r: 10,
       },
       width: this.parentElement.clientWidth - 50,
-      height: this.parentElement.clientHeight - 50
+      height: this.parentElement.clientHeight - 50,
     };
 
     this.plot_empty();
@@ -283,7 +288,9 @@ class Plot extends HTMLElement {
 
     // Get the contour trace from the plot data
     //
-    const contourTrace = this.plotData.find(trace => trace.type === 'contour');
+    const contourTrace = this.plotData.find(
+      (trace) => trace.type === "contour"
+    );
 
     // If the contour trace is not found, return null
     //
@@ -296,28 +303,27 @@ class Plot extends HTMLElement {
     return {
       z: contourTrace.z,
       x: contourTrace.x,
-      y: contourTrace.y
+      y: contourTrace.y,
     };
   }
   //
   // end of method
 
   createTraces(data, labelManager) {
-
     // make the all the data labels are the same
     //
-    if ((data.labels.length != data.x.length) ||
-        (data.x.length != data.y.length) || 
-        (data.y.length != data.labels.length)) {
-          
-          return null;
+    if (
+      data.labels.length != data.x.length ||
+      data.x.length != data.y.length ||
+      data.y.length != data.labels.length
+    ) {
+      return null;
     }
-    
+
     // iterate over each value in the data and create a trace for each label
     //
     let traces = {};
     for (let i = 0; i < data.labels.length; i++) {
-
       // get the Label object from the label manager
       // using the numeric mapping present in the data
       //
@@ -326,20 +332,19 @@ class Plot extends HTMLElement {
       // if the label is not a already created
       //
       if (!(label.mapping in traces)) {
-
         traces[label.mapping] = {
           x: [],
           y: [],
-          mode: 'markers',
-          type: 'scattergl',
+          mode: "markers",
+          type: "scattergl",
           name: label.name,
           mapping: label.mapping,
-          marker: { 
-            size: 2, 
-            color: label.color
+          marker: {
+            size: 2,
+            color: label.color,
           },
-          hoverinfo: 'none'
-        }
+          hoverinfo: "none",
+        };
       }
 
       // add the x and y values to the trace
@@ -376,12 +381,12 @@ class Plot extends HTMLElement {
     // set the layout for the empty plot
     //
     const layout = this.layout;
-    layout.margin = { 
+    layout.margin = {
       t: 10,
       b: 62,
       l: 40,
-      r: 10
-    }
+      r: 10,
+    };
 
     // Create the empty plot
     //
@@ -418,7 +423,7 @@ class Plot extends HTMLElement {
 
     // Get the plot div element
     //
-    const plotDiv = this.querySelector('#plot');
+    const plotDiv = this.querySelector("#plot");
 
     // Prepare plot data by creating a trace for each label
     //
@@ -427,7 +432,6 @@ class Plot extends HTMLElement {
     // check if the layout data is null, if so, use the default layout values
     //
     if (this.data.layout != null) {
-
       // get the axis values from the data
       //
       const xaxis = this.data.layout.xaxis;
@@ -447,7 +451,7 @@ class Plot extends HTMLElement {
     // of the current plot. this will effect which buttons are enabled
     // in the algoTool
     //
-    EventBus.dispatchEvent(new CustomEvent('stateChange'));
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
   //
   // end of method
@@ -469,19 +473,19 @@ class Plot extends HTMLElement {
 
     // Get the plot div element
     //
-    const plotDiv = this.querySelector('#plot');
+    const plotDiv = this.querySelector("#plot");
 
     // remove the contour data from the plot data
     //
-    this.plotData = this.plotData.filter(trace => trace.type !== 'scattergl');
+    this.plotData = this.plotData.filter((trace) => trace.type !== "scattergl");
 
     // update the plot to remove the decision surface
     //
-    Plotly.react(plotDiv, this.plotData, this.layout, this.config); 
-    
+    Plotly.react(plotDiv, this.plotData, this.layout, this.config);
+
     // dispatch an event to the algoTool to update the plot status
     //
-    EventBus.dispatchEvent(new CustomEvent('stateChange'));
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
 
   clear_plot() {
@@ -500,7 +504,7 @@ class Plot extends HTMLElement {
 
     // Get the plot div element
     //
-    const plotDiv = this.querySelector('#plot');
+    const plotDiv = this.querySelector("#plot");
 
     // remove all traces from the plot data
     //
@@ -514,7 +518,7 @@ class Plot extends HTMLElement {
     // of the current plot. this will effect which buttons are enabled
     // in the algoTool
     //
-    EventBus.dispatchEvent(new CustomEvent('stateChange'));
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
 
   decision_surface(data, labels) {
@@ -546,8 +550,8 @@ class Plot extends HTMLElement {
 
     // Get the plot div element
     //
-    const plotDiv = this.querySelector('#plot');
-      
+    const plotDiv = this.querySelector("#plot");
+
     // get all of the unique labels in the data
     //
     let uniqLabels = Array.from(new Set(data.z.flat()));
@@ -560,7 +564,7 @@ class Plot extends HTMLElement {
     let colorScale = [];
     labels.forEach((label) => {
       if (uniqLabels.includes(label.mapping)) {
-          colorScale.push(applyAlpha(label.color, 0.2));
+        colorScale.push(applyAlpha(label.color, 0.2));
       }
     });
 
@@ -568,12 +572,12 @@ class Plot extends HTMLElement {
     // duplicate the single color to create a gradient
     //
     if (colorScale.length === 1) {
-      colorScale.push(colorScale[0]); 
+      colorScale.push(colorScale[0]);
     }
 
     // recreate the color scale to be in the format of:
     //  [[0, <color>], [0.25, <color>], ..., [1, <color>]]
-    // normalize the index of each color in the scale 
+    // normalize the index of each color in the scale
     // to be between 0 and 1 as this is required by plotly
     //
     // i am not entirely sure how this works as the normalized
@@ -581,31 +585,30 @@ class Plot extends HTMLElement {
     // label manager. but it does work
     //
     colorScale = colorScale.map((color, index) => {
-      return [index / (colorScale.length - 1), color]
+      return [index / (colorScale.length - 1), color];
     });
 
     // Data for the contour plot
     //
     const contourData = {
-
       // convert the z values to numerics based on the
       // mapping
       //
       z: data.z,
       x: data.x,
       y: data.y,
-      type: 'contour',
+      type: "contour",
       contours: {
-        coloring: 'heatmap',
+        coloring: "heatmap",
       },
       line: {
-        smoothing: 1
+        smoothing: 1,
       },
-      name: 'Decision Surface',
+      name: "Decision Surface",
       showscale: false,
-      hoverinfo: 'none',
+      hoverinfo: "none",
       colorscale: colorScale,
-      showlegend: true
+      showlegend: true,
     };
 
     // add the contour data to the plot data
@@ -620,7 +623,7 @@ class Plot extends HTMLElement {
     // of the current plot. this will effect which buttons are enabled
     // in the algoTool
     //
-    EventBus.dispatchEvent(new CustomEvent('stateChange'));
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
 
   clear_decision_surface() {
@@ -639,22 +642,22 @@ class Plot extends HTMLElement {
 
     // Get the plot div element
     //
-    const plotDiv = this.querySelector('#plot');
+    const plotDiv = this.querySelector("#plot");
 
     // remove the contour data from the plot data
     //
-    this.plotData = this.plotData.filter(trace => trace.type !== 'contour');
+    this.plotData = this.plotData.filter((trace) => trace.type !== "contour");
 
     // update the plot to remove the decision surface
     //
-    Plotly.react(plotDiv, this.plotData, this.layout, this.config); 
-    
+    Plotly.react(plotDiv, this.plotData, this.layout, this.config);
+
     // dispatch an event to the algoTool to update the plot status
     //
-    EventBus.dispatchEvent(new CustomEvent('stateChange'));
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
 
-  traces_to_data(traces=null) {
+  traces_to_data(traces = null) {
     /*
     method: Plot::traces_to_data
 
@@ -682,16 +685,16 @@ class Plot extends HTMLElement {
 
     // create empty arrays to store the data
     //
-    const labels = [], x = [], y = [];
+    const labels = [],
+      x = [],
+      y = [];
 
     // iterate over each trace in the plot data
     //
     plotData.forEach((trace) => {
-      
       // if the trace is a scatter plot, add the data to the arrays
       //
-      if (trace.type === 'scattergl') {
-        
+      if (trace.type === "scattergl") {
         // iterate over each point in the trace and add the data to the arrays
         //
         for (let i = 0; i < trace.x.length; i++) {
@@ -705,10 +708,10 @@ class Plot extends HTMLElement {
     // create the data object
     //
     this.data = {
-      'labels': labels,
-      'x': x,
-      'y': y
-    }
+      labels: labels,
+      x: x,
+      y: y,
+    };
 
     // return the data object
     //
@@ -733,8 +736,8 @@ class Plot extends HTMLElement {
 
     // remove any trace with the same name as the label
     //
-    this.plotData = this.plotData.filter( (trace) => {
-      return trace.name.toLowerCase() !== label.toLowerCase()
+    this.plotData = this.plotData.filter((trace) => {
+      return trace.name.toLowerCase() !== label.toLowerCase();
     });
 
     // make sure to change the raw data to reflect the removed class
@@ -749,7 +752,15 @@ class Plot extends HTMLElement {
   //
   // end of method
 
-  enableDraw(type, label, numPoints=15, cov=[[0.025, 0], [0, 0.025]]) {
+  enableDraw(
+    type,
+    label,
+    numPoints = 15,
+    cov = [
+      [0.025, 0],
+      [0, 0.025],
+    ]
+  ) {
     /*
     method: Plot::enable_draw
 
@@ -773,7 +784,9 @@ class Plot extends HTMLElement {
     // this specifically needs to be the rect element that belongs to the
     // 'nsewdrag' class. otherwise, the points will be in the wrong place
     //
-    const rect = this.plotDiv.querySelector('.nsewdrag').getBoundingClientRect();
+    const rect = this.plotDiv
+      .querySelector(".nsewdrag")
+      .getBoundingClientRect();
     const xaxis = this.plotDiv._fullLayout.xaxis;
     const yaxis = this.plotDiv._fullLayout.yaxis;
 
@@ -782,7 +795,7 @@ class Plot extends HTMLElement {
     function getMousePoint(event) {
       return {
         x: xaxis.p2d(event.clientX - rect.left),
-        y: yaxis.p2d(event.clientY - rect.top)
+        y: yaxis.p2d(event.clientY - rect.top),
       };
     }
     //
@@ -791,22 +804,21 @@ class Plot extends HTMLElement {
     // function to update the existing trace dynamically
     //
     function drawPoint(plotDiv, xPoint, yPoint, idx, type) {
-
       let update;
 
-      if (type === 'points') {
+      if (type === "points") {
         update = {
           x: [[xPoint]],
-          y: [[yPoint]]
+          y: [[yPoint]],
         };
       }
 
-      if (type === 'gaussian') {
+      if (type === "gaussian") {
         const mean = [xPoint, yPoint];
         const points = generateMultivariateNormal(mean, cov, numPoints);
         update = {
           x: [points.x],
-          y: [points.y]
+          y: [points.y],
         };
       }
 
@@ -816,7 +828,6 @@ class Plot extends HTMLElement {
     }
     //
     // end of helper function
-
 
     // try to find the index of the proper class trace
     //
@@ -831,15 +842,15 @@ class Plot extends HTMLElement {
       this.plotData.push({
         x: [],
         y: [],
-        mode: 'markers',
-        type: 'scattergl',
+        mode: "markers",
+        type: "scattergl",
         name: label.name,
         mapping: label.mapping,
-        marker: { 
+        marker: {
           size: 2,
-          color: label.color
+          color: label.color,
         },
-        hoverinfo: 'none'
+        hoverinfo: "none",
       });
 
       // Set the index to the last trace in the plot data
@@ -854,12 +865,11 @@ class Plot extends HTMLElement {
     // when the mouse is clicked
     //
     this.plotDiv.onpointerdown = (event) => {
-      
       // set the drawing state to true
       //
       isDrawing = true;
 
-      // capture the pointer so we continue receiving events even if the mouse 
+      // capture the pointer so we continue receiving events even if the mouse
       // leaves plotDiv
       //
       this.plotDiv.setPointerCapture(event.pointerId);
@@ -876,11 +886,9 @@ class Plot extends HTMLElement {
     // when the mouse is moved
     //
     this.plotDiv.onpointermove = (event) => {
-      
       // if the mouse is down
       //
       if (isDrawing) {
-
         // get the mouse point
         //
         const mousePoint = getMousePoint(event);
@@ -894,7 +902,6 @@ class Plot extends HTMLElement {
     // when the mouse is released
     //
     this.plotDiv.onpointerup = (event) => {
-      
       // set the drawing state to false
       //
       isDrawing = false;
@@ -909,7 +916,7 @@ class Plot extends HTMLElement {
 
       // dispatch an event to the algoTool to update the plot status
       //
-      EventBus.dispatchEvent(new CustomEvent('stateChange'));
+      EventBus.dispatchEvent(new CustomEvent("stateChange"));
     };
   }
   //
@@ -957,7 +964,6 @@ function applyAlpha(hex, alpha) {
   */
 
   try {
-
     // Ensure the input HEX is valid
     //
     if (!/^#([0-9A-F]{3}|[0-9A-F]{6})$/i.test(hex)) {
@@ -978,18 +984,18 @@ function applyAlpha(hex, alpha) {
 
     // Convert alpha to a two-digit HEX value
     //
-    const alphaHex = Math.round(alpha * 255).toString(16).padStart(2, "0");
+    const alphaHex = Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, "0");
 
     // Return the HEX color with the alpha channel appended
     //
     return `${hex}${alphaHex}`;
-  }
-
-  // catch a type error if the hex color code is not valid
-  // most likely a color name was passed in
-  // so convert the color name to a hex color code
-  //
-  catch (TypeError) {
+  } catch (TypeError) {
+    // catch a type error if the hex color code is not valid
+    // most likely a color name was passed in
+    // so convert the color name to a hex color code
+    //
     return applyAlpha(colorNameToHex(hex), alpha);
   }
 }
@@ -1012,7 +1018,7 @@ function colorNameToHex(colorName) {
 
   // create a temporary element
   //
-  const tempElement = document.createElement('div');
+  const tempElement = document.createElement("div");
   tempElement.style.color = colorName;
   document.body.appendChild(tempElement);
 
@@ -1028,10 +1034,10 @@ function colorNameToHex(colorName) {
   //
   const rgb = computedColor.match(/\d+/g);
   if (rgb.length === 3) {
-      const r = parseInt(rgb[0]).toString(16).padStart(2, '0');
-      const g = parseInt(rgb[1]).toString(16).padStart(2, '0');
-      const b = parseInt(rgb[2]).toString(16).padStart(2, '0');
-      return `#${r}${g}${b}`;
+    const r = parseInt(rgb[0]).toString(16).padStart(2, "0");
+    const g = parseInt(rgb[1]).toString(16).padStart(2, "0");
+    const b = parseInt(rgb[2]).toString(16).padStart(2, "0");
+    return `#${r}${g}${b}`;
   }
 
   // return null if the conversion fails
@@ -1100,17 +1106,17 @@ function generateMultivariateNormal(mean, cov, numPoints) {
 
   // create empty arrays to store the generated points
   //
-  const x = [], y = [];
+  const x = [],
+    y = [];
 
   // get the mean and covariance values
   //
   const [meanX, meanY] = mean;
-  const [varX, covXY, , varY] = [cov[0][0], cov[0][1], cov[1][0], cov[1][1]]; 
-  
+  const [varX, covXY, , varY] = [cov[0][0], cov[0][1], cov[1][0], cov[1][1]];
+
   // generate the specified number of points
   //
   for (let i = 0; i < numPoints; i++) {
-
     // generate a pair of standard normal random variables
     //
     const [z0, z1] = generateStandardNormalPair();
@@ -1121,19 +1127,23 @@ function generateMultivariateNormal(mean, cov, numPoints) {
     // y = meanY + stdY * (rho * z0 + sqrt(1 - rho^2) * z1)
     // where rho = covXY / (stdX * stdY)
     // and stdX = sqrt(varX), stdY = sqrt(varY)
-    // 
+    //
     x.push(meanX + Math.sqrt(varX) * z0);
-    y.push(meanY + Math.sqrt(varY) * (covXY / varX * z0 + 
-           Math.sqrt(1 - (covXY * covXY) / (varX * varY)) * z1));
+    y.push(
+      meanY +
+        Math.sqrt(varY) *
+          ((covXY / varX) * z0 +
+            Math.sqrt(1 - (covXY * covXY) / (varX * varY)) * z1)
+    );
   }
 
   // return the generated points
   //
-  return {'x': x, 'y': y};
+  return { x: x, y: y };
 }
 //
 // end of function
 
 // register the custom element
 //
-customElements.define('plot-card', Plot); 
+customElements.define("plot-card", Plot);
