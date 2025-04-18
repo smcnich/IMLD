@@ -191,7 +191,7 @@ class DataPopup extends HTMLElement {
           width: 100%;
           margin: 1vh 0 0.1vw;
         }
-  
+
         .button, .reset {
           flex: 1; /* Makes each button take up equal width */
           padding: 0.2vh 0.4vw;
@@ -203,13 +203,12 @@ class DataPopup extends HTMLElement {
           font-family: 'Inter', sans-serif;
           font-size: 1em;
         }
-  
+
         .button:hover, .reset:hover {
           background-color: #2a732e;
         }
 
       </style>
-
 
       <!-- Button to trigger the popup -->
       <button class="toolbar-popup-button">${this.label}</button>

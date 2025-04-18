@@ -498,7 +498,7 @@ class ReportPopup extends HTMLElement {
           font-family: 'Inter', sans-serif;
           font-size: 0.9em;
         }
-  
+
         .button:hover {
           background-color: #2a732e;
         }

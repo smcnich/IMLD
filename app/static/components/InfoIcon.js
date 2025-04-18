@@ -100,7 +100,7 @@ class InfoIcon extends HTMLElement {
         .info-icon:hover {
           filter: invert(40%) sepia(100%) saturate(1000%) hue-rotate(180deg); /* Adjust colors to change the look */
         }
-  
+
         /* Popup window styling */
         .popup {
           display: none; /* Initially hidden */
@@ -118,19 +118,19 @@ class InfoIcon extends HTMLElement {
           opacity: 0; /* Start fully transparent */
           transition: opacity 0.1s ease, transform 0.3s ease; /* Transition for opening/closing */
         }
-  
+
         /* Class to show popup */
         .popup.show {
           display: block; /* Show when needed */
           opacity: 1; /* Fully opaque when shown */
           transform: translate(-50%, -50%) scale(1); /* Scale to original size */
         }
-  
+
         /* Top margin for heading */
         .popup h2 {
           margin: 0 0 20px 0;
         }
-  
+
         /* Close button styling */
         .close-btn {
           position: absolute;
@@ -142,7 +142,7 @@ class InfoIcon extends HTMLElement {
           cursor: pointer;
           color: #333;
         }
-  
+
         /* Overlay styling */
         .overlay {
           display: none; /* Initially hidden */
@@ -154,7 +154,7 @@ class InfoIcon extends HTMLElement {
           background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
           z-index: 999; /* Ensure it's below the popup */
         }
-  
+
         /* Class to show overlay */
         .overlay.show {
           display: block; 

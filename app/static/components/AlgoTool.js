@@ -486,7 +486,7 @@ class AlgoTool extends HTMLElement {
             justify-content: space-between;
             width: 100%;
           }
-      
+
           /* Styling for individual input containers */
           .num-container {
             display: flex;
@@ -499,7 +499,7 @@ class AlgoTool extends HTMLElement {
             box-sizing: border-box;
             width: 100%;
           }
-      
+
           /* Label styling for input fields */
           label {
             padding-left: 0.5vw;
@@ -509,7 +509,7 @@ class AlgoTool extends HTMLElement {
             font-size: 0.85em;
             font-weight: bold;
           }
-      
+
           /* Input field styling */
           input, select {
             padding: 0.2vw;

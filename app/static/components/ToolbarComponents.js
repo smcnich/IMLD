@@ -29,13 +29,13 @@ class Toolbar_Button extends HTMLElement {
           white-space: nowrap;
           text-align: left;
         }
-  
+
         .toolbar-button:hover {
           background-color: #c9c9c9;
         }
-  
+
       </style>
-  
+
       <button class="toolbar-button">${label}</button>
     `;
   }
@@ -108,17 +108,17 @@ class Toolbar_CheckboxButton extends HTMLElement {
           display: flex; /* Use flexbox for alignment */
           align-items: center; /* Center align items vertically */
         }
-  
+
         .toolbar-checkbox-button:hover {
           background-color: #c9c9c9;
         }
-  
+
         input[type="checkbox"] {
           margin-right: 7px; /* Space between checkbox and label */
           margin-left: 10px;
         }
       </style>
-  
+
       <button class="toolbar-checkbox-button" id="checkboxButton">
         <input type="checkbox" id="checkbox" ?checked="${this.checked}" />
         ${label}
@@ -187,7 +187,7 @@ class Toolbar_DropdownClear extends HTMLElement {
           text-align: left;
           position: relative; /* Needed for absolute positioning of dropdown */
         }
-  
+
         /* Add the triangle using ::after pseudo-element */
         .toolbar-button::after {
           content: ''; /* Empty content for triangle */
@@ -199,12 +199,12 @@ class Toolbar_DropdownClear extends HTMLElement {
           border-style: solid;
           border-color: transparent transparent transparent black; /* Creates a right-pointing triangle */
         }
-      
+
         .toolbar-button:hover,
         .toolbar-button.active {
           background-color: #c9c9c9; /* Highlight color */
         }
-  
+
         /* Dropdown menu styling */
         .dropdown-menu {
           display: none; /* Initially hidden */
@@ -216,11 +216,11 @@ class Toolbar_DropdownClear extends HTMLElement {
           min-width: 150px; /* Match button width */
           border: 1px solid #ccc;
         }
-  
+
         .dropdown-menu.show {
           display: block; /* Show when needed */
         }
-  
+
         .dropdown-item {
           background-color: white;
           color: black;
@@ -234,7 +234,7 @@ class Toolbar_DropdownClear extends HTMLElement {
           white-space: nowrap;
           text-align: left;
         }
-  
+
         .dropdown-item:hover {
           background-color: #c9c9c9; /* Hover effect for dropdown items */
         }
@@ -317,7 +317,7 @@ class Toolbar_DropdownSettings extends HTMLElement {
           text-align: left;
           position: relative; /* Needed for absolute positioning of dropdown */
         }
-  
+
         /* Add the triangle using ::after pseudo-element */
         .toolbar-button::after {
           content: ''; /* Empty content for triangle */
@@ -329,7 +329,7 @@ class Toolbar_DropdownSettings extends HTMLElement {
           border-style: solid;
           border-color: transparent transparent transparent black; /* Creates a right-pointing triangle */
         }
-          
+
         .toolbar-button:hover,
         .toolbar-button.active {
           background-color: #c9c9c9; /* Highlight color */
@@ -346,11 +346,11 @@ class Toolbar_DropdownSettings extends HTMLElement {
           min-width: 150px; /* Match button width */
           border: 1px solid #ccc;
         }
-  
+
         .dropdown-menu.show {
           display: block; /* Show when needed */
         }
-  
+
         .dropdown-item {
           background-color: white;
           color: black;
@@ -364,7 +364,7 @@ class Toolbar_DropdownSettings extends HTMLElement {
           white-space: nowrap;
           text-align: left;
         }
-  
+
         .dropdown-item:hover {
           background-color: #c9c9c9; /* Hover effect for dropdown items */
         }
@@ -451,6 +451,7 @@ class Toolbar_OpenFileButton extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
+
         .toolbar-openfile-button {
           background-color: white;
           color: black;
@@ -464,10 +465,13 @@ class Toolbar_OpenFileButton extends HTMLElement {
           white-space: nowrap;
           text-align: left;
         }
+
         .toolbar-openfile-button:hover {
           background-color: #c9c9c9;
         }
+
       </style>
+
       <button class="toolbar-openfile-button">${label}</button>
     `;
   }
@@ -576,12 +580,12 @@ class Toolbar_SaveFileButton extends HTMLElement {
           white-space: nowrap;
           text-align: left;
         }
-  
+
         .toolbar-openfile-button:hover {
           background-color: #c9c9c9;
         }
       </style>
-  
+
       <button class="toolbar-openfile-button">${label}</button>
     `;
   }
@@ -1290,7 +1294,7 @@ class Toolbar_SetRanges extends HTMLElement {
             <button type="button" class="button" id="presetButton">Presets</button>
             <button type="submit" class="button" id="submitButton">Submit</button>
           </div>
-        </div>      
+        </div>
       </div>
     `;
 

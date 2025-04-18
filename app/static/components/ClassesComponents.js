@@ -212,7 +212,7 @@ class AddClassPopup extends HTMLElement {
         .toolbar-popup-button:hover {
           background-color: #c9c9c9;
         }
-  
+
         /* Popup styling */
         .popup {
           display: none;
@@ -246,7 +246,7 @@ class AddClassPopup extends HTMLElement {
           font-size: 1.2em;
           margin: 0 0 8px 0;
         }
-  
+
         /* Close button styling */
         .close-btn {
           position: absolute;
@@ -258,7 +258,7 @@ class AddClassPopup extends HTMLElement {
           cursor: pointer;
           color: #333;
         }
-  
+
         /* Overlay styling */
         .overlay {
           display: none;
@@ -270,7 +270,7 @@ class AddClassPopup extends HTMLElement {
           background: rgba(0, 0, 0, 0.5);
           z-index: 999;
         }
-  
+
         .overlay.show {
           display: block;
         }
@@ -341,13 +341,13 @@ class AddClassPopup extends HTMLElement {
         }
       
       </style>
-  
+
       <!-- Button to trigger the popup -->
       <button class="toolbar-popup-button">${this.label}</button>
-        
+
       <!-- Background overlay -->
       <div class="overlay" id="overlay"></div>
-  
+
       <!-- Popup container -->
       <div class="popup" id="popup">
           <button class="close-btn" id="close-btn">X</button>
@@ -471,7 +471,7 @@ class DrawCheckBox extends HTMLElement {
           display: flex; /* Use flexbox for alignment */
           align-items: center; /* Center align items vertically */
         }
-  
+
         .toolbar-checkbox-button:hover {
           background-color: #c9c9c9;
         }
@@ -481,7 +481,7 @@ class DrawCheckBox extends HTMLElement {
           margin-left: 10px;
         }
       </style>
-  
+
       <button class="toolbar-checkbox-button" id="checkboxButton">
         <input type="checkbox" id="checkbox" ?checked="${this.checked}"/>
         Draw ${type.charAt(0).toUpperCase() + type.slice(1)}
