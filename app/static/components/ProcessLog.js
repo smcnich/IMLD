@@ -36,7 +36,7 @@ class ProcessLog extends HTMLElement {
 
     // Create a shadow root for the component
     //
-    this.attachShadow({ mode: 'open' });
+    this.attachShadow({ mode: "open" });
 
     // get the name of the class
     //
@@ -177,11 +177,11 @@ class ProcessLog extends HTMLElement {
 
     // Get the log container element
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // Clear the content of the log container by setting innerHTML to an empty string
     //
-      logObject.innerHTML = '';
+    logObject.innerHTML = "";
   }
   //
   // end of method
@@ -202,15 +202,15 @@ class ProcessLog extends HTMLElement {
 
     // Get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // Append the log message to the log container
     //
-    logObject.innerHTML += log + '<br>';
+    logObject.innerHTML += log + "<br>";
 
     // Scroll to the bottom of the log container
     //
-    let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
+    let logDiv = this.shadowRoot.querySelector(".scroll-div"); // This is the scroll container
     logDiv.scrollTop = logDiv.scrollHeight;
   }
   //
@@ -233,7 +233,7 @@ class ProcessLog extends HTMLElement {
 
     // get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // append the log message to the log container
     //
@@ -241,13 +241,13 @@ class ProcessLog extends HTMLElement {
 
     // scroll to the bottom of the log container
     //
-    let logDiv = this.shadowRoot.querySelector('.scroll-div');
+    let logDiv = this.shadowRoot.querySelector(".scroll-div");
     logDiv.scrollTop = logDiv.scrollHeight;
   }
   //
   // end of method
 
-  writeHeader(txt, type='h1') {
+  writeHeader(txt, type = "h1") {
     /*
     method: ProcessLog::writeHeader
 
@@ -264,7 +264,7 @@ class ProcessLog extends HTMLElement {
 
     // Get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // Append the header message to the log container
     //
@@ -272,7 +272,7 @@ class ProcessLog extends HTMLElement {
 
     // Scroll to the bottom of the log container
     //
-    let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
+    let logDiv = this.shadowRoot.querySelector(".scroll-div"); // This is the scroll container
     logDiv.scrollTop = logDiv.scrollHeight;
   }
   //
@@ -294,9 +294,9 @@ class ProcessLog extends HTMLElement {
     */
 
     return inputString
-      .slice(2, -2)   // Remove the outer brackets
-      .split('],[')   // Split by the inner array separator
-      .map(row => row.split(',').map(Number));  // Convert each row into an array of numbers
+      .slice(2, -2) // Remove the outer brackets
+      .split("],[") // Split by the inner array separator
+      .map((row) => row.split(",").map(Number)); // Convert each row into an array of numbers
   }
   //
   // end of method
@@ -326,13 +326,16 @@ class ProcessLog extends HTMLElement {
       let class_padding;
       let name_padding;
 
-      if (name.includes('Number')) {
-        this.writeSingleValue(`Class ${class_index}`, `${name}: ${paramValues[index]}`);
+      if (name.includes("Number")) {
+        this.writeSingleValue(
+          `Class ${class_index}`,
+          `${name}: ${paramValues[index]}`
+        );
         class_index = class_index + 1;
       } else {
         class_padding = `<span style="color: white; user-select: none;">Classs ${class_index}:</span>`;
 
-        if (paramValues[index].includes('[')) {
+        if (paramValues[index].includes("[")) {
           var matrix = this.parseMatrix(paramValues[index]);
           this.writePlain(`${class_padding}${name}: [${matrix[0]}]`);
 
@@ -369,18 +372,24 @@ class ProcessLog extends HTMLElement {
     */
 
     param_names.forEach((name, index) => {
-      if (Array.isArray(paramValues[index]) && paramValues[index].every(row => Array.isArray(row))) {
+      if (
+        Array.isArray(paramValues[index]) &&
+        paramValues[index].every((row) => Array.isArray(row))
+      ) {
         var matrix = this.parseMatrix(JSON.stringify(paramValues[index]));
         this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name}`, `[${matrix[0]}]`);
 
         for (let i = 1; i < matrix.length; i++) {
           name_padding = `<span style="color: white; user-select: none;">${name}:<span>`;
-          this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name_padding}`, `[${matrix[i]}]`);
+          this.writeSingleValue(
+            `&nbsp;&nbsp;&nbsp;${name_padding}`,
+            `[${matrix[i]}]`
+          );
         }
       } else {
         this.writeSingleValue(`&nbsp;&nbsp;&nbsp;${name}`, paramValues[index]);
       }
-    })
+    });
   }
   //
   // end of method
@@ -404,14 +413,17 @@ class ProcessLog extends HTMLElement {
     logOutput = logOutput.replace(/\n/g, "<br>");
 
     // Bold all words before ":"
-    logOutput = logOutput.replace(/(^|\b)([A-Za-z0-9\s]+?):/g, '<b>$2:</b>');
+    logOutput = logOutput.replace(/(^|\b)([A-Za-z0-9\s]+?):/g, "<b>$2:</b>");
 
     // Add indentation for covariance rows that start with a bracket
-    logOutput = logOutput.replace(/<br>\s*\[/g, '<br><span style="color: white; user-select: none;">Covariancess:</span> [');
+    logOutput = logOutput.replace(
+      /<br>\s*\[/g,
+      '<br><span style="color: white; user-select: none;">Covariancess:</span> ['
+    );
 
     // Get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // Append the log message to the log container
     //
@@ -419,9 +431,9 @@ class ProcessLog extends HTMLElement {
 
     // Scroll to the bottom of the log container
     //
-      let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
-      logDiv.scrollTop = logDiv.scrollHeight;
-  }    
+    let logDiv = this.shadowRoot.querySelector(".scroll-div"); // This is the scroll container
+    logDiv.scrollTop = logDiv.scrollHeight;
+  }
   //
   // end of method
 
@@ -444,7 +456,7 @@ class ProcessLog extends HTMLElement {
 
     // Get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     logObject.innerHTML += `
       <div>
@@ -454,7 +466,7 @@ class ProcessLog extends HTMLElement {
 
     // Scroll to the bottom of the log container
     //
-    let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
+    let logDiv = this.shadowRoot.querySelector(".scroll-div"); // This is the scroll container
     logDiv.scrollTop = logDiv.scrollHeight;
   }
   //
@@ -477,10 +489,10 @@ class ProcessLog extends HTMLElement {
 
     // Get the log object
     //
-    let logObject = this.shadowRoot.querySelector('.scroll-object');
+    let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // write a metrics header
-    this.writeHeader(`<br>Performance: ${label}`, 'h3');
+    this.writeHeader(`<br>Performance: ${label}`, "h3");
 
     // iterate over each metric in the log and write it to the process log
     //
@@ -496,15 +508,15 @@ class ProcessLog extends HTMLElement {
 
     // Scroll to the bottom of the log container
     //
-    let logDiv = this.shadowRoot.querySelector('.scroll-div'); // This is the scroll container
-    logDiv.scrollTop = logDiv.scrollHeight;        
+    let logDiv = this.shadowRoot.querySelector(".scroll-div"); // This is the scroll container
+    logDiv.scrollTop = logDiv.scrollHeight;
   }
   //
   // end of method
 
   // Function to generate a full-width separator using dashes
   addFullWidthSeparator() {
-    let logDiv = this.shadowRoot.querySelector('.scroll-object'); // Log container
+    let logDiv = this.shadowRoot.querySelector(".scroll-object"); // Log container
 
     if (!logDiv) return;
 
@@ -512,18 +524,17 @@ class ProcessLog extends HTMLElement {
     let charWidth = 5.5; // Approximate width of a dash (-) in pixels (depends on font)
 
     let dashCount = Math.floor(logWidth / charWidth); // Calculate how many dashes fit
-    let separator = '-'.repeat(dashCount); // Generate the separator line
+    let separator = "-".repeat(dashCount); // Generate the separator line
 
     // Add the separator to the log
     logDiv.innerHTML += `<div>${separator}</div>`;
   }
   //
   // end of method
-
 }
 //
 // end of class
 
 // Register the custom element
 //
-customElements.define('process-log', ProcessLog);
+customElements.define("process-log", ProcessLog);
