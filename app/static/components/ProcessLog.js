@@ -352,7 +352,6 @@ class ProcessLog extends HTMLElement {
   //
   // end of method
 
-  // Function to write algorithm parameters to the log
   writeAlgorithmParams(paramValues, param_names) {
     /*
     method: ProcessLog::writeAlgorithmParams
@@ -410,12 +409,15 @@ class ProcessLog extends HTMLElement {
     */
 
     // Convert new lines to <br> for HTML display
+    //
     logOutput = logOutput.replace(/\n/g, "<br>");
 
     // Bold all words before ":"
+    //
     logOutput = logOutput.replace(/(^|\b)([A-Za-z0-9\s]+?):/g, "<b>$2:</b>");
 
     // Add indentation for covariance rows that start with a bracket
+    //
     logOutput = logOutput.replace(
       /<br>\s*\[/g,
       '<br><span style="color: white; user-select: none;">Covariancess:</span> ['
@@ -437,7 +439,6 @@ class ProcessLog extends HTMLElement {
   //
   // end of method
 
-  // Function to write a single value to the log
   writeSingleValue(label, value) {
     /*
     method: ProcessLog::writeSingleValue
@@ -492,6 +493,7 @@ class ProcessLog extends HTMLElement {
     let logObject = this.shadowRoot.querySelector(".scroll-object");
 
     // write a metrics header
+    //
     this.writeHeader(`<br>Performance: ${label}`, "h3");
 
     // iterate over each metric in the log and write it to the process log
@@ -542,6 +544,7 @@ class ProcessLog extends HTMLElement {
     let separator = "-".repeat(dashCount); // Generate the separator line
 
     // Add the separator to the log
+    //
     logDiv.innerHTML += `<div>${separator}</div>`;
   }
   //

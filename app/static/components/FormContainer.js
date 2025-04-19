@@ -25,6 +25,7 @@ class InvalidLabelsError extends Error {
     */
 
     // Call the parent constructor
+    //
     super(message);
 
     // Set a custom name for logs and error handlers
@@ -75,6 +76,7 @@ class FormContainer extends HTMLElement {
     */
 
     // Call the parent constructor (HTMLElement)
+    //
     super();
 
     // Create a shadow root for the component
@@ -146,7 +148,6 @@ class FormContainer extends HTMLElement {
      shadow root to what is in the string below.
     */
 
-    // WRITE YOUR HTML AND CSS HERE
     this.shadowRoot.innerHTML = `
 
       <style>

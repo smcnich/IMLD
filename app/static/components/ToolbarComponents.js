@@ -62,6 +62,7 @@ class Toolbar_Button extends HTMLElement {
     this.render();
     this.addClickListener();
   }
+  //
   // end of method
 
   render() {
@@ -293,6 +294,7 @@ class Toolbar_CheckboxButton extends HTMLElement {
     `;
 
     // Add click event listener to toggle checkbox and button state
+    //
     const button = this.shadowRoot.querySelector("#checkboxButton");
     const checkbox = this.shadowRoot.querySelector("#checkbox");
 
@@ -325,6 +327,7 @@ class Toolbar_CheckboxButton extends HTMLElement {
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
+    //
     if (this.isOpen && !button.contains(event.target)) {
       this.isOpen = false; // Close the button
       // Optionally, reset checkbox state if needed
@@ -529,12 +532,14 @@ class Toolbar_DropdownClear extends HTMLElement {
     const dropdownMenu = this.shadowRoot.getElementById("dropdown-menu");
 
     // Show the dropdown on hover
+    //
     button.addEventListener("mouseenter", () => {
       dropdownMenu.classList.add("show");
       button.classList.add("active"); // Add active class to highlight button
     });
 
     // Hide the dropdown when not hovering over both the button and dropdown
+    //
     button.addEventListener("mouseleave", () => {
       if (!dropdownMenu.matches(":hover")) {
         dropdownMenu.classList.remove("show");
@@ -740,17 +745,21 @@ class Toolbar_DropdownSettings extends HTMLElement {
     const dropdownMenu = this.shadowRoot.getElementById("dropdown-menu");
 
     // Show the dropdown on hover
+    //
     button.addEventListener("mouseenter", () => {
       dropdownMenu.classList.add("show");
       button.classList.add("active"); // Add active class to highlight button
     });
 
     // Hide the dropdown when not hovering over both the button and dropdown
+    //
     button.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
+      //
       const openPopups = dropdownMenu.querySelectorAll("toolbar-popup-button");
 
       // Check if any of the popups is open
+      //
       const isAnyPopupOpen = Array.from(openPopups).some(
         (popup) => popup.isPopupOpen
       );
@@ -768,11 +777,13 @@ class Toolbar_DropdownSettings extends HTMLElement {
 
     dropdownMenu.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
+      //
       const openPopups = dropdownMenu.querySelectorAll(
         "toolbar-set-ranges, toolbar-set-gaussian"
       );
 
       // Check if any of the popups is open
+      //
       const isAnyPopupOpen = Array.from(openPopups).some(
         (popup) => popup.isPopupOpen
       );
@@ -1316,24 +1327,28 @@ class Toolbar_PopupButton extends HTMLElement {
     `;
 
     // Get elements
+    //
     const button = this.shadowRoot.querySelector(".toolbar-popup-button");
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
     const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Show the popup when clicking the button
+    //
     button.addEventListener("click", (event) => {
       event.stopPropagation();
       this.togglePopup();
     });
 
     // Close the popup when clicking the close button
+    //
     closeBtn.addEventListener("click", (event) => {
       event.stopPropagation();
       this.closePopup();
     });
 
     // Stop event propagation on popup to avoid closing when clicking inside it
+    //
     popup.addEventListener("click", (event) => {
       event.stopPropagation();
     });
@@ -1620,6 +1635,7 @@ class Toolbar_SetGaussian extends HTMLElement {
     const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Create a style element
+    //
     const style = `
       /* Styling the main container for form inputs */
       .form-container {
@@ -1842,10 +1858,12 @@ class Toolbar_SetGaussian extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -2080,6 +2098,7 @@ class Toolbar_SetRanges extends HTMLElement {
     const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Create a style element
+    //
     const style = `
       /* Styling the main container for form inputs */
       .form-container {
@@ -2268,6 +2287,7 @@ class Toolbar_SetRanges extends HTMLElement {
     this.isPopupOpen = !this.isPopupOpen;
 
     // Show popup and overlap and ensure they are both visible
+    //
     if (this.isPopupOpen) {
       popup.classList.add("show");
       overlay.classList.add("show");
@@ -2299,10 +2319,12 @@ class Toolbar_SetRanges extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -2451,6 +2473,7 @@ class Toolbar_Normalize extends HTMLElement {
     `;
 
     // Add click event listener to toggle checkbox and button state
+    //
     const button = this.shadowRoot.querySelector("#checkboxButton");
     const checkbox = this.shadowRoot.querySelector("#checkbox");
 
@@ -2491,6 +2514,7 @@ class Toolbar_Normalize extends HTMLElement {
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
+    //
     if (this.isOpen && !button.contains(event.target)) {
       this.isOpen = false; // Close the button
       // Optionally, reset checkbox state if needed

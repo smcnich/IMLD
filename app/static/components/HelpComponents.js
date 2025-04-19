@@ -271,6 +271,7 @@ class AboutPopup extends HTMLElement {
     this.isPopupOpen = !this.isPopupOpen;
 
     // Show popup and overlap and ensure they are both visible
+    //
     if (this.isPopupOpen) {
       popup.classList.add("show");
       overlay.classList.add("show");
@@ -302,10 +303,12 @@ class AboutPopup extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -818,10 +821,12 @@ class ReportPopup extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -1254,10 +1259,12 @@ class SharePopup extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -1724,10 +1731,12 @@ class ContactPopup extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 

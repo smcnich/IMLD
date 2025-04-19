@@ -239,6 +239,7 @@ class DataPopup extends HTMLElement {
     const closeBtn = this.shadowRoot.getElementById("close-btn");
 
     // Create a style element
+    //
     const style = `
     /* Styling the main container for form inputs */
     .form-container {
@@ -431,6 +432,7 @@ class DataPopup extends HTMLElement {
     this.isPopupOpen = !this.isPopupOpen;
 
     // Show popup and overlap and ensure they are both visible
+    //
     if (this.isPopupOpen) {
       popup.classList.add("show");
       overlay.classList.add("show");
@@ -462,10 +464,12 @@ class DataPopup extends HTMLElement {
     */
 
     // Create popup and overlay element
+    //
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
     // Remove show class from popup and overlay
+    //
     popup.classList.remove("show");
     overlay.classList.remove("show");
 
@@ -733,9 +737,11 @@ class DataButton extends HTMLElement {
     //
     button.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
+      //
       const openPopups = dropdownMenu.querySelectorAll("data-popup");
 
       // Check if any of the popups is open
+      //
       const isAnyPopupOpen = Array.from(openPopups).some(
         (popup) => popup.isPopupOpen
       );
@@ -757,9 +763,11 @@ class DataButton extends HTMLElement {
     //
     dropdownMenu.addEventListener("mouseleave", () => {
       // Check if any popup inside the dropdown is open
+      //
       const openPopups = dropdownMenu.querySelectorAll("data-popup");
 
       // Check if any of the popups is open
+      //
       const isAnyPopupOpen = Array.from(openPopups).some(
         (popup) => popup.isPopupOpen
       );

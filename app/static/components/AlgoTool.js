@@ -256,7 +256,6 @@ class AlgoTool extends HTMLElement {
         options += `<option value="${key}">${data[key]["name"]}</option>`;
       }
 
-      // WRITE YOUR HTML AND CSS HERE
       this.shadowRoot.innerHTML = `
         <style>
           /* Add your CSS styles here */
@@ -484,6 +483,7 @@ class AlgoTool extends HTMLElement {
           event.target.options[event.target.selectedIndex].text;
 
         // Create a style element
+        //
         const style = `
           /* Styling the main container for form inputs */
           .form-container {

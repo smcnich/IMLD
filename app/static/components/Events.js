@@ -222,6 +222,7 @@ EventBus.addEventListener("eval", (event) => {
   const start = Date.now();
 
   // Add a full-width separator
+  //
   processLog.addFullWidthSeparator();
 
   // write to the process log
@@ -550,6 +551,7 @@ EventBus.addEventListener("loadModel", (event) => {
   const file = event.detail.file;
 
   // if the file is valid
+  //
   if (file) {
     try {
       // write to the process log
@@ -1532,6 +1534,7 @@ EventBus.addEventListener("setGaussianParams", (event) => {
   gaussParams.cov = event.detail.cov;
 
   // if drawing is enabled, update the gaussian parameters
+  //
   if (canDraw === "gaussian") {
     let oldLabel = drawLabel;
     EventBus.dispatchEvent(new CustomEvent("disableDraw"));
@@ -1564,6 +1567,7 @@ EventBus.addEventListener("setRanges", (event) => {
   */
 
   // get the matrices as singular arrays
+  //
   let x = event.detail.x[0];
   let y = event.detail.y[0];
 

@@ -148,6 +148,7 @@ class AddClassPopup extends HTMLElement {
     };
 
     // Handle form submission
+    //
     const form = this.shadowRoot.querySelector("form");
     form.onsubmit = (event) => {
       // prevent form submission
@@ -404,6 +405,7 @@ class AddClassPopup extends HTMLElement {
     this.isPopupOpen = !this.isPopupOpen;
 
     // Show popup and overlap and ensure they are both visible
+    //
     if (this.isPopupOpen) {
       popup.classList.add("show");
       overlay.classList.add("show");
@@ -496,6 +498,7 @@ class DrawCheckBox extends HTMLElement {
     this.attachShadow({ mode: "open" });
 
     // Create variable to hold state of checkbox and button
+    //
     this.checked = false;
     this.isOpen = false;
   }
@@ -681,6 +684,7 @@ class DrawCheckBox extends HTMLElement {
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
+    //
     if (this.isOpen && !button.contains(event.target)) {
       this.isOpen = false; // Close the button
       // Optionally, reset checkbox state if needed
