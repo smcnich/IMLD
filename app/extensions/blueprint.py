@@ -1,3 +1,10 @@
+# file: .../blueprint.py
+#
+# This class enscapulsates functions that call on ML Tools for the IMLD app.
+#------------------------------------------------------------------------------
+
+# import required system modules
+#
 import os
 import json
 import io
@@ -8,6 +15,8 @@ from flask import Blueprint, render_template, request, jsonify, current_app, sen
 import numpy as np
 import toml
 
+# import required NEDC modules
+#
 import nedc_ml_tools_data as mltd
 import nedc_imld_tools as imld
 import nedc_ml_tools as mlt
@@ -21,6 +30,19 @@ main = Blueprint('main', __name__)
 model_cache = {}
 
 def clean_cache():
+    """
+    method: clean_cache
+
+    arguments:
+     None
+
+    return:
+     None
+
+    description:
+     Iterates through the model cache and removes any cached models
+     that are older than 5 minutes, based on their timestamp.
+    """
 
     # get the current time
     #
@@ -32,16 +54,44 @@ def clean_cache():
         if (now - model_cache[key]['timestamp']).seconds > 300:
             del model_cache[key]
 #
-# end of function
+# end of method
 
-# Define a route within the Blueprint
-#
 @main.route('/')
 def index():
+    """
+    method: index
+
+    arguments:
+     None
+
+    return:
+     HTML rendered page
+
+    description:
+     Route handler for the root URL. Renders the main index page.
+    """
+
+    # redner and return the main index page
+    #
     return render_template('index.shtml')
+#
+# end of method
 
 @main.route('/api/get_alg_params/', methods=['GET'])
 def get_alg_params():
+    """
+    method: get_alg_params
+
+    arguments:
+     None
+
+    return:
+     JSON response containing algorithm parameters
+
+    description:
+     Loads algorithm parameters from a TOML file and returns them
+     as an ordered JSON response. Used by the frontend to configure models.
+    """
 
     # get the default parameter file. do not do this as a global variable
     # because the 'current_app.config' object only works in a route
@@ -58,9 +108,24 @@ def get_alg_params():
         json.dumps(OrderedDict(params)),
         mimetype='application/json'
     )
+#
+# end of method
 
 @main.route('/api/get_data_params/', methods=['GET'])
 def get_data_params():
+    """
+    method: get_data_params
+
+    arguments:
+     None
+
+    return:
+     JSON response containing data generation parameters
+
+    description:
+     Loads data generation parameters from a TOML file and returns them
+     as an ordered JSON response. Used by the frontend for dataset configuration.
+    """
 
     # get the default parameter file. do not do this as a global variable
     # because the 'current_app.config' object only works in a route
@@ -77,12 +142,25 @@ def get_data_params():
         json.dumps(OrderedDict(params)),  # Serialize ordered data to JSON
         mimetype='application/json'
     )
+#
+# end of method
 
 @main.route('/api/load_alg_params/', methods=['POST'])
 def load_alg_params():
+    """
+    method: load_alg_params
 
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing algorithm parameters
+
+    description:
+     Parses and returns algorithm parameters from a user-uploaded TOML file.
+     Used by the frontend to dynamically update algorithm configuration.
+    """
     try:
-
         # get the file from the request
         #
         file = request.files['file']
@@ -107,101 +185,28 @@ def load_alg_params():
         # return the jsonifyied response
         #
         return jsonify(response)
-    
+
     except Exception as e:
         return f'Failed to load algorithm parameters: {e}', 500
-
-@main.route('/api/save_alg_params/', methods=['POST'])
-def save_alg_params():
-
-    try:
-
-        # get the data from the request
-        #
-        data = request.get_json()
-
-        # get the algo name and params
-        #
-        algo_name_raw = data.get('data', {}).get('name')
-        params = data.get('data', {}).get('params')
-
-        # Replace spaces and symbols for TOML-compliant table name
-        #
-        algo_key = algo_name_raw.replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
-
-        # Build nested TOML structure
-        #
-        toml_data = {
-            algo_key: {
-                "name": algo_name_raw,
-                "params": {}
-            }
-        }
-
-        # iterate through params to populate toml file
-        #
-        for param_name, param_info in params.items():
-            toml_data[algo_key]["params"][param_name] = {
-                "type": param_info.get("type", ""),
-                "default": str(param_info.get("default", ""))
-            }
-
-        # convert toml file to byte stream
-        #
-        toml_str = toml.dumps(toml_data)
-        file_data = io.BytesIO(toml_str.encode('utf-8'))
-
-        # return the toml file
-        #
-        return send_file(
-            file_data,
-            mimetype='application/octet-stream',
-            as_attachment=True,
-            download_name='alg.toml'
-        )
-    
-    except Exception as e:
-        return f'Failed to save algorithm parameters: {e}', 500
-
-@main.route('/api/save_model/', methods=['POST'])
-def save_model():
-
-    try:
-
-        # get the data from the request
-        #
-        data = request.get_json()
-
-        # get the user id
-        #
-        userID = data['userID']
-
-        if userID not in model_cache or not model_cache[userID]:
-            raise ValueError(f'Model Cache missing.')
-
-        model = model_cache[userID]['model']
-
-        model.mapping_label = data['label_mappings']
-
-        # Serialize the model using pickle and store it in a BytesIO stream
-        #
-        model_bytes = io.BytesIO()
-        pickle.dump(model, model_bytes)
-        model_bytes.seek(0)  # Reset the pointer to the beginning of the stream
-        
-        # Send the pickled model as a response, without writing to a file
-        #
-        return send_file(model_bytes, as_attachment=True, download_name=f'model.pkl', mimetype='application/octet-stream')
-
-    except Exception as e:
-        response = {'error': str(e)}
-        return jsonify(response), 500
+#
+# end of method
 
 @main.route('/api/load_model/', methods=['POST'])
 def load_model():
+    """
+    method: load_model
 
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing decision surface data and label mapping
+
+    description:
+     Loads a user-uploaded pickled model, caches it under the user's ID,
+     and generates a decision surface for the given x/y ranges and points.
+    """
     try:
-
         # get the file, userID, and plot bounds from the request
         #
         file = request.files['model']
@@ -258,13 +263,140 @@ def load_model():
         # return the jsonified response
         #
         return jsonify(response)
-    
+
     except Exception as e:
         return f'Failed to load model: {e}', 500
+#
+# end of method
+
+@main.route('/api/save_alg_params/', methods=['POST'])
+def save_alg_params():
+    """
+    method: save_alg_params
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     A downloadable TOML file containing the algorithm parameters
+
+    description:
+     Accepts algorithm name and parameters from the frontend, structures
+     them into a TOML-compliant format, and returns the file for download.
+    """
+    try:
+        # get the data from the request
+        #
+        data = request.get_json()
+
+        # get the algo name and params
+        #
+        algo_name_raw = data.get('data', {}).get('name')
+        params = data.get('data', {}).get('params')
+
+        # Replace spaces and symbols for TOML-compliant table name
+        #
+        algo_key = algo_name_raw.replace(" ", "_").replace("(", "").replace(")", "").replace("-", "_")
+
+        # Build nested TOML structure
+        #
+        toml_data = {
+            algo_key: {
+                "name": algo_name_raw,
+                "params": {}
+            }
+        }
+
+        # iterate through params to populate toml file
+        #
+        for param_name, param_info in params.items():
+            toml_data[algo_key]["params"][param_name] = {
+                "type": param_info.get("type", ""),
+                "default": str(param_info.get("default", ""))
+            }
+
+        # convert toml file to byte stream
+        #
+        toml_str = toml.dumps(toml_data)
+        file_data = io.BytesIO(toml_str.encode('utf-8'))
+
+        # return the toml file
+        #
+        return send_file(
+            file_data,
+            mimetype='application/octet-stream',
+            as_attachment=True,
+            download_name='alg.toml'
+        )
+
+    except Exception as e:
+        return f'Failed to save algorithm parameters: {e}', 500
+#
+# end of method
+
+@main.route('/api/save_model/', methods=['POST'])
+def save_model():
+    """
+    method: save_model
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     A downloadable pickled model (.pkl) file
+
+    description:
+     Retrieves a cached model associated with a user ID, updates its label
+     mappings, serializes it with pickle, and sends it as a downloadable file.
+    """
+    try:
+        # get the data from the request
+        #
+        data = request.get_json()
+
+        # get the user id
+        #
+        userID = data['userID']
+
+        if userID not in model_cache or not model_cache[userID]:
+            raise ValueError(f'Model Cache missing.')
+
+        model = model_cache[userID]['model']
+
+        model.mapping_label = data['label_mappings']
+
+        # Serialize the model using pickle and store it in a BytesIO stream
+        #
+        model_bytes = io.BytesIO()
+        pickle.dump(model, model_bytes)
+        model_bytes.seek(0)  # Reset the pointer to the beginning of the stream
+        
+        # Send the pickled model as a response, without writing to a file
+        #
+        return send_file(model_bytes, as_attachment=True, download_name=f'model.pkl', mimetype='application/octet-stream')
+
+    except Exception as e:
+        response = {'error': str(e)}
+        return jsonify(response), 500
+#
+# end of method
     
 @main.route('/api/train/', methods=['POST'])
 def train():
-    
+    """
+    method: train
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing decision surface data, model evaluation metrics, and parameter output
+
+    description:
+     Accepts user data, algorithm parameters, and plotting data, then creates and trains a model.
+     Generates a decision surface based on the trained model and returns metrics and parameter output.
+    """
+
     # get the data from the request
     #
     data = request.get_json()
@@ -322,16 +454,28 @@ def train():
         # return the jsonified response
         #
         return jsonify(response)
-    
+
     # Handle any exceptions and return an error message
     #          
     except Exception as e:
         return jsonify(f'Failed to train model: {str(e)}'), 500
 #
-# end of function
+# end of method
     
 @main.route('/api/eval/', methods=['POST'])
 def eval():
+    """
+    method: eval
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing model evaluation metrics and parameter output
+
+    description:
+     Evaluates a trained model using the provided user data and returns evaluation metrics and parameter output.
+    """
 
     # get the data from the request
     #
@@ -368,14 +512,27 @@ def eval():
         # return the jsonified response
         #
         return jsonify(response)
-    
+
     except Exception as e:
         return jsonify(f'Failed to evaluate model: {str(e)}'), 500
 #
-# end of function
+# end of method
     
 @main.route('/api/set_bounds/', methods=['POST'])
 def rebound():
+    """
+    method: rebound
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing updated decision surface data (x, y, z values)
+
+    description:
+     Updates the bounds for the decision surface based on the provided x/y ranges and user data,
+     and returns the updated decision surface data.
+    """
 
     # get the data from the request
     #
@@ -419,17 +576,30 @@ def rebound():
         # return the jsonified response
         #
         return jsonify(response)
-    
+
     # Handle any exceptions and return an error message
-    #          
+    #
     except Exception as e:
         return \
         jsonify(f'Failed to re-bound the decision surface: {str(e)}'), 500
 #
-# end of function
+# end of method
     
 @main.route('/api/data_gen/', methods=['POST'])
 def data_gen():
+    """
+    method: data_gen
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing generated data (labels, x, y values)
+
+    description:
+     Generates synthetic data based on the provided distribution name and parameters,
+     and normalizes the data if requested, returning the generated labels and data points.
+    """
 
     # Get the data sent in the POST request as JSON
     #
@@ -474,11 +644,22 @@ def data_gen():
     except Exception as e:
         return jsonify(f'Failed to generate data: {str(e)}'), 500
 #
-# end of function
+# end of method
 
 @main.route('/api/issue_log/', methods=['POST'])
 def write_issue():
+    """
+    method: write_issue
 
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response indicating the success or failure of the log writing process
+
+    description:
+     Logs an issue message along with its title and date to a log file for tracking and debugging purposes.
+    """
     try:
         # Get JSON data from the request
         #
@@ -515,3 +696,5 @@ def write_issue():
 
     except Exception as e:
         return jsonify(str(e)), 500
+#
+# end of method
