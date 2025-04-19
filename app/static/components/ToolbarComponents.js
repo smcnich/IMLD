@@ -33,7 +33,7 @@ class Toolbar_Button extends HTMLElement {
     // Call the parent constructor
     //
     super();
-    
+
     // Create a shadow root for the component
     //
     this.attachShadow({ mode: "open" });
@@ -190,7 +190,7 @@ class Toolbar_CheckboxButton extends HTMLElement {
     // Create a shadow root for the component
     //
     this.attachShadow({ mode: "open" });
-    
+
     // create a variable to hold initial state of checkbox and if it's open
     //
     this.checked = false;
@@ -339,17 +339,84 @@ class Toolbar_CheckboxButton extends HTMLElement {
 // end of class
 
 class Toolbar_DropdownClear extends HTMLElement {
+  /*
+  class: Toolbar_DropdownClear
+
+  description:
+    This class represents a custom dropdown toolbar button with functionality to clear data, 
+    results, or everything related to a plot. The dropdown menu is displayed when the user 
+    hovers over the button. The options include clearing data, results, or everything associated 
+    with the plot. The class utilizes a shadow DOM for encapsulation and contains styling for 
+    the button and the dropdown menu.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_DropdownClear::constructor
+
+    args:
+      None
+
+    return:
+      Toolbar_DropdownClear instance
+
+    description:
+      The constructor for the Toolbar_DropdownClear class. It initializes the custom element 
+      and attaches a shadow root to it in "open" mode for encapsulation. The constructor is 
+      automatically called when a new instance of the class is created.
+    */
+
+    // Call the parent constructor
+    //
     super();
+
+    // Create a shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_DropdownClear::connectedCallback
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method is invoked when the custom element is added to the document's DOM. It triggers 
+      the rendering of the toolbar button and dropdown menu, and adds hover event listeners 
+      for showing and hiding the dropdown. This ensures the element is functional when it becomes 
+      part of the DOM.
+    */
+
     this.render();
     this.addHoverListeners();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_DropdownClear::render
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method renders the HTML structure and styles for the dropdown button and the associated 
+      dropdown menu. The button's label and plotId are fetched from the attributes, and the shadow 
+      DOM is populated with the appropriate styles and elements. The dropdown menu contains three 
+      options: Clear Data, Clear Results, and Clear All.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
     const plotId = this.getAttribute("plotId");
 
@@ -438,8 +505,26 @@ class Toolbar_DropdownClear extends HTMLElement {
       </div>
     `;
   }
+  //
+  // end of method
 
   addHoverListeners() {
+    /*
+    method: Toolbar_DropdownClear::addHoverListeners
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method adds event listeners for mouse hover interactions. When the user hovers over the 
+      toolbar button, the dropdown menu is displayed, and the button is highlighted. Conversely, 
+      when the user stops hovering over the button or dropdown menu, the dropdown menu is hidden, 
+      and the button's highlight is removed. This creates an interactive hover effect for the dropdown.
+    */
+
     const button = this.shadowRoot.querySelector(".toolbar-button");
     const dropdownMenu = this.shadowRoot.getElementById("dropdown-menu");
 
@@ -467,20 +552,83 @@ class Toolbar_DropdownClear extends HTMLElement {
       button.classList.remove("active"); // Remove highlight when leaving dropdown
     });
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_DropdownSettings extends HTMLElement {
+  /*
+  class: Toolbar_DropdownSettings
+
+  description:
+    This class defines a custom toolbar dropdown element. It contains a button that, when hovered over, 
+    reveals a dropdown menu with different toolbar items (e.g., "Set Ranges" and "Set Gaussian"). The 
+    dropdown menu is shown or hidden based on the user's interaction with the button or the dropdown. 
+    It is intended to be used in a toolbar interface, providing users with quick access to various settings.
+
+  */
+
   constructor() {
+    /*
+    method: Toolbar_DropdownSettings::constructor
+
+    args:
+      None
+
+    returns:
+      Toolbar_DropdownSettings instance
+
+    description:
+      This is the constructor for the Toolbar_DropdownSettings class. It initializes the component by 
+      attaching a shadow DOM with the "open" mode, which encapsulates the styles and structure of the 
+      component.
+    */
+
     super();
     this.attachShadow({ mode: "open" });
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_DropdownSettings::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is invoked when the element is connected to the DOM. It triggers the rendering of 
+      the toolbar dropdown and adds hover event listeners to manage the display of the dropdown menu.
+    */
+
     this.render();
     this.addHoverListeners();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_DropdownSettings::render
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is responsible for rendering the HTML structure and styles of the toolbar dropdown component. 
+      It creates the button for the toolbar and the dropdown menu, applying the appropriate styles and structure 
+      to the shadow DOM. The label of the button is set from the element's `label` attribute or defaults to "Button".
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -568,8 +716,26 @@ class Toolbar_DropdownSettings extends HTMLElement {
       </div>
     `;
   }
+  //
+  // end of method
 
   addHoverListeners() {
+    /*
+    method: Toolbar_DropdownSettings::addHoverListeners
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method adds event listeners for mouse hover interactions. It listens for mouseenter and mouseleave events 
+      on both the toolbar button and the dropdown menu to manage the visibility of the dropdown menu and the 
+      active state of the toolbar button. When hovering over the button, the dropdown menu is shown, and when 
+      the mouse leaves the button or the dropdown (if no popups are open), the dropdown menu is hidden.
+    */
+
     const button = this.shadowRoot.querySelector(".toolbar-button");
     const dropdownMenu = this.shadowRoot.getElementById("dropdown-menu");
 
@@ -617,24 +783,87 @@ class Toolbar_DropdownSettings extends HTMLElement {
       }
     });
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_OpenFileButton extends HTMLElement {
+  /*
+  class: Toolbar_OpenFileButton
+
+  description:
+    This class defines a custom web component that represents a button in a toolbar for opening a file.
+    The button triggers a hidden file input field when clicked, allowing the user to select a file. 
+    Based on the label of the button, it dispatches custom events to load different types of data (e.g., 
+    training data, evaluation data, parameters, or models) through an event bus.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_OpenFileButton::constructor
+
+    args:
+      None
+
+    return:
+      Toolbar_OpenFileButton instance
+
+    description:
+      This is the constructor for the Toolbar_OpenFileButton class. It initializes the shadow DOM for the
+      component, creates a hidden file input element, and sets up its attributes, including the input type and
+      display properties.
+    */
+
     super();
     this.attachShadow({ mode: "open" });
     this.fileInput = document.createElement("input");
     this.fileInput.type = "file"; // Set the input type to file
     this.fileInput.style.display = "none"; // Hide the input
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_OpenFileButton::connectedCallback
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method is called when the element is inserted into the DOM. It renders the button in the shadow DOM,
+      appends the hidden file input, and attaches a click listener to the button. It triggers the file input
+      when the button is clicked.
+    */
+
     this.render();
     this.shadowRoot.appendChild(this.fileInput); // Append the hidden file input to the shadow DOM
     this.addClickListener();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_OpenFileButton::render
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method renders the button's HTML structure and styles inside the shadow DOM. It sets the button's label
+      based on the value of the "label" attribute, or defaults to "Button". The button is styled with a simple 
+      white background, black text, and hover effects.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -663,10 +892,26 @@ class Toolbar_OpenFileButton extends HTMLElement {
       <button class="toolbar-openfile-button">${label}</button>
     `;
   }
-
-  // Method to add a click listener to the toolbar button
   //
+  // end of method
+
   addClickListener() {
+    /*
+    method: Toolbar_OpenFileButton::addClickListener
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method adds event listeners to the button and the file input. It listens for a click on the button to
+      trigger the file input click, and listens for a change event on the file input to handle the selection of a file.
+      Based on the button's label, it dispatches a corresponding custom event (e.g., "loadData", "loadAlgParams", or "loadModel")
+      to the EventBus with the selected file as the event detail.
+    */
+
     // Get the buttom element from the shadow DOM
     //
     const button = this.shadowRoot.querySelector(".toolbar-openfile-button");
@@ -737,20 +982,81 @@ class Toolbar_OpenFileButton extends HTMLElement {
       }
     });
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_SaveFileButton extends HTMLElement {
+  /*
+  class: Toolbar_SaveFileButton
+
+  description:
+    This class defines a custom toolbar button for saving files. The button's label is customizable
+    through the `label` attribute. When clicked, the button triggers different events based on its label.
+    The class is structured to handle various save actions, such as saving training data, evaluation data,
+    algorithm parameters, or models. It encapsulates the logic for adding a click event listener and dispatching
+    the appropriate event when clicked.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_SaveFileButton::constructor
+
+    args:
+    None
+
+    return:
+    Toolbar_SaveFileButton instance
+
+    description:
+    This is the constructor for the Toolbar_SaveFileButton class. It initializes the custom element, attaches a shadow root,
+    and sets up the component. The constructor doesn't take any parameters.
+    */
+
     super();
     this.attachShadow({ mode: "open" });
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_SaveFileButton::connectedCallback
+
+    args:
+    None
+
+    return:
+    None
+
+    description:
+    This method is invoked when the custom element is added to the DOM. It is responsible for rendering the button and adding
+    the click event listener to the button. It is automatically called by the browser when the element is inserted into the document.
+    */
+
     this.render();
     this.addClickListener();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_SaveFileButton::render
+
+    args:
+    None
+
+    return:
+    None
+
+    description:
+    This method renders the button element inside the shadow DOM. It applies basic styling and inserts the button's label, 
+    which can be customized via the `label` attribute. If the `label` attribute is not provided, it defaults to "Save File".
+    */
+
     const label = this.getAttribute("label") || "Save File"; // Get the label from the attribute'
 
     this.shadowRoot.innerHTML = `
@@ -777,10 +1083,26 @@ class Toolbar_SaveFileButton extends HTMLElement {
       <button class="toolbar-openfile-button">${label}</button>
     `;
   }
-
-  // Method to add a click listener to the toolbar button
   //
+  // end of method
+
   addClickListener() {
+    /*
+    method: Toolbar_SaveFileButton::addClickListener
+
+    args:
+    None
+
+    return:
+    None
+
+    description:
+    This method adds a click event listener to the button element. When the button is clicked, the method checks the value
+    of the button's `label` attribute and dispatches a corresponding event to the EventBus for different save actions:
+    "Save Train As...", "Save Eval As...", "Save Parameters As...", and "Save Model As...". If the label doesn't match
+    any of these cases, no action is taken.
+    */
+
     // Get the button element from the shadow DOM
     //
     const button = this.shadowRoot.querySelector(".toolbar-openfile-button");
@@ -828,20 +1150,83 @@ class Toolbar_SaveFileButton extends HTMLElement {
       }
     });
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_PopupButton extends HTMLElement {
+  /*
+  class: Toolbar_PopupButton
+
+  description:
+    This class defines a custom button element with an attached popup. When the button is clicked, 
+    a popup appears with content that can be closed by clicking the close button. The popup also 
+    includes an overlay background. The button and popup behavior is controlled using JavaScript 
+    to toggle visibility and animations.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_PopupButton::constructor
+
+    args:
+      None
+
+    returns:
+      Toolbar_PopupButton instance
+
+    description:
+      This is the constructor for the Toolbar_PopupButton class. It is called when a new instance 
+      of the class is created. The constructor initializes the shadow DOM and sets an initial state 
+      for the popup (closed by default).
+    */
+
     super();
     this.attachShadow({ mode: "open" });
     this.isPopupOpen = false; // Track the popup state
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_PopupButton::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is called when the component is added to the DOM. It triggers the `render` method 
+      to display the button, popup, and overlay within the shadow DOM. It also sets up event listeners 
+      to manage button and popup interactions (open/close).
+    */
+
     this.render();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_PopupButton::render
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method generates the HTML structure for the button, popup, and overlay within the shadow DOM. 
+      It includes styling for the popup and button, as well as the functionality to open and close the popup 
+      when the button or close button is clicked.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -953,8 +1338,25 @@ class Toolbar_PopupButton extends HTMLElement {
       event.stopPropagation();
     });
   }
+  //
+  // end of method
 
   togglePopup() {
+    /*
+    method: Toolbar_PopupButton::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the Toolbar_PopupButton modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
@@ -969,8 +1371,25 @@ class Toolbar_PopupButton extends HTMLElement {
       this.closePopup();
     }
   }
+  //
+  // end of method
 
   closePopup() {
+    /*
+    method: Toolbar_PopupButton::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the Toolbar_PopupButton modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
 
@@ -984,24 +1403,87 @@ class Toolbar_PopupButton extends HTMLElement {
 
     this.isPopupOpen = false;
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_SetGaussian extends HTMLElement {
+  /*
+  class: Toolbar_SetGaussian 
+
+  description:
+    This class manages the toolbar for setting Gaussian draw parameters. It contains functionality
+    for rendering the toolbar, showing and hiding a popup form, and handling user input for the
+    Gaussian parameters such as covariance and number of points. The class also includes styling for
+    the popup, buttons, and form inputs, and provides interactivity for preset and submit actions.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_SetGaussian::constructor
+
+    args:
+    None
+
+    returns:
+    Toolbar_SetGaussian instance
+
+    description:
+    This is the constructor for the Toolbar_SetGaussian class. It sets up the shadow DOM, initializes
+    the `isPopupOpen` flag to track the popup state, and attaches the necessary styles and elements 
+    for the toolbar. It also sets up the rendering of the toolbar and the event listeners for interactivity.
+    */
+
     super();
     this.attachShadow({ mode: "open" });
     this.isPopupOpen = false; // Track the popup state
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_SetGaussian::connectedCallback
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This method is invoked when the custom element is attached to the DOM. It calls the render method 
+    to display the toolbar and adds the event listeners to enable interactivity. The method ensures the 
+    toolbar is ready to interact with the user.
+    */
     this.render();
 
     // Add event listeners for interactivity
     //
     this.addEventListeners();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_SetGaussian::render
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This method handles the rendering of the toolbar and its associated styles and HTML elements. 
+    It creates a shadow DOM structure with a button to trigger the popup and the corresponding popup 
+    with buttons for preset and submit actions. It also sets up the dynamic form container for setting 
+    Gaussian parameters such as the number of points and covariance matrix.
+    */
+
     this.shadowRoot.innerHTML = `
       <style>
 
@@ -1253,9 +1735,22 @@ class Toolbar_SetGaussian extends HTMLElement {
   //
   // end of method
 
-  // Add event listeners for preset and clear button actions
-  //
   addEventListeners() {
+    /*
+    method: Toolbar_SetGaussian::addEventListeners
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This method sets up event listeners for the preset and submit buttons in the popup. The preset 
+    button applies default values to the form, while the submit button dispatches the selected Gaussian 
+    parameters as a custom event and closes the popup.
+    */
+
     // Set up button to clear inputs and apply preset values
     //
     const presetButton = this.shadowRoot.querySelector("#presetButton");
@@ -1290,8 +1785,22 @@ class Toolbar_SetGaussian extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: Toolbar_SetGaussian::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the Toolbar_SetGaussian modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -1316,8 +1825,22 @@ class Toolbar_SetGaussian extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: Toolbar_SetGaussian::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the Toolbar_SetGaussian modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -1340,23 +1863,87 @@ class Toolbar_SetGaussian extends HTMLElement {
   //
   // end of method
 }
+//
+// end of class
 
 class Toolbar_SetRanges extends HTMLElement {
+  /*
+  class: Toolbar_SetRanges
+
+  description:
+   This class is responsible for creating a toolbar with a popup for setting the plot ranges.
+   It includes functionality for displaying the popup, setting ranges for the X and Y axes, 
+   providing preset values, and submitting the values. The class interacts with the shadow DOM 
+   to provide encapsulated styling and functionality.
+
+  */
+
   constructor() {
+    /*
+    method: Toolbar_SetRanges::constructor
+
+    args:
+      None
+
+    returns:
+      Toolbar_SetRanges instance
+
+    description:
+      This is the constructor for the Toolbar_SetRanges class. It initializes the component by
+      attaching a shadow root to the element and setting the initial state of the popup (closed).
+      It also prepares the state of the popup by setting up the flag to track whether the popup is open or not.
+    */
+
     super();
     this.attachShadow({ mode: "open" });
     this.isPopupOpen = false; // Track the popup state
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_SetRanges::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is called when the component is added to the DOM. It renders the toolbar and 
+      attaches event listeners for the toolbar buttons, such as the button to open the popup and 
+      the close button. It also appends the form for setting ranges to the popup and adds interactivity 
+      to handle the preset and submit actions.
+    */
+
     this.render();
 
     // Add event listeners for interactivity
     //
     this.addEventListeners();
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_SetRanges::render
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method generates and inserts the HTML structure for the toolbar and popup into the shadow DOM.
+      It includes styles for the popup, buttons, and overlay, as well as creating a form container 
+      for setting the X and Y axis ranges. This method also sets up the visibility of the popup and 
+      its interactions, including closing the popup when the close button is clicked.
+    */
+
     this.shadowRoot.innerHTML = `
       <style>
 
@@ -1605,9 +2192,22 @@ class Toolbar_SetRanges extends HTMLElement {
   //
   // end of method
 
-  // Add event listeners for preset and clear button actions
-  //
   addEventListeners() {
+    /*
+    method: Toolbar_SetRanges::addEventListeners
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method sets up event listeners for the preset and submit buttons. It defines the logic 
+      for applying preset values to the form and submitting the form data. Upon submission, it dispatches 
+      a custom event with the form data and closes the popup.
+    */
+
     // Set up button to clear inputs and apply preset values
     //
     const presetButton = this.shadowRoot.querySelector("#presetButton");
@@ -1642,8 +2242,22 @@ class Toolbar_SetRanges extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: Toolbar_SetRages::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the Toolbar_SetRages modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -1668,8 +2282,22 @@ class Toolbar_SetRanges extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: Toolbar_SetRages::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the Toolbar_SetRages modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -1692,25 +2320,100 @@ class Toolbar_SetRanges extends HTMLElement {
   //
   // end of method
 }
+//
+// end of class
 
 class Toolbar_Normalize extends HTMLElement {
+  /*
+  class: Toolbar_Normalize 
+
+  description:
+    This class defines a toolbar button with a checkbox that allows the user to toggle a normalization state.
+    The button updates the checkbox state when clicked and dispatches a custom event, `setNormalize`, to notify
+    other parts of the application about the normalization status. The class also handles click events to close the 
+    button when the user clicks outside of it.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_Normalize::constructor
+
+    args:
+      None
+
+    returns:
+      Toolbar_Normalize instance
+
+    description:
+      This is the constructor for the Toolbar_Normalize class. It is called when a new instance of the class is created.
+      The constructor initializes the component by attaching a shadow DOM, and it sets the initial states for the checkbox
+      (`checked`) and the open status (`isOpen`).
+    */
+
     super();
     this.attachShadow({ mode: "open" });
     this.checked = false; // Initial state of the checkbox
     this.isOpen = false; // Track if the button is open
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_Normalize::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is called when the element is added to the document's DOM. It renders the component's UI and sets up a 
+      global click event listener to handle clicks outside of the toolbar button to close the button if it is open.
+    */
+
     this.render();
     document.addEventListener("click", this.handleDocumentClick.bind(this)); // Add global click listener
   }
+  //
+  // end of method
 
   disconnectedCallback() {
+    /*
+    method: Toolbar_Normalize::disconnectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method is called when the element is removed from the document's DOM. It removes the global click event listener 
+      to avoid memory leaks or unnecessary listeners after the element is detached.
+    */
     document.removeEventListener("click", this.handleDocumentClick.bind(this)); // Clean up the listener
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_Normalize::render
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      This method renders the toolbar button with the checkbox and its label into the shadow DOM. It also adds a click 
+      event listener to the button to toggle the checkbox's checked state and dispatch a custom event with the updated 
+      normalization status.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -1768,8 +2471,23 @@ class Toolbar_Normalize extends HTMLElement {
       );
     });
   }
+  //
+  // end of method
 
   handleDocumentClick(event) {
+    /*
+    method: Toolbar_Normalize::handleDocumentClick
+
+    args:
+      event (Event): The click event that occurred in the document.
+
+    returns:
+      None
+
+    description:
+      This method handles the global click event to check if the user clicked outside the toolbar button. If the button is
+      open and the click is outside, it closes the button by resetting the `isOpen` state.
+    */
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
@@ -1780,7 +2498,11 @@ class Toolbar_Normalize extends HTMLElement {
       // this.shadowRoot.querySelector('#checkbox').checked = this.checked; // Update checkbox state
     }
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 // Register the custom element for dropdown buttons
 customElements.define("toolbar-button", Toolbar_Button);
