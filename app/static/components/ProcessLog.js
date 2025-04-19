@@ -514,8 +514,23 @@ class ProcessLog extends HTMLElement {
   //
   // end of method
 
-  // Function to generate a full-width separator using dashes
   addFullWidthSeparator() {
+    /*
+    method: ProcessLog::addFullWidthSeparator
+
+    args:
+      None
+
+    return:
+      None
+
+    description:
+      This method generates a full-width separator made up of dashes and appends it to the log container. 
+      The separator's width is calculated based on the current width of the log container, ensuring 
+      that it spans the entire width of the container. The separator is created by determining how many 
+      dashes fit within the container's width, and the appropriate number of dashes is appended to the log.
+    */
+
     let logDiv = this.shadowRoot.querySelector(".scroll-object"); // Log container
 
     if (!logDiv) return;

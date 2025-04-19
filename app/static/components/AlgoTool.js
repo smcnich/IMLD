@@ -1,3 +1,5 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 class AlgoTool extends HTMLElement {
@@ -67,19 +69,21 @@ class AlgoTool extends HTMLElement {
     //
     await this.render();
   }
+  //
+  // end of method
 
   save_alg_params(sender) {
     /*
     method: AlgoTool::save_alg_params
 
     args:
-    sender (Object): The object where algorithm data should be saved
+     sender (Object): The object where algorithm data should be saved
 
     return:
-    None
+     None
 
     description:
-    Collects algorithm parameters and saves them to the provided sender object
+     Collects algorithm parameters and saves them to the provided sender object
     */
 
     sender.data = {};
@@ -98,6 +102,8 @@ class AlgoTool extends HTMLElement {
     );
     sender.data.name = algoName;
   }
+  //
+  // end of method
 
   set_alg_params(algoName, params) {
     /*
@@ -137,6 +143,8 @@ class AlgoTool extends HTMLElement {
     //
     this.form.setDefaults(params);
   }
+  //
+  // end of method
 
   get_form() {
     /*
@@ -154,6 +162,8 @@ class AlgoTool extends HTMLElement {
 
     return this.form;
   }
+  //
+  // end of method
 
   get_algo() {
     /*
@@ -171,6 +181,8 @@ class AlgoTool extends HTMLElement {
 
     return this.selectedValue;
   }
+  //
+  // end of method
 
   async fetch_params() {
     /*
@@ -609,6 +621,8 @@ class AlgoTool extends HTMLElement {
       trainButton.className = "disabled";
     }
   }
+  //
+  // end of method
 
   change_eval_state(state) {
     /*
@@ -638,6 +652,8 @@ class AlgoTool extends HTMLElement {
       evalButton.className = "disabled";
     }
   }
+  //
+  // end of method
 }
 //
 // end of class

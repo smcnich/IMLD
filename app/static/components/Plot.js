@@ -1,3 +1,5 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 class Plot extends HTMLElement {
@@ -140,6 +142,8 @@ class Plot extends HTMLElement {
       "yaxis.range": y,
     });
   }
+  //
+  // end of method
 
   getBounds() {
     /*
@@ -204,14 +208,58 @@ class Plot extends HTMLElement {
   // end of method
 
   updateData() {
+    /*
+    method: Plot::updateData
+
+    args:
+     None
+
+    return:
+     None
+
+    description:
+     This method updates the data for the plot by calling the traces_to_data method.
+    */
+
     this.data = this.traces_to_data();
   }
+  //
+  // end of method
 
   updateShapeName(shape_name) {
+    /*
+    method: Plot::updateShapeName
+
+    args:
+     shape_name (String): the name of the shape to set
+
+    return:
+     None
+
+    description:
+     This method updates the shape name for the current plot.
+    */
+
     this.ShapeName = shape_name;
   }
+  //
+  // end of method
 
   initPlot() {
+    /*
+    method: Plot::initPlot
+
+    args:
+     None
+
+    return:
+     None
+
+    description:
+     This method initializes the plot by setting up the configuration and layout data for Plotly.
+     It also creates an empty plot initially by calling the plot_empty method.
+    */
+
     // Set configuration data for Plotly
     //
     this.config = {
@@ -267,6 +315,8 @@ class Plot extends HTMLElement {
 
     this.plot_empty();
   }
+  //
+  // end of method
 
   getDecisionSurface() {
     /*
@@ -310,6 +360,27 @@ class Plot extends HTMLElement {
   // end of method
 
   createTraces(data, labelManager) {
+    /*
+    method: Plot::createTraces
+
+    args:
+     data (Object): an object containing the data to plot, with the structure:
+                    {
+                      labels: ['label1', 'label1', 'label2', ...],
+                      x: [1, 2, 3, 4, 5, 6, ...],
+                      y: [1, 2, 3, 4, 5, 6, ...]
+                    }
+     labelManager (LabelManager): an instance of the LabelManager class containing the labels,
+                                  colors, and mappings for each label in the data.
+
+    return:
+     Array: an array of trace objects that can be used in Plotly to plot the data.
+
+    description:
+     This method creates a trace for each unique label in the provided data and organizes
+     the data into Plotly-compatible traces for plotting.
+    */
+
     // make the all the data labels are the same
     //
     if (
@@ -358,6 +429,8 @@ class Plot extends HTMLElement {
     //
     return Object.values(traces);
   }
+  //
+  // end of method
 
   plot_empty() {
     /*
@@ -392,6 +465,8 @@ class Plot extends HTMLElement {
     //
     Plotly.newPlot(this.plotDiv, this.plotData, this.layout, this.config);
   }
+  //
+  // end of method
 
   plot(data, labelManager) {
     /*
@@ -487,6 +562,8 @@ class Plot extends HTMLElement {
     //
     EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
+  //
+  // end of method
 
   clear_plot() {
     /*
@@ -520,6 +597,8 @@ class Plot extends HTMLElement {
     //
     EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
+  //
+  // end of method
 
   decision_surface(data, labels) {
     /*
@@ -625,6 +704,8 @@ class Plot extends HTMLElement {
     //
     EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
+  //
+  // end of method
 
   clear_decision_surface() {
     /*
@@ -656,6 +737,8 @@ class Plot extends HTMLElement {
     //
     EventBus.dispatchEvent(new CustomEvent("stateChange"));
   }
+  //
+  // end of method
 
   traces_to_data(traces = null) {
     /*
@@ -999,6 +1082,8 @@ function applyAlpha(hex, alpha) {
     return applyAlpha(colorNameToHex(hex), alpha);
   }
 }
+//
+// end of function
 
 function colorNameToHex(colorName) {
   /*
@@ -1044,6 +1129,8 @@ function colorNameToHex(colorName) {
   //
   return null;
 }
+//
+// end of function
 
 function generateStandardNormalPair() {
   /*

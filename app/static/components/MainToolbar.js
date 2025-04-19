@@ -183,24 +183,27 @@ class MainToolbar extends HTMLElement {
       }
     });
   }
+  //
+  // end of method
 
   isAnyPopupOpen(dropdown) {
     /*
     method: MainToolbar::isAnyPopupOpen
 
     args:
-    dropdown (HTMLElement): The dropdown element to check for open popups.
+     dropdown (HTMLElement): The dropdown element to check for open popups.
 
     return:
-    Boolean: True if any popup within the dropdown is open, false otherwise.
+     Boolean: True if any popup within the dropdown is open, false otherwise.
 
     description:
-    This method checks whether any popup elements within the specified dropdown are
-    currently open. It iterates over a predefined list of popup selectors and checks
-    their `isPopupOpen` property.
+     This method checks whether any popup elements within the specified dropdown are
+     currently open. It iterates over a predefined list of popup selectors and checks
+     their `isPopupOpen` property.
     */
 
     // Define a list of all potential popup query selectors
+    //
     const PopupSelectors = [
       "toolbar-popup-button",
       "about-popup",
@@ -210,6 +213,7 @@ class MainToolbar extends HTMLElement {
     ];
 
     // Define a list of nested dropdown selectors
+    //
     const nestedDropdownSelectors = [
       "toolbar-dropdown-settings", // This can be expanded with more dropdown types
       "data-button",
@@ -217,6 +221,7 @@ class MainToolbar extends HTMLElement {
     ];
 
     // Define a list of nested popup selectors
+    //
     const NestedPopupSelectors = [
       "toolbar-popup-button",
       "data-popup", // Include any other nested popup types as needed
@@ -225,26 +230,32 @@ class MainToolbar extends HTMLElement {
     ];
 
     // First, check the popups in the current dropdown
+    //
     const openPopups = dropdown.querySelectorAll(PopupSelectors.join(","));
 
     // If any of the popups inside the dropdown are open, return true
+    //
     if (Array.from(openPopups).some((popup) => popup.isPopupOpen)) {
       return true;
     }
 
     // Check if there are any nested dropdowns inside the current dropdown
+    //
     const nestedDropdowns = dropdown.querySelectorAll(
       nestedDropdownSelectors.join(",")
     );
 
     // If there are nested dropdowns, check each one for open popups
+    //
     for (let nestedDropdown of nestedDropdowns) {
       // For each nested dropdown, check for popups in its shadow DOM
+      //
       const nestedPopups = nestedDropdown.shadowRoot.querySelectorAll(
         NestedPopupSelectors.join(",")
       );
 
       // If any nested popups are open, return true
+      //
       if (Array.from(nestedPopups).some((popup) => popup.isPopupOpen)) {
         return true;
       }
@@ -252,6 +263,8 @@ class MainToolbar extends HTMLElement {
 
     return false; // No popups are open in the dropdown or its nested dropdowns
   }
+  //
+  // end of method
 
   updateClassList(labels) {
     /*
@@ -301,6 +314,8 @@ class MainToolbar extends HTMLElement {
       classDropdown.insertBefore(button, addClassBtn);
     });
   }
+  //
+  // end of method
 
   getClassDropdowns() {
     /*

@@ -42,7 +42,6 @@
     <!-- Load custom components -->
     <!--                        -->
     <script type="module" src="static/components/Events.js"></script>
-    <script src="static/components/ShareBtn.js"></script>
     <script src="static/components/MainToolbar.js"></script>
     <script src="static/components/ProcessLog.js"></script>
     <script type="module" src="static/components/Plot.js"></script>

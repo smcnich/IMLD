@@ -245,8 +245,22 @@ class AboutPopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: AboutPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the AboutPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -271,8 +285,22 @@ class AboutPopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: AboutPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the AboutPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -300,31 +328,33 @@ class AboutPopup extends HTMLElement {
 
 class ReportPopup extends HTMLElement {
   /*
-  class: AboutPopup
+  class: ReportPopup
 
   description:
-   This class creates a customizable About button that, when clicked, displays a popup containing 
-   information about the IMLD tool, including its purpose, features, and history. The popup provides 
-   a focused user experience by using an overlay to isolate content and includes functionality for 
-   closing it with a close button or by clicking outside the popup.
+   This class creates a customizable "Report Issue" button that, when clicked, displays a popup
+   containing a form to report an issue. The form includes fields for the issue title and description.
+   It provides a focused user experience by using an overlay to isolate content and includes functionality
+   for submitting the report, closing the popup, or canceling the operation.
 
-   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-   independent of other components. It dynamically updates its contents using attributes such as 
-   'label' and 'version'.
+   The ReportPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain
+   independent of other components. It includes word count functionality for the description field
+   and handles submitting the issue report to a backend server.
+
+   The component dynamically updates its contents and provides an interactive way to submit issue reports.
   */
 
   constructor() {
     /*
-    method: AboutPopup::constructor
+    method: ReportPopup::constructor
 
     args:
      None
 
     returns:
-     AboutPopup instance
+     ReportPopup instance
 
     description:
-     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     Initializes the ReportPopup component. The constructor creates the shadow DOM and sets 
      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
@@ -345,7 +375,7 @@ class ReportPopup extends HTMLElement {
 
   connectedCallback() {
     /*
-    method: AboutPopup::connectedCallback
+    method: ReportPopup::connectedCallback
 
     args:
      None
@@ -354,9 +384,9 @@ class ReportPopup extends HTMLElement {
      None
 
     description:
-     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-     structure and styles, initializes attributes such as 'label' and 'version', and provides 
-     information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the ReportPopup component is added to the DOM. This method renders the component's 
+     structure and styles, initializes attributes such as 'label' and 'version', and sets up the event listeners 
+     for opening, closing, and submitting the popup form.
     */
 
     // Retrieve the button label from attributes
@@ -372,7 +402,7 @@ class ReportPopup extends HTMLElement {
 
   render() {
     /*
-    method: AboutPopup::render
+    method: ReportPopup::render
       
     args:
      None
@@ -381,8 +411,9 @@ class ReportPopup extends HTMLElement {
      None
 
     description:
-     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-     `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ReportPopup component by setting the shadow root's
+     `innerHTML`. This defines the layout and appearance of the component, including the form
+     for submitting an issue report and the associated popup and overlay elements.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -730,8 +761,22 @@ class ReportPopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: ReportPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the ReportPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -756,8 +801,22 @@ class ReportPopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: ReportPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the ReportPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -785,32 +844,32 @@ class ReportPopup extends HTMLElement {
 
 class SharePopup extends HTMLElement {
   /*
-  class: AboutPopup
+  class: SharePopup
 
   description:
-   This class creates a customizable About button that, when clicked, displays a popup containing 
-   information about the IMLD tool, including its purpose, features, and history. The popup provides 
-   a focused user experience by using an overlay to isolate content and includes functionality for 
-   closing it with a close button or by clicking outside the popup.
+   This class creates a customizable Share button that, when clicked, displays a popup allowing 
+   users to copy a shareable link to the IMLD tool. The popup includes functionality for closing it 
+   with a close button or by clicking outside the popup. It is designed to enhance user experience 
+   by isolating content with an overlay and using an intuitive layout.
 
-   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-   independent of other components. It dynamically updates its contents using attributes such as 
-   'label' and 'version'.
+   The SharePopup component is encapsulated using Shadow DOM, ensuring the styles and logic 
+   are independent from other components. The component is designed to be dynamic, with elements 
+   like the 'label' and 'version' updated through attributes.
   */
 
   constructor() {
     /*
-    method: AboutPopup::constructor
+    method: SharePopup::constructor
 
     args:
      None
 
     returns:
-     AboutPopup instance
+     SharePopup instance
 
     description:
-     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
-     an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
+     Initializes the SharePopup component by creating the shadow DOM and setting the initial state 
+     for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
     // Call the parent HTMLElement constructor
@@ -830,18 +889,17 @@ class SharePopup extends HTMLElement {
 
   connectedCallback() {
     /*
-    method: AboutPopup::connectedCallback
+    method: SharePopup::connectedCallback
 
     args:
      None
 
-    return:
+    returns:
      None
 
     description:
-     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-     structure and styles, initializes attributes such as 'label' and 'version', and provides 
-     information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the SharePopup component is added to the DOM. This method renders the component's 
+     structure and styles, and initializes attributes like 'label' to display the Share button.
     */
 
     // Retrieve the button label from attributes
@@ -857,17 +915,17 @@ class SharePopup extends HTMLElement {
 
   render() {
     /*
-    method: AboutPopup::render
-      
+    method: SharePopup::render
+
     args:
      None
 
-    return:
+    returns:
      None
 
     description:
-     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-     `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML structure and CSS styles for the SharePopup component. This method defines 
+     the button layout, the shareable link, and the popup appearance.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -1139,8 +1197,22 @@ class SharePopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: SharePopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the SharePopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -1165,8 +1237,22 @@ class SharePopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: SharePopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the SharePopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -1194,31 +1280,32 @@ class SharePopup extends HTMLElement {
 
 class ContactPopup extends HTMLElement {
   /*
-  class: AboutPopup
+  class: ContactPopup
 
   description:
-   This class creates a customizable About button that, when clicked, displays a popup containing 
-   information about the IMLD tool, including its purpose, features, and history. The popup provides 
-   a focused user experience by using an overlay to isolate content and includes functionality for 
-   closing it with a close button or by clicking outside the popup.
+   This class creates a customizable button that, when clicked, displays a popup 
+   containing information about the IMLD tool, including its purpose, features, and history. 
+   The popup is interactive and allows users to copy important links, including the IMLD email 
+   and GitHub repository. The user can close the popup using the close button or by clicking 
+   outside the popup.
 
-   The AboutPopup component is encapsulated using Shadow DOM to ensure its styles and logic remain 
-   independent of other components. It dynamically updates its contents using attributes such as 
-   'label' and 'version'.
+   The ContactPopup component is encapsulated using Shadow DOM to ensure that its styles 
+   and behavior do not affect other components on the page. The popup's content is dynamically 
+   updated based on attributes like 'label' and 'version'.
   */
 
   constructor() {
     /*
-    method: AboutPopup::constructor
+    method: ContactPopup::constructor
 
     args:
      None
 
     returns:
-     AboutPopup instance
+     ContactPopup instance
 
     description:
-     Initializes the AboutPopup component. The constructor creates the shadow DOM and sets 
+     Initializes the ContactPopup component. The constructor creates the shadow DOM and sets 
      an initial state for `isPopupOpen`, which tracks whether the popup is visible or not.
     */
 
@@ -1239,18 +1326,17 @@ class ContactPopup extends HTMLElement {
 
   connectedCallback() {
     /*
-    method: AboutPopup::connectedCallback
+    method: ContactPopup::connectedCallback
 
     args:
      None
 
-    return:
+    returns:
      None
 
     description:
-     Invoked when the AboutPopup component is added to the DOM. This method renders the component's 
-     structure and styles, initializes attributes such as 'label' and 'version', and provides 
-     information about the IMLD tool, including its interactive features and historical evolution.
+     Invoked when the ContactPopup component is added to the DOM. This method renders the 
+     component's structure, applies the styles, and initializes attributes like 'label' and 'version'.
     */
 
     // Retrieve the button label from attributes
@@ -1266,17 +1352,17 @@ class ContactPopup extends HTMLElement {
 
   render() {
     /*
-    method: AboutPopup::render
-      
+    method: ContactPopup::render
+
     args:
      None
 
-    return:
+    returns:
      None
 
     description:
-     Renders the HTML and CSS for the ShareBtn component by setting the shadow root's
-     `innerHTML`. This defines the layout and appearance of the component.
+     Renders the HTML and CSS for the ContactPopup component. It defines the structure and 
+     appearance of the component within the shadow DOM.
     */
 
     // Define the HTML structure and CSS styles for the component
@@ -1581,8 +1667,22 @@ class ContactPopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: ContactPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the ContactPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -1607,8 +1707,22 @@ class ContactPopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: ContactPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the ContactPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");

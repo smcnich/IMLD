@@ -1,3 +1,5 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 class DataPopup extends HTMLElement {
@@ -331,9 +333,27 @@ class DataPopup extends HTMLElement {
   //
   // end of method
 
-  // Add event listeners for preset and clear button actions
-  //
   addEventListeners() {
+    /*
+    method: DataPopup::addEventListeners
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+      Adds interactivity to the buttons within the DataPopup component's form. This includes:
+      - Clearing form inputs when the "Clear" button is clicked.
+      - Setting preset/default values when the "Presets" button is clicked.
+      - Collecting form input values and dispatching a "dataGen" event with structured details
+        when the "Submit" button is clicked.
+      
+      The method leverages the `FormContainer` instance to perform actions like resetting and submitting
+      the form. It also ensures that the popup closes after successful submission.
+    */
+
     // Set up button to clear inputs and apply preset values
     //
     const clearButton = this.shadowRoot.querySelector("#clearButton");
@@ -385,8 +405,22 @@ class DataPopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: DataPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the DataPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -411,8 +445,22 @@ class DataPopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
   closePopup() {
+    /*
+    method: DataPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the DataPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     const popup = this.shadowRoot.getElementById("popup");
     const overlay = this.shadowRoot.getElementById("overlay");
@@ -647,10 +695,28 @@ class DataButton extends HTMLElement {
     _eval.setAttribute("name", label);
     dropMenu.appendChild(_eval);
   }
-
-  // Add event listeners when hovering over the dropdown button
   //
+  // end of method
+
   addHoverListeners() {
+    /*
+    method: DataButton::addHoverListeners
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Adds mouse event listeners to the toolbar button and dropdown menu elements to control 
+     their interactive behavior. On hovering over the button, the dropdown menu is displayed 
+     and the button is highlighted. When the mouse leaves the button or dropdown menu area,
+     it checks whether any internal popup is open (`data-popup` elements) before hiding the 
+     dropdown. This ensures that dropdown visibility is managed properly during interactions 
+     with nested popup components.
+    */
+
     // Create the button and dropdown menu reference
     //
     const button = this.shadowRoot.querySelector(".toolbar-button");

@@ -1,7 +1,33 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 export class Label {
+  /*
+  class: Label
+
+  description:
+   This class represents a label object with a name, numeric mapping, and color.
+   It provides methods to get and set the mapping and to change the color of the label.
+  */
+
   constructor(labelName, color) {
+    /*
+    method: Label::constructor
+
+    args:
+     labelName (String | Number): the name of the label, which can either be a string or a number
+     color (String): the color associated with the label
+
+    returns:
+     Label instance
+
+    description:
+     The constructor initializes the label with a name and color.
+     If the label name is a number, it is mapped to a "Class X" format. If it's a string,
+     the name is used directly, and the mapping is set to null.
+    */
+
     if (isNumber(labelName)) {
       this.name = `Class ${labelName}`;
       this.mapping = labelName;
@@ -12,31 +38,118 @@ export class Label {
 
     this.color = color;
   }
+  //
+  // end of method
 
   getMapping() {
+    /*
+    method: Label::getMapping
+
+    args:
+     None
+
+    returns:
+     Number | null: the numeric mapping associated with the label
+
+    description:
+     Returns the mapping associated with the label. This is used to map the label to a number.
+    */
+
     return this.mapping;
   }
+  //
+  // end of method
 
   setMapping(mapping) {
+    /*
+    method: Label::setMapping
+
+    args:
+     mapping (Number): the numeric mapping to set for the label
+
+    returns:
+     None
+
+    description:
+     Sets the numeric mapping for the label. This is used to associate a number with the label.
+    */
+
     this.mapping = mapping;
   }
+  //
+  // end of method
 
   changeColor(color) {
+    /*
+    method: Label::changeColor
+
+    args:
+     color (String): the new color to set for the label
+
+    returns:
+     None
+
+    description:
+     Changes the color of the label.
+    */
+
     this.color = color;
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 export class LabelManager {
+  /*
+  class: LabelManager
+
+  description:
+   This class manages a collection of Label objects. It provides methods for adding labels,
+   retrieving labels by name or mapping, and updating mappings and colors.
+  */
+
   constructor() {
+    /*
+    method: LabelManager::constructor
+
+    args:
+     None
+
+    returns:
+     LabelManager instance
+
+    description:
+     Initializes the LabelManager with empty arrays for labels, names, mappings, and a map.
+    */
+
     this.labels = [];
     this.names = [];
     this.mappings = [];
     this.map = {};
   }
+  //
+  // end of method
 
   getLabels() {
+    /*
+    method: LabelManager::getLabels
+
+    args:
+     None
+
+    returns:
+     Array: the list of all label objects
+
+    description:
+     Returns an array of all the labels managed by the LabelManager.
+    */
+
     return this.labels;
   }
+  //
+  // end of method
 
   getLabelByName(labelName) {
     /*
@@ -87,8 +200,23 @@ export class LabelManager {
   // end of method
 
   getMappings() {
+    /*
+    method: LabelManager::getMappings
+
+    args:
+     None
+
+    returns:
+     Array: an array of all label mappings
+
+    description:
+     Returns an array of the numeric mappings of all the labels.
+    */
+
     return this.mappings;
   }
+  //
+  // end of method
 
   getMapping(labelName) {
     /*
@@ -111,6 +239,19 @@ export class LabelManager {
   }
 
   getColors() {
+    /*
+    method: LabelManager::getColors
+
+    args:
+    None
+
+    returns:
+    Array: an array of all the label colors
+
+    description:
+    Returns an array of the colors associated with the labels.
+    */
+
     const colors = [];
 
     this.labels.forEach((label) => {
@@ -119,6 +260,8 @@ export class LabelManager {
 
     return colors;
   }
+  //
+  // end of method
 
   getColorMappings() {
     /*
@@ -171,6 +314,8 @@ export class LabelManager {
       label.setMapping(this.mappings[label.name?.toLowerCase?.()]);
     });
   }
+  //
+  // end of method
 
   addLabel(labelObj) {
     /*
@@ -361,6 +506,8 @@ export class LabelManager {
   //
   // end of method
 }
+//
+// end of class
 
 function isNumber(value) {
   /*

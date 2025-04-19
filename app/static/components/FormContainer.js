@@ -1,9 +1,40 @@
 class InvalidLabelsError extends Error {
+  /*
+  class: InvalidLabelsError
+
+  description:
+   This custom error class is used to indicate that an operation failed due to missing or invalid labels.
+   It extends the built-in JavaScript `Error` class to allow for more descriptive and semantic error handling
+   when label-related issues occur, such as attempting to train or evaluate a model without the required labels.
+   The name of the error is set explicitly for easier identification in error handling logic.
+  */
+
   constructor(message) {
+    /*
+    method: InvalidLabelsError::constructor
+
+    args:
+     message (string): A human-readable message describing the error.
+
+    returns:
+     InvalidLabelsError instance
+
+    description:
+     Initializes the error instance with a custom message and sets the error name to "NoLabelsError".
+     This allows error-handling mechanisms to distinguish it from other types of errors in the system.
+    */
+
+    // Call the parent constructor
     super(message);
+
+    // Set a custom name for logs and error handlers
     this.name = "NoLabelsError";
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class FormContainer extends HTMLElement {
   /*
@@ -81,17 +112,17 @@ class FormContainer extends HTMLElement {
 
   async connectedCallback() {
     /*
-      method: Template::connectedCallback
+    method: Template::connectedCallback
 
-      args:
-       None
+    args:
+     None
 
-      return:
-       None
+    return:
+     None
 
-      description:
-       This method is called when the component is added to the DOM.
-      */
+    description:
+     This method is called when the component is added to the DOM.
+    */
 
     // render the component to the webpage
     //
@@ -102,18 +133,18 @@ class FormContainer extends HTMLElement {
 
   render() {
     /*
-      method: FormContainer::render
+    method: FormContainer::render
       
-      args:
-       None
+    args:
+     None
 
-      return:
-       None
+    return:
+     None
 
-      description:
-       This method renders the component to the webpage by setting the innerHTML of the
-       shadow root to what is in the string below.
-      */
+    description:
+     This method renders the component to the webpage by setting the innerHTML of the
+     shadow root to what is in the string below.
+    */
 
     // WRITE YOUR HTML AND CSS HERE
     this.shadowRoot.innerHTML = `
@@ -263,6 +294,8 @@ class FormContainer extends HTMLElement {
     //
     return null;
   }
+  //
+  // end of method
 
   generate_numeric_input(key, params, int = false) {
     /*
@@ -423,6 +456,8 @@ class FormContainer extends HTMLElement {
 
     return container;
   }
+  //
+  // end of method
 
   generate_matrix_input(key, params, int = False) {
     /*
@@ -616,6 +651,8 @@ class FormContainer extends HTMLElement {
     //
     return container;
   }
+  //
+  // end of method
 
   createForm(params) {
     /*
@@ -861,9 +898,31 @@ class FormContainer extends HTMLElement {
     //
     return [formValues, param_names];
   }
+  //
   // end of method
 
   clearForm(_params = null) {
+    /*
+    method: clearForm
+
+    args:
+     _params (object|null): Optional parameter that overrides the default class `params`. If no value is provided, 
+                            the class-level `params` attribute is used.
+
+    returns:
+     None
+
+    description:
+     This method clears the form inputs by resetting them to their default values. If a group or matrix type input is
+     encountered, the method will recursively clear all nested values or reset the matrix cells accordingly. The method 
+     checks for the presence of the `_params` argument to determine whether to use the provided parameters or default to 
+     the class's `params`. The function iterates through each parameter in the given or default parameters, clearing 
+     form inputs in the shadow DOM.
+
+     If a matrix type parameter is found, it locates the associated container and resets all input elements within it. 
+     For non-group and non-matrix parameters, it directly clears the associated input field.
+    */
+
     // create a params variable. since the default param is null, test
     // make sure the params var always holds something, whether it is the
     // class attribute or if it is passed in
@@ -912,6 +971,8 @@ class FormContainer extends HTMLElement {
       }
     }
   }
+  //
+  // end of method
 
   setDefaults(_params = null) {
     /*
@@ -1048,6 +1109,8 @@ class FormContainer extends HTMLElement {
       }
     }
   }
+  //
+  // end of method
 }
 //
 // end of class

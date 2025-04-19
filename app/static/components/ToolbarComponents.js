@@ -1,17 +1,85 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 class Toolbar_Button extends HTMLElement {
+  /*
+  class: Toolbar_Button 
+
+  description:
+   This class represents a custom toolbar button element. It allows for creating a button with a label
+   and some basic styling. It also provides the functionality of adding an event listener to the button
+   so that when clicked, it can dispatch a custom event to the window, typically for interacting with 
+   other components like a plot. This class extends HTMLElement and uses Shadow DOM to encapsulate 
+   the styles and structure of the button.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_Button::constructor
+
+    args:
+     None
+
+    returns:
+     Toolbar_Button instance
+
+    description:
+     This is the constructor for the Toolbar_Button class. It is called when a new instance of the class is created.
+     The constructor attaches a shadow DOM to the element with the "open" mode, which allows styling and structure 
+     to be encapsulated within the component.
+    */
+
+    // Call the parent constructor
+    //
     super();
+    
+    // Create a shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_Button::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+     This method is called when the Toolbar_Button element is added to the DOM. It triggers the rendering of the button 
+     and adds a click event listener to it. This lifecycle method ensures that the button is properly initialized 
+     when the component is inserted into the DOM.
+    */
+
+    // render the component
+    //
     this.render();
     this.addClickListener();
   }
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_Button::render
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     This method is responsible for rendering the button element in the shadow DOM. It defines the button's 
+     HTML structure, style, and the label that appears on the button. The label is fetched from the "label" 
+     attribute of the element, with a fallback value of "Button" if the attribute is not provided.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -40,9 +108,22 @@ class Toolbar_Button extends HTMLElement {
     `;
   }
 
-  // Method to add a click listener to the toolbar button
-  //
   addClickListener() {
+    /*
+    method: Toolbar_Button::addClickListener
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     This method adds a click event listener to the button. When the button is clicked, it dispatches a custom 
+     "clearPlot" event with the `clear` and `plotId` attributes as event details. This event can be used 
+     to communicate with other components, such as clearing a plot based on the values of these attributes.
+    */
+
     // Get the button element from the shadow DOM
     //
     const button = this.shadowRoot.querySelector(".toolbar-button");
@@ -69,26 +150,112 @@ class Toolbar_Button extends HTMLElement {
       );
     });
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_CheckboxButton extends HTMLElement {
+  /*
+  class: Toolbar_CheckboxButton
+
+  description:
+    This class represents a checkbox button in a toolbar component. It manages the checkbox's checked state and toggles
+    its appearance when clicked. The class uses a shadow DOM to encapsulate its styles and structure, which includes a button
+    with a checkbox input and associated styles for hover and layout. It also listens for clicks outside of the button to close
+    the button's state when clicked elsewhere on the document.
+  */
+
   constructor() {
+    /*
+    method: Toolbar_CheckboxButton::constructor
+
+    args:
+     None
+
+    returns:
+     Toolbar_CheckboxButton instance
+
+    description:
+     This is the constructor for the Toolbar_CheckboxButton class. It is called when a new instance of the class is created.
+     The constructor attaches a shadow DOM to the element with the "open" mode, which allows styling and structure 
+     to be encapsulated within the component.
+    */
+
+    // Call the parent constructor
+    //
     super();
+
+    // Create a shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
-    this.checked = false; // Initial state of the checkbox
-    this.isOpen = false; // Track if the button is open
+    
+    // create a variable to hold initial state of checkbox and if it's open
+    //
+    this.checked = false;
+    this.isOpen = false;
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: Toolbar_CheckboxButton::connectedCallback
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This lifecycle method is called when the component is inserted into the DOM. It triggers the rendering of the component
+    and sets up a global click event listener to detect clicks outside of the component in order to close the button if needed.
+    */
+
     this.render();
     document.addEventListener("click", this.handleDocumentClick.bind(this)); // Add global click listener
   }
+  //
+  // end of method
 
   disconnectedCallback() {
+    /*
+    method: Toolbar_CheckboxButton::disconnectedCallback
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This lifecycle method is called when the component is removed from the DOM. It cleans up by removing the global
+    click event listener to prevent memory leaks and unnecessary event handling after the component is removed.
+    */
+
     document.removeEventListener("click", this.handleDocumentClick.bind(this)); // Clean up the listener
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: Toolbar_CheckboxButton::render
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    This method is responsible for rendering the component's structure inside the shadow DOM. It creates the button with
+    a checkbox and applies the relevant styles. It also adds a click event listener to toggle the checkbox state and the
+    button's open state when clicked.
+    */
+
     const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
 
     this.shadowRoot.innerHTML = `
@@ -136,8 +303,25 @@ class Toolbar_CheckboxButton extends HTMLElement {
       this.isOpen = true; // Mark the button as open
     });
   }
+  //
+  // end of method
 
   handleDocumentClick(event) {
+    /*
+    method: Toolbar_CheckboxButton::handleDocumentClick
+
+    args:
+    event (Event): The click event triggered on the document.
+
+    returns:
+    None
+
+    description:
+    This method is called whenever a click event occurs on the document. It checks if the click happened outside the
+    button, and if so, it closes the button's state by setting `isOpen` to false. This ensures the button behaves like a
+    dropdown, closing when clicked outside.
+    */
+
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
@@ -148,7 +332,11 @@ class Toolbar_CheckboxButton extends HTMLElement {
       // this.shadowRoot.querySelector('#checkbox').checked = this.checked; // Update checkbox state
     }
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class Toolbar_DropdownClear extends HTMLElement {
   constructor() {

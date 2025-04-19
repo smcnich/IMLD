@@ -1,3 +1,5 @@
+// import Event Bus to handle events
+//
 import { EventBus } from "./Events.js";
 
 class AddClassPopup extends HTMLElement {
@@ -5,22 +7,26 @@ class AddClassPopup extends HTMLElement {
   class: AddClassPopup
 
   description:
-
+   This class defines the functionality, styling, and structure of the "Add Class" popup component.
+   It includes the logic to open and close the popup, render the HTML form for class name and color
+   selection, initialize the color picker, and dispatch a custom event with form data when a new class
+   is submitted.
   */
 
   constructor() {
     /*
-      method: AddClassPopup::constructor
+    method: AddClassPopup::constructor
 
-      args:
-        None
+    args:
+     None
 
-      returns:
+    returns:
+     AddClassPopup instance
 
-
-      description:
-
-      */
+    description:
+     This is the constructor for the AddClassPopup class. It creates a shadow DOM for encapsulating styles
+     and markup and sets the initial popup state. It prepares the component for rendering and interaction.
+    */
 
     // Call the parent HTMLElement constructor
     //
@@ -372,8 +378,22 @@ class AddClassPopup extends HTMLElement {
   //
   // end of method
 
-  // Toggle the visibility of the popup
   togglePopup() {
+    /*
+    method: AddClassPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the AddClassPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -398,9 +418,22 @@ class AddClassPopup extends HTMLElement {
   //
   // end of method
 
-  // Close the popup and overlay
-  //
   closePopup() {
+    /*
+    method: AddClassPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the AddClassPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
     // Create popup and overlay element
     //
     const popup = this.shadowRoot.getElementById("popup");
@@ -429,14 +462,61 @@ class AddClassPopup extends HTMLElement {
 // end of class
 
 class DrawCheckBox extends HTMLElement {
+  /*
+  class: DrawCheckBox
+
+  description:
+   This class defines a custom HTML element that represents a checkbox-based toolbar button for enabling 
+   or disabling drawing functionality in a UI. It handles rendering, toggling state, and dispatching 
+   corresponding custom events based on user interactions. The component also listens for clicks outside 
+   its scope to manage internal state.
+  */
+
   constructor() {
+    /*
+    method: DrawCheckBox::constructor
+
+    args:
+     None
+
+    returns:
+     DrawCheckBox instance
+
+    description:
+     Initializes the DrawCheckBox component by attaching a shadow DOM and setting default states
+     for `checked` and `isOpen`, which track the checkbox status and open/closed state of the button.
+    */
+
+    // Call the parent constructor
+    //
     super();
+
+    // Create a shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
-    this.checked = false; // Initial state of the checkbox
-    this.isOpen = false; // Track if the button is open
+
+    // Create variable to hold state of checkbox and button
+    this.checked = false;
+    this.isOpen = false;
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: DrawCheckBox::connectedCallback
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Lifecycle method called when the component is added to the DOM. It renders the component's structure
+     and sets up a global click listener to detect and handle clicks outside the component.
+    */
+
     // Render the initial state
     //
     this.render();
@@ -445,15 +525,54 @@ class DrawCheckBox extends HTMLElement {
     //
     document.addEventListener("click", this.handleDocumentClick.bind(this));
   }
+  //
+  // end of method
 
   disconnectedCallback() {
+    /*
+    method: DrawCheckBox::disconnectedCallback
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Lifecycle method called when the component is removed from the DOM. Cleans up the global event
+     listener to prevent memory leaks.
+    */
+
+    // Remove the global event listener
+    //
     document.removeEventListener("click", this.handleDocumentClick.bind(this)); // Clean up the listener
   }
+  //
+  // end of method
 
   render() {
-    const label = this.getAttribute("label"); // Get the label from the attribute
-    const type = this.getAttribute("type") || "points"; // Get the type from the attribute
+    /*
+    method: DrawCheckBox::render
 
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Renders the HTML and styles for the checkbox button. The button displays a label based on the
+     'label' and 'type' attributes, and adds logic to toggle draw state and dispatch custom events
+     for enabling or disabling draw functionality when clicked.
+    */
+
+    // Retrieve attributes for label and type
+    //
+    const label = this.getAttribute("label");
+    const type = this.getAttribute("type") || "points";
+
+    // Inject HTML structures and styles into the shadow DOM
+    //
     this.shadowRoot.innerHTML = `
       <style>
         .toolbar-checkbox-button {
@@ -489,6 +608,7 @@ class DrawCheckBox extends HTMLElement {
     `;
 
     // Add click event listener to toggle checkbox and button state
+    //
     const button = this.shadowRoot.querySelector("#checkboxButton");
     const checkbox = this.shadowRoot.querySelector("#checkbox");
 
@@ -519,14 +639,45 @@ class DrawCheckBox extends HTMLElement {
       }
     };
   }
+  //
+  // end of method
 
   disable() {
+    /*
+    method: DrawCheckBox::disable
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Programmatically disables the checkbox and resets internal state to reflect that the draw 
+     functionality is no longer active.
+    */
+
     this.checked = false;
     this.isOpen = false;
     this.shadowRoot.querySelector("#checkbox").checked = false;
   }
+  //
+  // end of method
 
   handleDocumentClick(event) {
+    /*
+    method: DrawCheckBox::handleDocumentClick
+
+    args:
+     event (Event): The global click event to evaluate
+
+    returns:
+     None
+
+    description:
+     Handles global document clicks to determine if the user clicked outside the component. 
+     If so, and the component is open, it updates internal state to reflect the closed state.
+    */
     const button = this.shadowRoot.querySelector("#checkboxButton");
 
     // Check if the clicked target is outside of the button
@@ -537,15 +688,63 @@ class DrawCheckBox extends HTMLElement {
       // this.shadowRoot.querySelector('#checkbox').checked = this.checked; // Update checkbox state
     }
   }
+  //
+  // end of method
 }
+//
+// end of class
 
 class DeleteClassButton extends HTMLElement {
+  /*
+  class: DeleteClassButton
+
+  description:
+  This custom HTML element defines a toolbar button used to delete a class. When clicked, it dispatches
+  a `deleteClass` event with the class name as its payload. The element is styled and rendered using
+  shadow DOM, and its label is provided via an HTML attribute.
+  */
+
   constructor() {
+    /*
+    method: DeleteClassButton::constructor
+
+    args:
+     None
+
+    returns:
+     DeleteClassButton instance
+
+    description:
+     Initializes the component by attaching an open shadow DOM for style encapsulation and
+     internal HTML structure.
+    */
+
+    // Call the parent constructor
+    //
     super();
+
+    // Create the shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
   }
+  //
+  // end of method
 
   connectedCallback() {
+    /*
+    method: DeleteClassButton::connectedCallback
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Lifecycle method called when the element is added to the DOM. It renders the button and adds
+     an `onclick` handler to dispatch a custom `deleteClass` event with the class name.
+    */
+
     // render the component
     //
     this.render();
@@ -567,8 +766,24 @@ class DeleteClassButton extends HTMLElement {
       );
     };
   }
+  //
+  // end of method
 
   render() {
+    /*
+    method: DeleteClassButton::render
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Renders the button with styling inside the shadow DOM. The button is labeled "Delete Class"
+     and styled to look like a toolbar element.
+    */
+
     this.shadowRoot.innerHTML = `
       <style>
         .toolbar-button {
@@ -594,6 +809,8 @@ class DeleteClassButton extends HTMLElement {
       <button class="toolbar-button">Delete Class</button>
     `;
   }
+  //
+  // end of method
 }
 //
 // end of class
@@ -782,10 +999,27 @@ class LabelButton extends HTMLElement {
       </div>
     `;
   }
-
-  // Add event listeners when hovering over the dropdown button
   //
+  // end of method
+
   addHoverListeners() {
+    /*
+    method: LabelButton::addHoverListeners
+
+    args:
+    None
+
+    returns:
+    None
+
+    description:
+    Adds mouse hover event listeners to both the toolbar button and its associated dropdown menu.
+    When the user hovers over the button, the dropdown becomes visible and the button is highlighted.
+    The dropdown remains open as long as the user is hovering over either the button or the menu.
+    Once the user stops hovering over both, the dropdown is hidden and the button highlight is removed.
+    This method ensures a smooth interaction when transitioning between the button and dropdown.
+    */
+
     // Create the button and dropdown menu reference
     //
     const button = this.shadowRoot.querySelector(".toolbar-button");

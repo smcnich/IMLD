@@ -309,6 +309,8 @@ EventBus.addEventListener("eval", (event) => {
       EventBus.dispatchEvent(new CustomEvent("continue"));
     });
 });
+//
+// end of event listener
 
 EventBus.addEventListener("saveModel", () => {
   EventBus.dispatchEvent(new CustomEvent("suspend"));
@@ -389,6 +391,8 @@ EventBus.addEventListener("saveModel", () => {
     processLog.writeError("Could not save model.");
   }
 });
+//
+// end of event listener
 
 EventBus.addEventListener("setNormalize", (event) => {
   normalize = event.detail.status;
@@ -515,6 +519,8 @@ EventBus.addEventListener("setNormalize", (event) => {
     }
   }
 });
+//
+// end of event listener
 
 EventBus.addEventListener("loadModel", (event) => {
   /*
@@ -972,6 +978,8 @@ EventBus.addEventListener("dataGen", (event) => {
     });
   }
 });
+//
+// end of event listener
 
 EventBus.addEventListener("updateLabels", (event) => {
   /*
@@ -990,6 +998,8 @@ EventBus.addEventListener("updateLabels", (event) => {
   //
   mainToolbar.updateClassList(event.detail.labels);
 });
+//
+// end of event listener
 
 EventBus.addEventListener("addClass", (event) => {
   /*
@@ -1267,6 +1277,8 @@ EventBus.addEventListener("loadData", (event) => {
     EventBus.dispatchEvent(new CustomEvent("continue"));
   }
 });
+//
+// end of event listener
 
 EventBus.addEventListener("saveData", (event) => {
   /*
@@ -1772,6 +1784,8 @@ EventBus.addEventListener("clearPlot", (event) => {
 
   EventBus.dispatchEvent(new CustomEvent("stateChange"));
 });
+//
+// end of event listener
 
 EventBus.addEventListener("suspend", () => {
   /*
@@ -1797,6 +1811,8 @@ EventBus.addEventListener("suspend", () => {
   //
   body.className = "loading";
 });
+//
+// end of event listener
 
 EventBus.addEventListener("continue", () => {
   /*
@@ -1822,6 +1838,8 @@ EventBus.addEventListener("continue", () => {
   //
   body.className = "";
 });
+//
+// end of event listener
 
 // Event listeners that depend on the website being loaded
 // before being triggered
@@ -1830,3 +1848,5 @@ document.addEventListener("DOMContentLoaded", () => {
   trainPlot.initPlot();
   evalPlot.initPlot();
 });
+//
+// end of event listener
