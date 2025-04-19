@@ -334,6 +334,18 @@ class FormContainer extends HTMLElement {
     label.textContent = params.name;
     label.for = key;
 
+    // create an info icon for the input
+    //
+    const info = document.createElement("info-icon");
+    info.title = params.name;
+
+    // create a wrapper to contain both the label and info icon
+    //
+    const labelWrapper = document.createElement("div");
+    labelWrapper.style.display = "flex";
+    labelWrapper.appendChild(label);
+    labelWrapper.appendChild(info);
+
     // create the input field
     //
     const inputDiv = document.createElement("input");
@@ -383,9 +395,9 @@ class FormContainer extends HTMLElement {
     //
     inputDiv.placeholder = placeHolder;
 
-    // add the label and input to the container
+    // add the label wrapper and input to the container
     //
-    container.appendChild(label);
+    container.appendChild(labelWrapper);
     container.appendChild(inputDiv);
 
     // return the container as an HTML string
@@ -430,6 +442,18 @@ class FormContainer extends HTMLElement {
     label.textContent = params.name;
     label.for = key;
 
+    // create an info icon for the input
+    //
+    const info = document.createElement("info-icon");
+    info.title = params.name;
+
+    // create a wrapper to contain both the label and info icon
+    //
+    const labelWrapper = document.createElement("div");
+    labelWrapper.style.display = "flex";
+    labelWrapper.appendChild(label);
+    labelWrapper.appendChild(info);
+
     // create the input field
     //
     const inputDiv = document.createElement("select");
@@ -450,9 +474,9 @@ class FormContainer extends HTMLElement {
       inputDiv.appendChild(opt);
     });
 
-    // append the label and input div to the container
+    // append the label wrapper and input div to the container
     //
-    container.appendChild(label);
+    container.appendChild(labelWrapper);
     container.appendChild(inputDiv);
 
     return container;
@@ -556,6 +580,18 @@ class FormContainer extends HTMLElement {
     label.textContent = params.name;
     label.for = key;
 
+    // create an info icon for the input
+    //
+    const info = document.createElement("info-icon");
+    info.title = params.name;
+
+    // create a wrapper to contain both the label and info icon
+    //
+    const labelWrapper = document.createElement("div");
+    labelWrapper.style.display = "flex";
+    labelWrapper.appendChild(label);
+    labelWrapper.appendChild(info);
+
     // Create a container with label and input grid
     // make sure it has the correct aria label that matches
     // the label
@@ -570,9 +606,9 @@ class FormContainer extends HTMLElement {
     inputDiv.style.gridTemplateColumns = `repeat(${cols}, 1fr)`; // Dynamically set grid columns
     inputDiv.style.gap = "0.5vw"; // Space between inputs
 
-    // append the label and input div to the container
+    // append the label wrapper and input div to the container
     //
-    container.appendChild(label);
+    container.appendChild(labelWrapper);
     container.appendChild(inputDiv);
 
     // return the container that contains the label and the matrix input
@@ -635,6 +671,18 @@ class FormContainer extends HTMLElement {
     label.textContent = params.name;
     label.for = key;
 
+    // create an info icon for the input
+    //
+    const info = document.createElement("info-icon");
+    info.title = params.name;
+
+    // create a wrapper to contain both the label and info icon
+    //
+    const labelWrapper = document.createElement("div");
+    labelWrapper.style.display = "flex";
+    labelWrapper.appendChild(label);
+    labelWrapper.appendChild(info);
+
     // Create a container with label and input grid
     // make sure it has the correct aria label that matches
     // the label
@@ -643,9 +691,9 @@ class FormContainer extends HTMLElement {
     container.className = "class-container";
     container.ariaLabel = key;
 
-    // append the label and input div to the container
+    // append the label wrapper and input div to the container
     //
-    container.appendChild(label);
+    container.appendChild(labelWrapper);
     container.appendChild(inputDiv);
 
     // return the container that contains the label and the matrix input

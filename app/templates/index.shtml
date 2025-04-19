@@ -46,7 +46,7 @@
     <script src="static/components/ProcessLog.js"></script>
     <script type="module" src="static/components/Plot.js"></script>
     <script type="module" src="static/components/AlgoTool.js"></script>
-    <script src="static/components/InfoIcon.js"></script>
+    <script type ="module" src="static/components/InfoIcon.js"></script>
     <script type="module" src="static/components/ToolbarComponents.js"></script>
     <script type="module" src="static/components/DataParams.js"></script>
     <script src="static/components/FormContainer.js"></script>
