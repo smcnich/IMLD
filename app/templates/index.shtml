@@ -103,7 +103,7 @@
           <div class="card plot">
             <div class="card-title-container">
               <h3 class="card-title">Train</h3>
-              <info-icon></info-icon>
+              <info-icon title="Train Plot"></info-icon>
             </div>
             <plot-card plotId="train" id="train-plot"></plot-card>
           </div>
@@ -112,7 +112,7 @@
           <div class="card plot">
             <div class="card-title-container">
               <h3 class="card-title">Eval</h3>
-              <info-icon></info-icon>
+              <info-icon title="Eval Plot"></info-icon>
             </div>
             <plot-card plotId="eval" id="eval-plot"></plot-card>
           </div>
@@ -122,7 +122,7 @@
         <div class="card">
           <div class="card-title-container">
             <h3 class="card-title">Process Log</h3>
-            <info-icon></info-icon>
+            <info-icon title="Process Log"></info-icon>
           </div>
           <process-log id="process-log"></process-log>
         </div>
@@ -134,7 +134,7 @@
         <div class="card" id="alg-card">
           <div class="card-title-container">
             <h3>Algorithms</h3>
-            <info-icon></info-icon>
+            <info-icon title="Algorithms"></info-icon>
           </div>
           <algorithm-toolbar id="algo-tool"></algorithm-toolbar>
         </div>

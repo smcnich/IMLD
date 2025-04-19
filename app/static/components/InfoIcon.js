@@ -38,14 +38,14 @@ class InfoIcon extends HTMLElement {
     //
     this.attachShadow({ mode: "open" });
 
-    // Get the name of the class
+    // Set initial popup status
     //
-    this.name = this.constructor.name;
+    this.isPopupOpen = false;
   }
   //
   // end of method
 
-  async connectedCallback() {
+  connectedCallback() {
     /*
     method: InfoIcon::connectedCallback
 
@@ -60,6 +60,23 @@ class InfoIcon extends HTMLElement {
      It triggers the rendering of the component's HTML and CSS by 
      calling the render() method.
     */
+
+    this.title = this.getAttribute("title");
+
+    switch (this.title) {
+      case "Train Plot":
+        this.description = "This shows a visual representation of the data you've trained your model on. Each point is a data sample, and the colored regions (decision boundaries) show how the model has learned to separate different categories or classes. You can see how the model “understands” the training data.";
+        break;
+      case "Eval Plot":
+        this.description = "This plot shows how well your trained model works on new, unseen data. It's used to test if the model can make accurate predictions outside of what it was trained on. Like the Train Plot, it displays decision boundaries, but using evaluation data instead.";
+        break;
+      case "Process Log":
+        this.description = "This is a step-by-step log of everything happening in the tool. It keeps track of when you create datasets, which algorithms you choose, what parameters you use, and the results of training and evaluation. It's a helpful way to see a summary of your actions and the model's performance.";
+        break;
+      case "Algorithms":
+        this.description = "This is where you pick a machine learning algorithm to use, like Naive Bayes or Principal Components Analysis. Each algorithm has its own settings you can adjust, which control how the model learns from the data. You can experiment with different options to see how they affect the results.";
+        break;
+    }
 
     // Render the component to the webpage
     //
@@ -103,32 +120,43 @@ class InfoIcon extends HTMLElement {
 
         /* Popup window styling */
         .popup {
-          display: none; /* Initially hidden */
+          display: none;
           position: fixed;
           top: 50%;
           left: 50%;
-          transform: translate(-50%, -50%) scale(0); /* Start scaled down */
-          width: 300px;
-          height: 200px; /* Increased height */
-          padding: 20px;
+          transform: translate(-50%, -50%) scale(0);
+          width: 15vw;
+          max-width: 90%;
+          max-height: 80vh;
+          padding: 15px;
+          padding-top: 10px;
+          padding-bottom: 10px;
           background-color: white;
-          border-radius: 15px; /* Rounded corners */
+          border-radius: 15px;
           box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-          z-index: 1000; /* Ensure it's on top */
-          opacity: 0; /* Start fully transparent */
-          transition: opacity 0.1s ease, transform 0.3s ease; /* Transition for opening/closing */
+          z-index: 1000;
+          opacity: 0;
+          transition: opacity 0.1s ease, transform 0.2s ease;
+          overflow: auto;
         }
 
-        /* Class to show popup */
         .popup.show {
-          display: block; /* Show when needed */
-          opacity: 1; /* Fully opaque when shown */
-          transform: translate(-50%, -50%) scale(1); /* Scale to original size */
+          display: block;
+          opacity: 1;
+          transform: translate(-50%, -50%) scale(1);
         }
 
-        /* Top margin for heading */
         .popup h2 {
-          margin: 0 0 20px 0;
+          font-family: 'Inter', sans-serif;
+          font-size: 1.2em;
+          margin: 0 0 8px 0;
+        }
+
+        .popup .description {
+          font-family: 'Inter', sans-serif;
+          font-size: 0.9em;
+          margin: 10px 0 0 0;
+          text-align: justify;
         }
 
         /* Close button styling */
@@ -162,12 +190,14 @@ class InfoIcon extends HTMLElement {
 
       </style>
   
-      <!-- Overlay and Popup -->
+      <!-- Background overlay -->
       <div class="overlay" id="overlay"></div>
+
+      <!-- Popup container -->
       <div class="popup" id="popup">
         <button class="close-btn" id="close-btn">X</button>
-        <h2>Information</h2>
-        <p>This is your popup information!</p>
+        <h2>${this.title}</h2>
+        <div class="description">${this.description}</div>
       </div>
   
       <!-- Info icon within a div for positioning -->
@@ -178,42 +208,120 @@ class InfoIcon extends HTMLElement {
 
     // Access HTML elements within the shadow DOM
     //
-    const infoIcon = this.shadowRoot.getElementById("info-icon"); // Icon for displaying popup
+    const button = this.shadowRoot.getElementById("info-icon"); // Icon for displaying popup
     const popup = this.shadowRoot.getElementById("popup"); // Popup element
-    const overlay = this.shadowRoot.getElementById("overlay"); // Background overlay
     const closeBtn = this.shadowRoot.getElementById("close-btn"); // Close button in popup
 
-    // Event listener to show popup when clicking the info icon
+    // Show the popup when the button is clicked
     //
-    infoIcon.addEventListener("click", () => {
-      popup.classList.add("show"); // Add show class to initiate transition
-      overlay.classList.add("show"); // Add show class to overlay
-      popup.style.display = "block"; // Ensure popup is displayed
-      overlay.style.display = "block"; // Ensure overlay is displayed
+    button.addEventListener("click", (event) => {
+      // Prevent event propagation to avoid unintended behavior
+      //
+      event.stopPropagation();
+
+      // Call togglePopup method to show/hide popup
+      //
+      this.togglePopup();
     });
 
-    // Event listeners to close the popup when clicking close button or overlay
+    // Close the popup when clicking the close button
     //
-    closeBtn.addEventListener("click", closePopup);
-    overlay.addEventListener("click", closePopup);
-
-    // Function to close the popup and overlay
-    //
-    function closePopup() {
-      popup.classList.remove("show"); // Remove show class to initiate transition
-      overlay.classList.remove("show"); // Remove show class from overlay
-
-      // Wait for the transition to end before hiding elements
+    closeBtn.addEventListener("click", (event) => {
+      // Prevent event propagation to avoid conflicts
       //
-      setTimeout(() => {
-        if (!popup.classList.contains("show")) {
-          popup.style.display = "none"; // Hide after transition
-        }
-        if (!overlay.classList.contains("show")) {
-          overlay.style.display = "none"; // Hide overlay after transition
-        }
-      }, 100); // Match the timeout with the CSS transition duration
+      event.stopPropagation();
+
+      // Call closePopup method to hide popup
+      //
+      this.closePopup();
+    });
+
+    // Stop event propagation on popup to avoid closing when clicking inside it
+    //
+    popup.addEventListener("click", (event) => {
+      event.stopPropagation(); // Stop event from bubbling up to parent listeners
+    });
+  }
+  //
+  // end of method
+
+  togglePopup() {
+    /*
+    method: AboutPopup::togglePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Toggles the visibility of the AboutPopup modal and its overlay. If the popup is currently hidden,
+     this method makes it visible; otherwise, it closes the popup by calling `closePopup()`. It also updates
+     the internal `isPopupOpen` state to reflect the current visibility.
+    */
+
+    // Create popup and overlay element
+    //
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
+
+    // Toggle popup state
+    //
+    this.isPopupOpen = !this.isPopupOpen;
+
+    // Show popup and overlap and ensure they are both visible
+    //
+    if (this.isPopupOpen) {
+      popup.classList.add("show");
+      overlay.classList.add("show");
+      popup.style.display = "block";
+      overlay.style.display = "block";
+    } else {
+      // Close popup if already open
+      //
+      this.closePopup();
     }
+  }
+  //
+  // end of method
+
+  closePopup() {
+    /*
+    method: AboutPopup::closePopup
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     Closes the AboutPopup modal and overlay by removing the visible classes and setting their display
+     to "none" after a short delay to allow CSS transitions to complete. Also updates the internal
+     `isPopupOpen` flag to indicate that the popup is closed.
+    */
+
+    // Create popup and overlay element
+    //
+    const popup = this.shadowRoot.getElementById("popup");
+    const overlay = this.shadowRoot.getElementById("overlay");
+
+    // Remove show class from popup and overlay
+    //
+    popup.classList.remove("show");
+    overlay.classList.remove("show");
+
+    // Hide popup and overlay after transition ends
+    //
+    setTimeout(() => {
+      popup.style.display = "none";
+      overlay.style.display = "none";
+    }, 100);
+
+    // Set popup state to closed
+    //
+    this.isPopupOpen = false;
   }
   //
   // end of method
