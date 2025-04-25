@@ -22,6 +22,7 @@ LIST = [
     "RNF",
     "SVM",
     "MLP",
+    "TRANSFORMER",
     "QSVM",
     "QNN",
     "QRBM"
@@ -507,7 +508,7 @@ LIST = [
         [TRANSFORMER.params.early_stopping]
             name = "Earling Stopping"
             type = "select"
-            range = [true, false]
+            options = [true, false]
             default = true
         [TRANSFORMER.params.max_iters]
             name = "Max Iterations"
