@@ -666,7 +666,11 @@ TRANSF_IMPLS = [IMP_NAME_PYTORCH]
 #   'num_layers': 2,
 #   'mlp_dim': 64,
 #   'dropout': 0.1,
-#   'random_state': 27
+#   'random_state': 27,
+#   'tolerance': 0.0001,
+#   'validation_fraction': 0.1,
+#   'early_stopping': True,
+#   'max_iters': 5
 #   }
 #  })
 
