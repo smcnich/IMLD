@@ -22,8 +22,6 @@ LIST = [
     "RNF",
     "SVM",
     "MLP",
-    "RBM",
-    "TRANSFORMER",
     "QSVM",
     "QNN",
     "QRBM"
@@ -561,8 +559,8 @@ LIST = [
             type = "select"
             options = ["full"]
             default = "full"
-        [QSVM.params.kernel_name]
-            name = "Kernel Name"
+        [QSVM.params.kernel]
+            name = "Kernel"
             type = "select"
             options = ["fidelity"]
             default = "fidelity"
@@ -573,7 +571,7 @@ LIST = [
             default = 1024
 
 [QNN]
-    name = "Quantum Nueral Network"
+    name = "Quantum Nueral Network (QNN)"
     [QNN.params]
         [QNN.params.implementation_name]
             name = "Implementation Name"
