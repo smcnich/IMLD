@@ -509,13 +509,13 @@ class MLToolsData:
             if not isinstance(params, dict):
                 raise ValueError("Toroidal parameters must be a dictionary.")
             else:
-                X, y = generate_toroidal(*params)
+                X, y = generate_toroidal(**params)
 
         elif dist_name == YIN_YANG:
             if not isinstance(params, dict):
                 raise ValueError("Yin-Yang parameters must be a dictionary.")
             else:
-                X, y = generate_yin_yang(*params)
+                X, y = generate_yin_yang(**params)
 
         # exit gracefully:
         #  take the data and labels and create a new MLToolsData object

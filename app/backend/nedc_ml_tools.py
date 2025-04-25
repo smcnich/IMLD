@@ -666,7 +666,11 @@ TRANSF_IMPLS = [IMP_NAME_PYTORCH]
 #   'num_layers': 2,
 #   'mlp_dim': 64,
 #   'dropout': 0.1,
-#   'random_state': 27
+#   'random_state': 27,
+#   'tolerance': 0.0001,
+#   'validation_fraction': 0.1,
+#   'early_stopping': True,
+#   'max_iters': 5
 #   }
 #  })
 
@@ -856,7 +860,7 @@ class Alg:
         # attempt to set the name only
         #
         if alg_name in ALGS:
-            self.alg_d = ALGS[alg_name]
+            self.alg_d = ALGS[alg_name]()
 
         # if the algorithm is not set print an error message and exit
         #
@@ -5296,20 +5300,22 @@ class RBM:
         rbm= BernoulliRBM(n_components=n_comp, learning_rate=lr,
                           batch_size=b_size, n_iter=n_iter,
                           verbose=verbose, random_state=random_state)
+
+        self.classifier = ALGS[classifier]()
         
         # set classifier's param_d
         #
-        ALGS[classifier].params_d = self.params_d
+        self.classifier.params_d = self.params_d
         
         # train the classifier model
         #
-        ALGS[classifier].train(data = data, write_train_labels = False,
+        self.classifier.train(data = data, write_train_labels = False,
               fname_train_labels = "train_labels.csv")
         
         self.model_d[ALG_NAME_MDL] = \
             Pipeline(steps = [
                 ('rbm', rbm),
-                ('classifier', ALGS[classifier].model_d[ALG_NAME_MDL])
+                ('classifier', self.classifier.model_d[ALG_NAME_MDL])
             ]).fit(samples, labels)
 
         # prediction
@@ -6365,26 +6371,26 @@ class QRBM:
 
 # define variables to configure the machine learning algorithms
 #
-ALGS = {EUCL_NAME:EUCLIDEAN(),
-        PCA_NAME:PCA(),
-        LDA_NAME:LDA(),
-        QDA_NAME:QDA(),
-        QLDA_NAME:QLDA(),
-        NB_NAME:NB(),
-        GMM_NAME:GMM(),
+ALGS = {EUCL_NAME:EUCLIDEAN,
+        PCA_NAME:PCA,
+        LDA_NAME:LDA,
+        QDA_NAME:QDA,
+        QLDA_NAME:QLDA,
+        NB_NAME:NB,
+        GMM_NAME:GMM,
 
-        KNN_NAME:KNN(),
-        KMEANS_NAME:KMEANS(),
-        RNF_NAME:RNF(),
-        SVM_NAME:SVM(),
+        KNN_NAME:KNN,
+        KMEANS_NAME:KMEANS,
+        RNF_NAME:RNF,
+        SVM_NAME:SVM,
 
-        MLP_NAME:MLP(),
-        RBM_NAME:RBM(),
-        TRANSF_NAME:TRANSFORMER(),
+        MLP_NAME:MLP,
+        RBM_NAME:RBM,
+        TRANSF_NAME:TRANSFORMER,
 
-        QSVM_NAME:QSVM(),
-        QNN_NAME:QNN(),
-        QRBM_NAME:QRBM()}
+        QSVM_NAME:QSVM,
+        QNN_NAME:QNN,
+        QRBM_NAME:QRBM}
 
 #
 # end of file

@@ -24,7 +24,9 @@ LIST = [
     "MLP",
     "RBM",
     "TRANSFORMER",
-    "QSVM"
+    "QSVM",
+    "QNN",
+    "QRBM"
 ]
 
 #------------------------------------------------------------------------------
@@ -494,6 +496,26 @@ LIST = [
             type = "int"
             range = [0, "inf"]
             default = 27
+        [TRANSFORMER.params.tolerance]
+            name = "Tolerance"
+            type = "float"
+            range = [0, 1]
+            default = 0.0001
+        [TRANSFORMER.params.validation_fraction]
+            name = "Validation Fraction"
+            type = "float"
+            range = [0, 1]
+            default = 0.1
+        [TRANSFORMER.params.early_stopping]
+            name = "Earling Stopping"
+            type = "select"
+            range = [true, false]
+            default = true
+        [TRANSFORMER.params.max_iters]
+            name = "Max Iterations"
+            type = "int"
+            range = [0, 100]
+            default = 5
 
 #------------------------------------------------------------------------------
 #
@@ -502,90 +524,156 @@ LIST = [
 #------------------------------------------------------------------------------
 
 [QSVM]
-    name = "Quantum Support Vector Machine (QVSM)"
-    [QVSM.params]
-        [QVSM.params.implementation_name]
+    name = "Quantum Support Vector Machine (QSVM)"
+    [QSVM.params]
+        [QSVM.params.implementation_name]
             name = "Implementation"
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
-        [QVSM.params.provider_name]
+        [QSVM.params.provider_name]
             name = "Provider Name"
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
-        [QVSM.params.hardware]
+        [QSVM.params.hardware]
             name = "Hardware"
             type = "select"
             options = ["cpu"]
             default = "cpu"
-        [QVSM.params.encoder_name]
+        [QSVM.params.encoder_name]
             name = "Encoder Name"
             type = "select"
             options = ["zz"]
             default = "zz"
-        [QVSM.params.n_qubits]
+        [QSVM.params.n_qubits]
             name = "Number of Qubits"
             type = "int"
             range = [2, 4]
             default = 4
-        [QVSM.params.featuremap_reps]
+        [QSVM.params.featuremap_reps]
             name = "Feature Map Repetitions"
             type = "int"
             range = [1, 2]
             default = 2
-        [QVSM.params.entanglement]
+        [QSVM.params.entanglement]
             name = "Entanglement"
             type = "select"
             options = ["full"]
             default = "full"
-        [QVSM.params.kernel_name]
+        [QSVM.params.kernel_name]
             name = "Kernel Name"
             type = "select"
             options = ["fidelity"]
             default = "fidelity"
-        [QVSM.params.shots]
+        [QSVM.params.shots]
             name = "Number of Shots"
             type = "int"
             range = [1, 1024]
             default = 1024
 
-# [QSVM]
-# name = "QSVM"
-# model_name = "qsvm"
-# provider_name = "qiskit"
-# hardware = "cpu"
-# encoder_name = "zz"
-# n_qubits = 4
-# featuremap_reps = 2
-# entanglement = "full"
-# kernel_name = "fidelity"
-# shots = 1024
-
-# [QNN]
-# name = "QNN"
-# model_name = "qnn"
-# provider_name = "qiskit"
-# hardware = "cpu"
-# encoder_name = "zz"
-# n_qubits = 2
-# featuremap_reps = 2
-# ansatz_reps = 2
-# entanglement = "full"
-# ansatz_name = "real_amplitudes"
-# optim_name = "cobyla"
-# optim_max_steps = 50
-# meas_type = "sampler"
-
-# [QRBM]
-# name = "QRBM"
-# model_name = "qrbm"
-# provider_name = "dwave"
-# encoder_name = "bqm"
-# n_hidden = 2
-# shots = 2
-# chain_strength = 2
-# knn_n_neighbors = 2
+[QNN]
+    name = "Quantum Nueral Network"
+    [QNN.params]
+        [QNN.params.implementation_name]
+            name = "Implementation Name"
+            type = "select"
+            options = ["qiskit"]
+            default = "qiskit"
+        [QNN.params.provider_name]
+            name = "Provider Name"
+            type = "select"
+            options = ["qiskit"]
+            default = "qiskit"
+        [QNN.params.hardware]
+            name = "Hardware"
+            type = "select"
+            options = ["cpu", "gpu"]
+            default = "cpu"
+        [QNN.params.encoder_name]
+            name = "Encoder Name"
+            type = "select"
+            options = ["zz"]
+            default = "zz"
+        [QNN.params.n_qubits]
+            name = "Number Qubits"
+            type = "int"
+            range = [2, 4]
+            default = 2
+        [QNN.params.entanglement]
+            name = "Entanglement"
+            type = "select"
+            options = ["full"]
+            default = "full"
+        [QNN.params.featuremap_reps]
+            name = "Feature Map Repetitions"
+            type = "int"
+            range = [1, 2]
+            default = 2
+        [QNN.params.ansatz_reps]
+            name = "Ansatz Repetitions"
+            type = "int"
+            range = [1, 2]
+            default = 2
+        [QNN.params.ansatz_name]
+            name = "Ansatz Name"
+            type = "select"
+            options = ["real_amplitudes"]
+            default = "real_amplitudes"
+        [QNN.params.optim_name]
+            name = "Optimizer Name"
+            type = "select"
+            options = ["cobyla"]
+            default = "cobyla"
+        [QNN.params.optim_max_steps]
+            name = "Optimizer Maximum Steps"
+            type = "int"
+            range = [1, 100]
+            default = 50
+        [QNN.params.meas_type]
+            name = "Measurement Type"
+            type = "select"
+            options = ["sampler"]
+            default = "sampler"
+        
+[QRBM]
+    name = "Quantum Restricted Boltzmann Machine (QRBM)"
+    [QRBM.params]
+        [QRBM.params.implementation_name]
+            name = "Implementation Name"
+            type = "select"
+            options = ["dwave"]
+            default = "dwave"
+        [QRBM.params.provider_name]
+            name = "Provider Name"
+            type = "select"
+            options = ["dwave"]
+            default = "dwave"
+        [QRBM.params.encoder_name]
+            name = "Encoder Name"
+            type = "select"
+            options = ["bqm"]
+            default = "bqm"
+        [QRBM.params.n_hidden]
+            name = "Number Hidden Units"
+            type = "int"
+            range = [1, 2]
+            default = 2
+        [QRBM.params.shots]
+            name = "Number of Shots"
+            type = "int"
+            range = [1, 2]
+            default = 2
+        [QRBM.params.chain_strength]
+            name = "Chain Strength"
+            type = "float"
+            range = [0, 10]
+            default = 2.0
+        [QRBM.params.knn_n_neighbors]
+            name = "KNN Neighbors"
+            type = "int"
+            range = [1, 10]
+            default = 2
 
 #------------------------------------------------------------------------------
 #
