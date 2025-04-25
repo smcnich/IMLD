@@ -1,17 +1,18 @@
-:root{
-    --main-color: #F2F1F1;
-    --secondary-color: #FFFFFF;
-    --complementary-1: #7441BA;
-    --complementary-2: #6C6C6C;
-    --complementary-3: #c9c9c9;
-    --complementary-4: #464646;
+:root {
+  --main-color: #f2f1f1;
+  --secondary-color: #ffffff;
+  --complementary-1: #7441ba;
+  --complementary-2: #6c6c6c;
+  --complementary-3: #c9c9c9;
+  --complementary-4: #464646;
 }
 
 * {
   margin: 0;
 }
 
-html, body{
+html,
+body {
   height: 100%;
   width: 100%;
   overflow: overlay;
@@ -44,12 +45,12 @@ header {
 header h1 {
   color: var(--secondary-color);
   padding-left: 10px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 100;
   font-size: clamp(16px, 2vh, 40px);
 }
 
-header div{
+header div {
   display: flex;
   flex-direction: row;
   padding-right: 30px;
@@ -58,7 +59,7 @@ header div{
 header div h2 {
   padding-right: 30px;
   color: var(--secondary-color);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 100;
   font-size: clamp(16px, 2vh, 40px);
   transition: text-shadow 0.3s ease;
@@ -77,7 +78,8 @@ div {
   align-items: center;
 }
 
-div h1, h2 {
+div h1,
+h2 {
   padding: 10px 10px 10px 10px;
 }
 /* End of Header */
@@ -97,7 +99,7 @@ div h1, h2 {
 .toolbar button {
   background-color: var(--secondary-color);
   color: var(--complementary-4);
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 100;
   font-size: 1.15em;
   padding: 5px 20px 5px 20px;
@@ -113,7 +115,6 @@ div h1, h2 {
   color: var(--complementary-1);
   border-bottom: 2px solid var(--complementary-1);
 }
-
 
 /* end of toolbar */
 
@@ -134,14 +135,21 @@ div h1, h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 95%;
-  margin-left: 1rem; 
+  height: 98%;
+  margin-left: 1rem;
   margin-right: 1rem;
 }
 
 /* style the main (left) column */
 #main-col {
   width: 100%;
+}
+
+#main-col > .plots {
+  height: 70%;
+}
+#main-col > .card {
+  height: 30%; /* process log */
 }
 
 /* style the tool (right) column */
@@ -172,7 +180,7 @@ div h1, h2 {
 }
 
 .card h3 {
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 1.25em;
   color: var(--complementary-2);

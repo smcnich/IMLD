@@ -1,12 +1,23 @@
+# file: .../nedc_imld_tools.py
+#
+# This class enscapulsates functions that call on ML Tools for the IMLD app.
+#------------------------------------------------------------------------------
+
+# import required system modules
+#
 from io import StringIO
 from contextlib import redirect_stdout
 import numpy as np
 from math import floor, ceil
 
+# import required NEDC modules
+#
 import nedc_ml_tools as mlt
 import nedc_ml_tools_data as mltd
 from nedc_file_tools import load_parameters
 
+# create instance for ML Tools Error
+#
 class MLToolsError(Exception):
     def __init__(self, message):
         self.message = message
@@ -15,8 +26,14 @@ class MLToolsError(Exception):
         # return self.message.split(':')[-1].strip().capitalize()
         return self.message
 
+#------------------------------------------------------------------------------
+#
+# functions are listed here
+#
+#------------------------------------------------------------------------------
+
 def check_return(func, *args, **kwargs):
-    '''
+    """
     function: check_return
 
     args:
@@ -37,7 +54,7 @@ def check_return(func, *args, **kwargs):
      return value is valid, return the return value of the function. should
      only really be used when calling ML Tools functions,
      i.e. model.predict(), model.train(), model.score()
-    '''
+    """
 
     # create a string buffer to capture the std output of the function
     #
@@ -64,7 +81,7 @@ def check_return(func, *args, **kwargs):
 # end of function
 
 def create_model(alg_name:str, params=None) -> mlt.Alg:
-    '''
+    """
     function: create_model
 
     args:
@@ -74,8 +91,8 @@ def create_model(alg_name:str, params=None) -> mlt.Alg:
                       [optional]
 
     return:
-     mlt.Alg       : the ML Tools object that was created
-    '''
+     mlt.Alg: the ML Tools object that was created
+    """
 
     # create an instance of a ML Tools algorithm
     #
@@ -102,7 +119,7 @@ def create_model(alg_name:str, params=None) -> mlt.Alg:
 # end of function
 
 def create_data(x:list, y:list, labels:list) -> mltd.MLToolsData:
-    '''
+    """
     function: create_data
 
     args:
@@ -112,7 +129,7 @@ def create_data(x:list, y:list, labels:list) -> mltd.MLToolsData:
 
     return:
      mltd.MLToolsData: the ML Tools data object created
-    '''
+    """
 
     # create a numpy array from the data
     # make sure to stack the x and y data into a single array
@@ -135,6 +152,19 @@ def create_data(x:list, y:list, labels:list) -> mltd.MLToolsData:
 # end of method
 
 def normalize_data(x:list, y:list, xrange:list, yrange:list):
+    """
+    function: normalize_data
+
+    args:
+     x (list): list of x-values to normalize
+     y (list): list of y-values to normalize
+     xrange (list): target range [min, max] for x-values
+     yrange (list): target range [min, max] for y-values
+
+    return:
+     x.list: list representing normalized x values
+     y.list: list representing normalized y values
+    """
 
     # convert x and y to NumPy arrays for math
     #
@@ -160,7 +190,7 @@ def normalize_data(x:list, y:list, xrange:list, yrange:list):
 # end of function
 
 def generate_data(dist_name:str, params:dict):
-    '''
+    """
     function: generate_data
 
     arguments:
@@ -174,7 +204,7 @@ def generate_data(dist_name:str, params:dict):
     
     description:
      generate a MLToolsData object given a distribution name and the parameters
-    '''
+    """
 
     if dist_name == 'gaussian':
 
@@ -228,7 +258,7 @@ def generate_data(dist_name:str, params:dict):
 # end of function
 
 def train(model:mlt.Alg, data:mltd.MLToolsData):
-    '''
+    """
     function: train
 
     args:
@@ -244,7 +274,7 @@ def train(model:mlt.Alg, data:mltd.MLToolsData):
       train a ML Tools model on a given set of data. The data must be in the
       MLToolData class. Return the trained model, a goodness of fit score, a
       the labels generated while calculating the goodness of fit score.    
-    '''
+    """
 
     # train the model
     #
@@ -261,7 +291,7 @@ def train(model:mlt.Alg, data:mltd.MLToolsData):
 # end of function
 
 def predict(model:mlt.Alg, data:mltd.MLToolsData):
-    '''
+    """
     function: predict
 
     args:
@@ -282,7 +312,7 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
      use a ML Tools trained model to predict unseen data. return vectors
      of the labels given to each index of the unseen data, and posterior
      probabilities of each class assignment for each index of the array
-    '''
+    """
 
     # predict the labels of the data
     #
@@ -302,12 +332,13 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
 #
 # end of function
 
-'''
+"""
 TODO: create the wrapper to score the predicted labels compared to the
       actual labels of a dataset. see nedc_ml_tools.py line 1730.
-'''
+"""
+
 def score(model:mlt.Alg, data:mltd.MLToolsData, hyp_labels:list):
-    '''
+    """
     function: score
 
     args:
@@ -329,7 +360,7 @@ def score(model:mlt.Alg, data:mltd.MLToolsData, hyp_labels:list):
      calculate various metrics to that show how well a model performed on unseen data.
      pass it unseen data with the proper labels, the hypothesis labels, and the number 
      of classes. return the performance metrics of the model
-    '''
+    """
 
     # get the number of classes from the data
     # the number of classes is always the greatest amount of
@@ -368,7 +399,7 @@ def score(model:mlt.Alg, data:mltd.MLToolsData, hyp_labels:list):
 # end of function
 
 def load_params(pfile:str) -> dict:
-    '''
+    """
     function: load_params
 
     args:
@@ -379,7 +410,7 @@ def load_params(pfile:str) -> dict:
 
     description:
      load the parameters from a file and return them as a dictionary
-    '''
+    """
 
     # load the algorithm parameters from the file
     #
@@ -397,7 +428,7 @@ def load_params(pfile:str) -> dict:
 
 def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
                               xrange:list=None, yrange:list=None):
-    '''
+    """
     function: generate_decision_surface
 
     args:
@@ -415,7 +446,7 @@ def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
      then create a meshgrid of the data (a grid of points within the bounds).
      then use the model to predict the classification at each point in the
      meshgrid. return the x, y, and z (class) values of the decision surface
-    '''
+    """
 
     # get the raw data from the ML Tools data object
     #

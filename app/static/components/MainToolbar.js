@@ -39,8 +39,7 @@ class MainToolbar extends HTMLElement {
 
     // Create a shadow root for the component
     //
-    this.attachShadow({ mode: 'open' });
-
+    this.attachShadow({ mode: "open" });
   }
   //
   // end of method
@@ -71,26 +70,22 @@ class MainToolbar extends HTMLElement {
     // Add click event listeners to the menu buttons
     //
     this.addHoverEvents();
-    
   }
   //
   // end of method
 
   async loadJSONData() {
     try {
-
       // Fetch the JSON data from the server\
       //
       const response = await fetch(`${baseURL}api/get_data_params/`);
-      const jsonText = await response.json(); 
-      this.jsonData = jsonText; 
-    } 
-    
-    catch (error) {
-      this.jsonData = {};  // Fallback in case of error
+      const jsonText = await response.json();
+      this.jsonData = jsonText;
+    } catch (error) {
+      this.jsonData = {}; // Fallback in case of error
       console.error("Error loading JSON data:", error);
     }
-  }  
+  }
 
   closeAllDropdowns() {
     /*
@@ -110,11 +105,11 @@ class MainToolbar extends HTMLElement {
 
     // Close all dropdowns and remove the 'active' class from all buttons
     //
-    this.shadowRoot.querySelectorAll('.dropdown').forEach(dropdown => {
-        dropdown.style.display = 'none';
+    this.shadowRoot.querySelectorAll(".dropdown").forEach((dropdown) => {
+      dropdown.style.display = "none";
     });
-    this.shadowRoot.querySelectorAll('.menubutton').forEach(button => {
-        button.classList.remove('active');
+    this.shadowRoot.querySelectorAll(".menubutton").forEach((button) => {
+      button.classList.remove("active");
     });
   }
   //
@@ -137,123 +132,139 @@ class MainToolbar extends HTMLElement {
 
     // Select all menu buttons within the component's shadow root
     //
-    const buttons = this.shadowRoot.querySelectorAll('.menubutton');
+    const buttons = this.shadowRoot.querySelectorAll(".menubutton");
 
     // Add hover event listeners to each menu button
     //
-    buttons.forEach(button => {
+    buttons.forEach((button) => {
       const dropdown = button.nextElementSibling;
 
       // Ensure there's a dropdown to work with
       //
       if (dropdown) {
-          // Show dropdown on mouseenter
-          //
-          button.addEventListener('mouseenter', () => {
-              this.closeAllDropdowns(); // Close other dropdowns
-              dropdown.style.display = 'block';
-              button.classList.add('active');
-          });
+        // Show dropdown on mouseenter
+        //
+        button.addEventListener("mouseenter", () => {
+          this.closeAllDropdowns(); // Close other dropdowns
+          dropdown.style.display = "block";
+          button.classList.add("active");
+        });
 
-          // Hide dropdown on mouseleave
+        // Hide dropdown on mouseleave
+        //
+        button.addEventListener("mouseleave", () => {
+          const isAnyPopupOpen = this.isAnyPopupOpen(dropdown);
+          // Only close the dropdown if the popup isn't open
           //
-          button.addEventListener('mouseleave', () => {
-            const isAnyPopupOpen = this.isAnyPopupOpen(dropdown);
-            // Only close the dropdown if the popup isn't open
-            //
-            if (!isAnyPopupOpen) {
-              dropdown.style.display = 'none';
-              button.classList.remove('active');
-            }
-          });
+          if (!isAnyPopupOpen) {
+            dropdown.style.display = "none";
+            button.classList.remove("active");
+          }
+        });
 
-          // Keep dropdown open when hovering over it directly
-          //
-          dropdown.addEventListener('mouseenter', () => {
-              dropdown.style.display = 'block';
-              button.classList.add('active');
-          });
+        // Keep dropdown open when hovering over it directly
+        //
+        dropdown.addEventListener("mouseenter", () => {
+          dropdown.style.display = "block";
+          button.classList.add("active");
+        });
 
-          // Hide dropdown on mouseleave
+        // Hide dropdown on mouseleave
+        //
+        dropdown.addEventListener("mouseleave", () => {
+          const isAnyPopupOpen = this.isAnyPopupOpen(dropdown);
+          // Only close the dropdown if the popup isn't open
           //
-          dropdown.addEventListener('mouseleave', () => {
-            const isAnyPopupOpen = this.isAnyPopupOpen(dropdown);
-            // Only close the dropdown if the popup isn't open
-            //
-            if (!isAnyPopupOpen) {
-              dropdown.style.display = 'none';
-              button.classList.remove('active');
-            }
-          });
+          if (!isAnyPopupOpen) {
+            dropdown.style.display = "none";
+            button.classList.remove("active");
+          }
+        });
       }
     });
   }
+  //
+  // end of method
 
   isAnyPopupOpen(dropdown) {
     /*
     method: MainToolbar::isAnyPopupOpen
 
     args:
-    dropdown (HTMLElement): The dropdown element to check for open popups.
+     dropdown (HTMLElement): The dropdown element to check for open popups.
 
     return:
-    Boolean: True if any popup within the dropdown is open, false otherwise.
+     Boolean: True if any popup within the dropdown is open, false otherwise.
 
     description:
-    This method checks whether any popup elements within the specified dropdown are
-    currently open. It iterates over a predefined list of popup selectors and checks
-    their `isPopupOpen` property.
+     This method checks whether any popup elements within the specified dropdown are
+     currently open. It iterates over a predefined list of popup selectors and checks
+     their `isPopupOpen` property.
     */
 
     // Define a list of all potential popup query selectors
+    //
     const PopupSelectors = [
-      'toolbar-popup-button',
-      'about-popup',
-      'report-popup',
-      'data-popup',
-      'add-class-popup',
+      "toolbar-popup-button",
+      "about-popup",
+      "report-popup",
+      "data-popup",
+      "add-class-popup",
     ];
 
     // Define a list of nested dropdown selectors
+    //
     const nestedDropdownSelectors = [
-      'toolbar-dropdown-settings',  // This can be expanded with more dropdown types      
-      'data-button',
-      'class-button'
+      "toolbar-dropdown-settings", // This can be expanded with more dropdown types
+      "data-button",
+      "class-button",
     ];
 
     // Define a list of nested popup selectors
+    //
     const NestedPopupSelectors = [
-      'toolbar-popup-button',
-      'data-popup',  // Include any other nested popup types as needed
-      'toolbar-set-gaussian',
-      'toolbar-set-ranges'
+      "toolbar-popup-button",
+      "data-popup", // Include any other nested popup types as needed
+      "toolbar-set-gaussian",
+      "toolbar-set-ranges",
     ];
 
     // First, check the popups in the current dropdown
-    const openPopups = dropdown.querySelectorAll(PopupSelectors.join(','));
+    //
+    const openPopups = dropdown.querySelectorAll(PopupSelectors.join(","));
 
     // If any of the popups inside the dropdown are open, return true
-    if (Array.from(openPopups).some(popup => popup.isPopupOpen)) {
+    //
+    if (Array.from(openPopups).some((popup) => popup.isPopupOpen)) {
       return true;
     }
 
     // Check if there are any nested dropdowns inside the current dropdown
-    const nestedDropdowns = dropdown.querySelectorAll(nestedDropdownSelectors.join(','));
+    //
+    const nestedDropdowns = dropdown.querySelectorAll(
+      nestedDropdownSelectors.join(",")
+    );
 
     // If there are nested dropdowns, check each one for open popups
+    //
     for (let nestedDropdown of nestedDropdowns) {
       // For each nested dropdown, check for popups in its shadow DOM
-      const nestedPopups = nestedDropdown.shadowRoot.querySelectorAll(NestedPopupSelectors.join(','));
+      //
+      const nestedPopups = nestedDropdown.shadowRoot.querySelectorAll(
+        NestedPopupSelectors.join(",")
+      );
 
       // If any nested popups are open, return true
-      if (Array.from(nestedPopups).some(popup => popup.isPopupOpen)) {
+      //
+      if (Array.from(nestedPopups).some((popup) => popup.isPopupOpen)) {
         return true;
       }
     }
 
     return false; // No popups are open in the dropdown or its nested dropdowns
-
   }
+  //
+  // end of method
 
   updateClassList(labels) {
     /*
@@ -273,37 +284,38 @@ class MainToolbar extends HTMLElement {
 
     // get the class dropdown object
     //
-    const classDropdown = this.shadowRoot.getElementById('class-dropdown');
+    const classDropdown = this.shadowRoot.getElementById("class-dropdown");
 
     // get the add class button on the dropdown
     // all class buttons are inserted before this button
     //
-    const addClassBtn = classDropdown.querySelector('add-class-popup');
+    const addClassBtn = classDropdown.querySelector("add-class-popup");
 
     // get all class buttons in the dropdown
     //
-    const classButtons = classDropdown.querySelectorAll('class-button')
+    const classButtons = classDropdown.querySelectorAll("class-button");
 
     // clear the class buttons from the dropdown
     //
-    classButtons.forEach(button => {
+    classButtons.forEach((button) => {
       classDropdown.removeChild(button);
-    })
-    
+    });
+
     // for each label, create a new class button
     //
-    labels.forEach(label => {
-
+    labels.forEach((label) => {
       // Create a new class button element
       //
-      const button = document.createElement('class-button');
-      button.setAttribute('label', label.name);
+      const button = document.createElement("class-button");
+      button.setAttribute("label", label.name);
 
       // Insert the button as the first child of classDropdown
       //
       classDropdown.insertBefore(button, addClassBtn);
-    })
+    });
   }
+  //
+  // end of method
 
   getClassDropdowns() {
     /*
@@ -321,11 +333,11 @@ class MainToolbar extends HTMLElement {
 
     // get the class dropdown object
     //
-    const classDropdown = this.shadowRoot.getElementById('class-dropdown');
+    const classDropdown = this.shadowRoot.getElementById("class-dropdown");
 
     // get all class buttons in the dropdown
     //
-    const classButtons = classDropdown.querySelectorAll('class-button')
+    const classButtons = classDropdown.querySelectorAll("class-button");
 
     return classButtons;
   }
@@ -347,13 +359,15 @@ class MainToolbar extends HTMLElement {
       shadow root to what is in the string below.
     */
 
-    const dataButtons = Object.entries(this.jsonData).map(([key, value]) => {
-      const button = document.createElement('data-button');
-      button.setAttribute('label', value.name);
-      button.setAttribute('key', key);
-      button.setAttribute('params', JSON.stringify(value));
-      return button.outerHTML;
-    }).join("");
+    const dataButtons = Object.entries(this.jsonData)
+      .map(([key, value]) => {
+        const button = document.createElement("data-button");
+        button.setAttribute("label", value.name);
+        button.setAttribute("key", key);
+        button.setAttribute("params", JSON.stringify(value));
+        return button.outerHTML;
+      })
+      .join("");
 
     // Set the inner HTML of the shadow root with toolbar structure, menu items, and dropdowns
     //
@@ -494,7 +508,6 @@ class MainToolbar extends HTMLElement {
           <button class="menubutton">Help</button>
           <div class="dropdown">
             <about-popup label="About" version="1.0.0"></about-popup>
-            <toolbar-popup-button label="User Guide"></toolbar-popup-button>
             <report-popup label="Report Issue"></report-popup>
           </div>
         </div>
@@ -503,11 +516,10 @@ class MainToolbar extends HTMLElement {
   }
   //
   // end of method
-
 }
 //
-// end of class 
+// end of class
 
 // Register the custom element
 //
-customElements.define('main-toolbar', MainToolbar);
+customElements.define("main-toolbar", MainToolbar);

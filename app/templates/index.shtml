@@ -8,162 +8,143 @@
 ------------------------------------------------------------------------------>
 
 <html lang="en">
+  <!---------------- define the contents of the html head tag ----------------->
+  <!--                                                                       -->
+  <head>
+    <!-- display the page title -->
+    <!--                        -->
+    <title>IMLD - The ISIP Machine Learning Demo</title>
 
- <!---------------- define the contents of the html head tag ----------------->
- <!--                                                                       -->
- <head>
+    <!-- set up overall window scaling -->
+    <!--                               -->
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- display the page title -->
-  <!--                        -->
-  <title>
-   IMLD - The ISIP Machine Learning Demo
-  </title>
+    <!-- define site information for search engines -->
+    <!--                                            -->
+    <meta name="description" content="Machine Learning Demonstration" />
+    <meta name="author" content="Shane McNicholas" />
+    <meta
+      name="keywords"
+      content="Machine Learning, Big Data, Deep Learning, Pattern Recognition"
+    />
 
-  <!-- set up overall window scaling -->
-  <!--                               -->     
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-  <!-- define site information for search engines -->
-  <!--                                            -->
-  <meta name="description" content="Machine Learning Demonstration">
-  <meta name="author" content="Shane McNicholas">
-  <meta name="keywords"
-   content="Machine Learning, Big Data, Deep Learning, Pattern Recognition">
-    
-  <!-- Load bootstrap -->
-  <!--                -->
-  <link type = "text/css" rel="stylesheet" href="static/index.css">
+    <!-- Load bootstrap -->
+    <!--                -->
+    <link type="text/css" rel="stylesheet" href="static/index.css" />
 
-  <!--Load libraries-->
-  <!--              -->
-  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
+    <!--Load libraries-->
+    <!--              -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
 
-  <!-- Load custom components -->
-  <!--                        -->
-  <script type="module" src="static/components/Events.js"></script>
-  <script src="static/components/ShareBtn.js"></script>
-  <script src="static/components/MainToolbar.js"></script>
-  <script src="static/components/ProcessLog.js"></script>
-  <script type="module" src="static/components/Plot.js"></script>
-  <script type="module" src="static/components/AlgoTool.js"></script>
-  <script src="static/components/InfoIcon.js"></script>
-  <script type="module" src="static/components/ToolbarComponents.js"></script>
-  <script type="module" src="static/components/DataParams.js"></script>
-  <script src="static/components/FormContainer.js"></script>
-  <script src="static/components/HelpComponents.js"></script>
-  <script type="module" src="static/components/ClassesComponents.js"></script>
+    <!-- Load custom components -->
+    <!--                        -->
+    <script type="module" src="static/components/Events.js"></script>
+    <script src="static/components/MainToolbar.js"></script>
+    <script src="static/components/ProcessLog.js"></script>
+    <script type="module" src="static/components/Plot.js"></script>
+    <script type="module" src="static/components/AlgoTool.js"></script>
+    <script type ="module" src="static/components/InfoIcon.js"></script>
+    <script type="module" src="static/components/ToolbarComponents.js"></script>
+    <script type="module" src="static/components/DataParams.js"></script>
+    <script src="static/components/FormContainer.js"></script>
+    <script src="static/components/HelpComponents.js"></script>
+    <script type="module" src="static/components/ClassesComponents.js"></script>
+  </head>
+  <style>
+    @font-face {
+      font-family: "Inter";
+      src: url("static/fonts/Inter_24pt-Regular.ttf") format("ttf");
+    }
+  </style>
 
- </head>
- <style>
-  @font-face {
-   font-family: 'Inter';
-   src: url("static/fonts/Inter_24pt-Regular.ttf") format('ttf');
-  }
- </style>
+  <!------------------------ define the html page body ------------------------>
+  <body>
+    <script>
+      const userID = Date.now().toString();
 
- <!------------------------ define the html page body ------------------------>
- <body>
+      // get the base URL (localhost:5000 or https://isip.piconepress.com)
+      //
+      let baseURL = window.location.origin;
 
-  <script>
+      // get the path of the app from the URL
+      // (/projects/imld/resources/app/ for production
+      // or / for development)
+      //
+      const path = window.location.pathname;
 
-   const userID = Date.now().toString();
+      // Check if the app is in a subdirectory
+      // will be in subdirectory if production
+      // no subdirectory if development
+      //
+      baseURL += `${path}`;
+    </script>
 
-   // get the base URL (localhost:5000 or https://isip.piconepress.com)
-   //
-   let baseURL = window.location.origin;
+    <!---------------------- define the html page header ----------------------->
+    <header>
+      <contact-popup label="The ISIP Machine Learning Demo" link="https://nam10.safelinks.protection.outlook.com/?url=https%3A%2F%2Fisip.piconepress.com%2Fprojects%2Fimld%2F&data=05%7C02%7Cbrianh.thai%40temple.edu%7C24b010294f744d8721c008dd7afe853f%7C716e81efb52244738e3110bd02ccf6e5%7C0%7C0%7C638801955759447843%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=yWwybnAcK7XGKySJh4OdKu8205tnwHOZPdjyOJ1wTsk%3D&reserved=0"></contact-popup>
+      <contact-popup label="Contact" link="https://nam10.safelinks.protection.outlook.com/?url=https%3A%2F%2Fisip.piconepress.com%2Fhtml%2Fcontact.shtml&data=05%7C02%7Cbrianh.thai%40temple.edu%7C1d80208075f74a87f1a508dd7aff13b0%7C716e81efb52244738e3110bd02ccf6e5%7C0%7C0%7C638801958163343415%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=1CkEZdF5%2B%2FauhWuyMwqQI1XKnYmiqcKzojaTV%2ByXHvI%3D&reserved=0"></contact-popup>
+    </header>
 
-   // get the path of the app from the URL 
-   // (/projects/imld/resources/app/ for production 
-   // or / for development)
-   // 
-   const path = window.location.pathname;
-
-   // Check if the app is in a subdirectory
-   // will be in subdirectory if production
-   // no subdirectory if development
-   //
-   baseURL += `${path}`;
-
-  </script>
-
-  <!---------------------- define the html page header ----------------------->
-  <header>
-   <h1>The ISIP Machine Learning Demo</h1>
-   <div>
-    <contact-popup label="Contact"></contact-popup>
-    <share-popup label="Share"></share-popup>
-   </div>
-  </header>
-
-  <!---------------------- define the page toolbar ----------------------->
-  <div class="toolbar">
-    <main-toolbar id="main-toolbar"></main-toolbar>
-  </div>
-
-  <!---------------------- define the main body -------------------->
-  <div class="main">
-
-   <!---------------------- define the main features column -------------------->
-   <div class="col" id="main-col">
-
-    <!---------------------- define a row for the plots -------------------->
-    <div class="plots">
-
-     <!---------------------- define a card for the train plot -------------------->
-     <div class="card plot">
-      <div class="card-title-container"> 
-        <h3 class="card-title">Train</h3>
-        <info-icon></info-icon>
-      </div>
-      <plot-card plotId="train" id="train-plot"></plot-card>
-     </div>    
-
-     <!---------------------- define a card for the eval plot -------------------->
-     <div class="card plot">
-      <div class="card-title-container">
-        <h3 class="card-title">Eval</h3>
-        <info-icon></info-icon>
-      </div>
-      <plot-card plotId="eval" id="eval-plot"></plot-card>
-     </div>
-
-
+    <!---------------------- define the page toolbar ----------------------->
+    <div class="toolbar">
+      <main-toolbar id="main-toolbar"></main-toolbar>
     </div>
 
-    <!---------------------- define a row for the process log -------------------->
-    <div class="card">
-      <div class="card-title-container">
-        <h3 class="card-title">Process Log</h3>
-        <info-icon></info-icon>
+    <!---------------------- define the main body -------------------->
+    <div class="main">
+      <!---------------------- define the main features column -------------------->
+      <div class="col" id="main-col">
+        <!---------------------- define a row for the plots -------------------->
+        <div class="plots">
+          <!---------------------- define a card for the train plot -------------------->
+          <div class="card plot">
+            <div class="card-title-container">
+              <h3 class="card-title">Train</h3>
+              <info-icon title="Train Plot"></info-icon>
+            </div>
+            <plot-card plotId="train" id="train-plot"></plot-card>
+          </div>
+
+          <!---------------------- define a card for the eval plot -------------------->
+          <div class="card plot">
+            <div class="card-title-container">
+              <h3 class="card-title">Eval</h3>
+              <info-icon title="Eval Plot"></info-icon>
+            </div>
+            <plot-card plotId="eval" id="eval-plot"></plot-card>
+          </div>
+        </div>
+
+        <!---------------------- define a row for the process log -------------------->
+        <div class="card">
+          <div class="card-title-container">
+            <h3 class="card-title">Process Log</h3>
+            <info-icon title="Process Log"></info-icon>
+          </div>
+          <process-log id="process-log"></process-log>
+        </div>
       </div>
-      <process-log id="process-log"></process-log>
-    </div>
-   
-   </div>
 
-   <!---------------------- define the algorithm toolbar column -------------------->
-   <div class="col" id="tool-col">
-
-    <!---------------------- define a card for the algorithm toolbar -------------------->
-    <div class="card" id="alg-card">
-     <div class="card-title-container">
-      <h3>Algorithms</h3>
-      <info-icon></info-icon>
-     </div>
-     <algorithm-toolbar id="algo-tool"></algorithm-toolbar>
+      <!---------------------- define the algorithm toolbar column -------------------->
+      <div class="col" id="tool-col">
+        <!---------------------- define a card for the algorithm toolbar -------------------->
+        <div class="card" id="alg-card">
+          <div class="card-title-container">
+            <h3>Algorithms</h3>
+            <info-icon title="Algorithms"></info-icon>
+          </div>
+          <algorithm-toolbar id="algo-tool"></algorithm-toolbar>
+        </div>
+      </div>
     </div>
 
-   </div>
+    <!-- end of body -->
+    <!--             -->
+  </body>
 
-  </div>
-
- <!-- end of body -->
- <!--             -->
- </body>
-
-<!-- end of file -->
-<!--             -->
+  <!-- end of file -->
+  <!--             -->
 </html>
