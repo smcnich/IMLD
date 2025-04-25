@@ -135,7 +135,7 @@ h2 {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 98%;
+  height: 95%;
   margin-left: 1rem;
   margin-right: 1rem;
 }
@@ -143,13 +143,6 @@ h2 {
 /* style the main (left) column */
 #main-col {
   width: 100%;
-}
-
-#main-col > .plots {
-  height: 70%;
-}
-#main-col > .card {
-  height: 30%; /* process log */
 }
 
 /* style the tool (right) column */
