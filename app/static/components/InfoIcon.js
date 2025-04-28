@@ -120,7 +120,7 @@ class InfoIcon extends HTMLElement {
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%) scale(0);
-          width: 15vw;
+          width: 30vw;
           max-width: 90%;
           max-height: 80vh;
           padding: 15px;
