@@ -263,22 +263,35 @@ class AlgoTool extends HTMLElement {
           :host {
             height: 100%;
             width: 100%;
+            overflow: hidden;
           }
 
           .main {
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: start;
             align-items: center;
-            height: 95%;
-            margin-top: 0.2rem;
-            margin-bottom: 0.2rem;
-            margin-left: 1.25rem;
-            margin-right: 1.25rem;
+            margin: 0.2rem 1.25rem;
+            overflow: hidden;
+            flex: 1 1 auto;
+          }
+
+          #button-container {
+            flex: 0 0 auto;
+            padding: 0.2rem;
+            height: 60px;
+            width: 90%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
           }
 
           .algo-select {
-            height: 2.5rem;
+            flex: 0 0 auto;
+            padding: 0.2rem;
+            height: 40px; /* good moderate size */
+            width: 90%; /* not too big, adjust if needed */
+            margin-bottom: 1rem;
             border: 1px solid black;
             border-radius: 5px;
             font-family: 'Inter', sans-serif;
@@ -287,18 +300,18 @@ class AlgoTool extends HTMLElement {
             background-color: var(--main-color);
           }
 
+          #paramBox {
+            flex: 1 1 auto;
+            width: 95%;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 0.2rem;
+          }
+
           option {
             font-family: 'Inter', sans-serif;
             font-size: 1em;
             font-weight: 100;
-          }
-
-          #button-container {
-            display: flex;
-            flex-direction: row;
-            justify-content: center;
-            width: 100%;
-            height: 10%;
           }
 
           button { 
@@ -381,12 +394,6 @@ class AlgoTool extends HTMLElement {
           div.label-container > info-icon {
             margin-top: 4px;
             margin-left: 5px;
-          }
-
-          #paramBox {
-            margin-top: 1em;
-            width: 100%;
-            height: 100%;
           }
         </style>
 
@@ -509,7 +516,7 @@ class AlgoTool extends HTMLElement {
             border-radius: 0.4vw;
             margin: 0.4vh 0.15vw 0.1vw;
             box-sizing: border-box;
-            width: 100%;
+            width: 95%;
           }
 
           /* Label styling for input fields */
@@ -549,6 +556,12 @@ class AlgoTool extends HTMLElement {
             border-color: #7441BA;
             border-width: 2px;
             outline: none;
+          }
+
+          form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
           }
         `;
 

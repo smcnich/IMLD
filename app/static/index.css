@@ -15,8 +15,7 @@ html,
 body {
   height: 100%;
   width: 100%;
-  overflow: overlay;
-  scroll-behavior: smooth;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -120,6 +119,7 @@ h2 {
 
 /* Main Body */
 .main {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: row;
   justify-content: center;
@@ -127,27 +127,34 @@ h2 {
   background-color: var(--main-color);
   height: 100%;
   width: 100%;
+  overflow: hidden;
 }
 
 /* style for each column */
 .col {
+  flex: 1 1 auto;
+  height: 95%;
+  margin: 0 1rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 95%;
-  margin-left: 1rem;
-  margin-right: 1rem;
 }
 
 /* style the main (left) column */
 #main-col {
-  width: 100%;
+  flex: 1 1 auto;
+  height: 95%;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* style the tool (right) column */
 #tool-col {
-  width: 50%;
+  flex: 1 1 auto;
+  height: 95%;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
 }
 
 /* style the plots container */
@@ -182,10 +189,21 @@ h2 {
 
 /* style the algorithm card */
 #alg-card {
-  width: 100%;
+  flex: 1 1 0;
   height: 100%;
-  justify-content: start;
-  align-content: center;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+#algo-tool {
+  flex: 1 1 auto;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 /* style the plot cards */
@@ -218,5 +236,7 @@ div.card-title-container > info-icon {
   height: 50%;
   width: 100%;
 }
+
+
 
 /* end of main body */
