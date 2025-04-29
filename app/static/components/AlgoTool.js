@@ -503,7 +503,8 @@ class AlgoTool extends HTMLElement {
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            width: 100%;
+            align-self: center;
+            width: 95%;
           }
 
           /* Styling for individual input containers */
@@ -574,9 +575,18 @@ class AlgoTool extends HTMLElement {
         // the user needs to create training data before selecting an algorithm
         //
         if (this.form instanceof InvalidLabelsError) {
-          this.processLog.writePlain(
-            `Please create training data before selecting ${this.selectedValue} algorithm`
-          );
+
+          const errorMessage = document.createElement("p");
+          errorMessage.textContent = `Please create training data before selecting ${this.selectedValue} algorithm`;
+          errorMessage.style = `
+            display: flex;
+            color: red;
+            font: 1em 'Inter', sans-serif;
+            justify-content: center;
+            align-items: center;
+            width: 90%;
+          `;
+          paramsContainer.appendChild(errorMessage);
 
           // reset the form
           //
