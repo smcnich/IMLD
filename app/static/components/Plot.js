@@ -357,7 +357,7 @@ class Plot extends HTMLElement {
       },
       margin: {
         t: 10,
-        b: 20,
+        b: 30,
         l: 30,
         r: 10,
       },
@@ -539,7 +539,7 @@ class Plot extends HTMLElement {
     const layout = this.layout;
     layout.margin = {
       t: 10,
-      b: 20,
+      b: 30,
       l: 30,
       r: 10,
     };
