@@ -408,6 +408,7 @@ EventBus.addEventListener("normalize", (event) => {
       plotData: event.detail.plotData,
       xrange: bounds.x,
       yrange: bounds.y,
+      denormalize: event.detail.denormalize,
     }),
   })
 
@@ -459,59 +460,51 @@ EventBus.addEventListener("normalize", (event) => {
 EventBus.addEventListener("setNormalize", (event) => {
   normalize = event.detail.status;
 
-  if (normalize) {
+  let denormalize;
+  if (normalize) { denormalize = false; }
+  else { denormalize = true; }
 
+  if (trainPlot.getData()) {
 
-    if (trainPlot.getData()) {
+    // suspend the application as loading
+    //
+    EventBus.dispatchEvent(new CustomEvent("suspend"));
 
-      // suspend the application as loading
-      //
-      EventBus.dispatchEvent(new CustomEvent("suspend"));
+    // run the normalize event
+    //
+    EventBus.dispatchEvent(new CustomEvent('normalize', {
+      detail: {
+        plotID: "train",
+        plotData: trainPlot.getData(),
+        denormalize: denormalize,
+      },
+    }));
 
-      // run the normalize event
-      //
-      EventBus.dispatchEvent(new CustomEvent("normalize", {
-        detail: {
-          plotID: "train",
-          plotData: trainPlot.getData(),
-        },
-      }));
-
-      // continue the application
-      //
-      EventBus.dispatchEvent(new CustomEvent("continue"));
-    }
-
-    if (evalPlot.getData()) {
-
-      // suspend the application as loading
-      //
-      EventBus.dispatchEvent(new CustomEvent("suspend"));
-
-      // run the normalize event
-      //
-      EventBus.dispatchEvent(new CustomEvent("normalize", {
-        detail: {
-          plotID: "eval",
-          plotData: evalPlot.getData(),
-        },
-      }));
-
-      // continue the application
-      //
-      EventBus.dispatchEvent(new CustomEvent("continue"));
-    } 
+    // continue the application
+    //
+    EventBus.dispatchEvent(new CustomEvent("continue"));
   }
-  
-  else {
-    if (normalizeCache.train) {
-      trainPlot.plot(normalizeCache.train, labelManager);
-    }
 
-    if (normalizeCache.eval) {
-      evalPlot.plot(normalizeCache.eval, labelManager);
-    }
-  }
+  if (evalPlot.getData()) {
+
+    // suspend the application as loading
+    //
+    EventBus.dispatchEvent(new CustomEvent("suspend"));
+
+    // run the normalize event
+    //
+    EventBus.dispatchEvent(new CustomEvent('normalize', {
+      detail: {
+        plotID: "eval",
+        plotData: evalPlot.getData(),
+        denormalize: denormalize,
+      },
+    }));
+
+    // continue the application
+    //
+    EventBus.dispatchEvent(new CustomEvent("continue"));
+  } 
 });
 //
 // end of event listener
@@ -585,7 +578,9 @@ EventBus.addEventListener("loadModel", (event) => {
         .then((response) => {
           if (response.ok) {
             return response.json();
-          } else {
+          } 
+          
+          else {
             return response.json().then((errorData) => {
               EventBus.dispatchEvent(new CustomEvent("continue"));
               processLog.writeError(errorData);
@@ -896,7 +891,8 @@ EventBus.addEventListener("dataGen", (event) => {
       .then((response) => {
         if (response.ok) {
           return response.json();
-        } else {
+        } 
+        else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
             processLog.writeError(errorData);
@@ -929,15 +925,6 @@ EventBus.addEventListener("dataGen", (event) => {
         }
 
         if (normalize) {
-
-          // save the un-normalized data to the cache
-          //
-          if (event.detail.plotID == "train") {
-            normalizeCache.train = data;
-          }
-          else if (event.detail.plotID == "eval") {
-            normalizeCache.eval = data;
-          }
         
           // normalize the generated data
           //
@@ -945,6 +932,7 @@ EventBus.addEventListener("dataGen", (event) => {
             detail: {
               plotID: event.detail.plotID,
               plotData: data,
+              denormalize: false
             },
           }));
         }
@@ -1598,6 +1586,29 @@ EventBus.addEventListener("setRanges", (event) => {
     return;
   }
 
+  // if the data is normalized, denormalize before changing bounds
+  //
+  if (normalize) {
+    if (trainPlot.getData()) {
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "train",
+          plotData: trainPlot.getData(),
+          denormalize: true,
+        },
+      }));
+    }
+    if (evalPlot.getData()) {
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "eval",
+          plotData: evalPlot.getData(),
+          denormalize: true,
+        },
+      }));
+    }
+  }
+
   // set the bounds to the global var
   //
   bounds.x = x;
@@ -1608,50 +1619,27 @@ EventBus.addEventListener("setRanges", (event) => {
   trainPlot.setBounds(bounds.x, bounds.y);
   evalPlot.setBounds(bounds.x, bounds.y);
 
-  // if the data is normalized, renormalize for the new bounds
+  // if the data is supposed to be normalized,
+  // renomalize the data to the new bounds
   //
   if (normalize) {
-
     if (trainPlot.getData()) {
-
-      console.log('normalizing train')
-
-      // suspend the application as loading
-      //
-      EventBus.dispatchEvent(new CustomEvent("suspend"));
-
-      // run the normalize event
-      //
       EventBus.dispatchEvent(new CustomEvent("normalize", {
         detail: {
           plotID: "train",
-          plotData: normalizeCache.train,
+          plotData: trainPlot.getData(),
+          denormalize: false,
         },
       }));
-
-      // continue the application
-      //
-      EventBus.dispatchEvent(new CustomEvent("continue"));
     }
-
     if (evalPlot.getData()) {
-
-      // suspend the application as loading
-      //
-      EventBus.dispatchEvent(new CustomEvent("suspend"));
-
-      // run the normalize event
-      //
       EventBus.dispatchEvent(new CustomEvent("normalize", {
         detail: {
           plotID: "eval",
-          plotData: normalizeCache.eval,
+          plotData: evalPlot.getData(),
+          denormalize: false,
         },
       }));
-
-      // continue the application
-      //
-      EventBus.dispatchEvent(new CustomEvent("continue"));
     } 
   }
 

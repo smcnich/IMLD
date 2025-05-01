@@ -189,6 +189,42 @@ def normalize_data(x:list, y:list, xrange:list, yrange:list):
 #
 # end of function
 
+def denormalize_data(x: list, y: list, xrange: list, yrange: list):
+    """
+    function: denormalize_data
+
+    args:
+     x (list): list of normalized x-values
+     y (list): list of normalized y-values
+     xrange (list): original range [min, max] for x-values
+     yrange (list): original range [min, max] for y-values
+
+    return:
+     x.list: list representing denormalized x values
+     y.list: list representing denormalized y values
+    """
+
+    # convert x and y to NumPy arrays for math
+    #
+    x = np.array(x)
+    y = np.array(y)
+
+    # get the x and y bounds of the original data
+    #
+    x_min, x_max = xrange
+    y_min, y_max = yrange
+
+    # denormalize the data from the range [-1, 1]
+    #
+    x = ((x - x_min) / (x_max - x_min)) * (1 - (-1)) + (-1)
+    y = ((y - y_min) / (y_max - y_min)) * (1 - (-1)) + (-1)
+
+    # exit gracefully
+    #
+    return x.tolist(), y.tolist()
+#
+# end of function
+
 def generate_data(dist_name:str, params:dict):
     """
     function: generate_data
