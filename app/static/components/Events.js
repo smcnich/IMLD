@@ -506,12 +506,10 @@ EventBus.addEventListener("setNormalize", (event) => {
   else {
     if (normalizeCache.train) {
       trainPlot.plot(normalizeCache.train, labelManager);
-      normalizeCache.train = null;
     }
 
     if (normalizeCache.eval) {
       evalPlot.plot(normalizeCache.eval, labelManager);
-      normalizeCache.eval = null;
     }
   }
 });
