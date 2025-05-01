@@ -716,7 +716,7 @@ class Toolbar_DropdownSettings extends HTMLElement {
         <div class="dropdown-menu" id="dropdown-menu">
           <toolbar-set-ranges label="Set Ranges"></toolbar-set-ranges>
           <toolbar-set-gaussian label="Set Gaussian"></toolbar-set-gaussian>
-          <!-- <toolbar-checkbox-button label="Normalize Data"></toolbar-checkbox-button> -->
+          <toolbar-normalize label="Normalize Data"></toolbar-normalize>
         </div>
       </div>
     `;
@@ -2346,97 +2346,87 @@ class Toolbar_SetRanges extends HTMLElement {
 // end of class
 
 class Toolbar_Normalize extends HTMLElement {
-  /*
-  class: Toolbar_Normalize 
-
-  description:
-    This class defines a toolbar button with a checkbox that allows the user to toggle a normalization state.
-    The button updates the checkbox state when clicked and dispatches a custom event, `setNormalize`, to notify
-    other parts of the application about the normalization status. The class also handles click events to close the 
-    button when the user clicks outside of it.
-  */
-
   constructor() {
     /*
-    method: Toolbar_Normalize::constructor
+    method: DrawCheckBox::constructor
 
     args:
-      None
+     None
 
     returns:
-      Toolbar_Normalize instance
+     DrawCheckBox instance
 
     description:
-      This is the constructor for the Toolbar_Normalize class. It is called when a new instance of the class is created.
-      The constructor initializes the component by attaching a shadow DOM, and it sets the initial states for the checkbox
-      (`checked`) and the open status (`isOpen`).
+     Initializes the DrawCheckBox component by attaching a shadow DOM and setting default states
+     for `checked` and `isOpen`, which track the checkbox status and open/closed state of the button.
     */
 
+    // Call the parent constructor
+    //
     super();
+
+    // Create a shadow root for the component
+    //
     this.attachShadow({ mode: "open" });
-    this.checked = false; // Initial state of the checkbox
-    this.isOpen = false; // Track if the button is open
+
+    // Create variable to hold state of checkbox and button
+    //
+    this.checked = false;
+    this.isOpen = false;
   }
   //
   // end of method
 
   connectedCallback() {
     /*
-    method: Toolbar_Normalize::connectedCallback
+    method: DrawCheckBox::connectedCallback
 
     args:
-      None
+     None
 
     returns:
-      None
+     None
 
     description:
-      This method is called when the element is added to the document's DOM. It renders the component's UI and sets up a 
-      global click event listener to handle clicks outside of the toolbar button to close the button if it is open.
+     Lifecycle method called when the component is added to the DOM. It renders the component's structure
+     and sets up a global click listener to detect and handle clicks outside the component.
     */
 
+    // Render the initial state
+    //
     this.render();
-    document.addEventListener("click", this.handleDocumentClick.bind(this)); // Add global click listener
+
+    // Add global click listener
+    //
+    document.addEventListener("click", this.handleDocumentClick.bind(this));
   }
   //
   // end of method
 
   disconnectedCallback() {
     /*
-    method: Toolbar_Normalize::disconnectedCallback
+    method: DrawCheckBox::disconnectedCallback
 
     args:
-      None
+     None
 
     returns:
-      None
+     None
 
     description:
-      This method is called when the element is removed from the document's DOM. It removes the global click event listener 
-      to avoid memory leaks or unnecessary listeners after the element is detached.
+     Lifecycle method called when the component is removed from the DOM. Cleans up the global event
+     listener to prevent memory leaks.
     */
+
+    // Remove the global event listener
+    //
     document.removeEventListener("click", this.handleDocumentClick.bind(this)); // Clean up the listener
   }
   //
   // end of method
 
   render() {
-    /*
-    method: Toolbar_Normalize::render
-
-    args:
-      None
-
-    returns:
-      None
-
-    description:
-      This method renders the toolbar button with the checkbox and its label into the shadow DOM. It also adds a click 
-      event listener to the button to toggle the checkbox's checked state and dispatch a custom event with the updated 
-      normalization status.
-    */
-
-    const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
+    const label = this.getAttribute("label") || "Button";
 
     this.shadowRoot.innerHTML = `
       <style>
@@ -2446,14 +2436,14 @@ class Toolbar_Normalize extends HTMLElement {
           font-family: 'Inter', sans-serif;
           font-weight: 100;
           font-size: 1em;
-          padding: 5px 0; /* Remove left padding, keep top/bottom padding */
+          padding: 5px 0;
           border: none;
           cursor: pointer;
           min-width: 220px;
           white-space: nowrap;
           text-align: left;
-          display: flex; /* Use flexbox for alignment */
-          align-items: center; /* Center align items vertically */
+          display: flex;
+          align-items: center;
         }
 
         .toolbar-checkbox-button:hover {
@@ -2461,55 +2451,70 @@ class Toolbar_Normalize extends HTMLElement {
         }
 
         input[type="checkbox"] {
-          margin-right: 7px; /* Space between checkbox and label */
+          margin-right: 7px;
           margin-left: 10px;
         }
       </style>
 
       <button class="toolbar-checkbox-button" id="checkboxButton">
-        <input type="checkbox" id="checkbox" ?checked="${this.checked}" />
+        <input type="checkbox" id="checkbox" />
         ${label}
       </button>
     `;
 
-    // Add click event listener to toggle checkbox and button state
-    //
     const button = this.shadowRoot.querySelector("#checkboxButton");
     const checkbox = this.shadowRoot.querySelector("#checkbox");
 
-    button.addEventListener("click", (event) => {
-      event.stopPropagation(); // Prevent event from bubbling up
-      this.checked = !this.checked; // Toggle the checked state
-      checkbox.checked = this.checked; // Update the checkbox state
-      this.isOpen = true; // Mark the button as open
 
-      // dispatch a custom event with the checkbox state
+    button.onclick = (event) => {
+
+      // Prevent event from bubbling up
       //
-      EventBus.dispatchEvent(
-        new CustomEvent("setNormalize", {
-          detail: {
-            status: this.checked,
-          },
-        })
-      );
-    });
+      event.stopPropagation();
+
+      if (this.checked) {
+        this.checked = false;
+        checkbox.checked = false;
+        this.isOpen = false;
+
+        EventBus.dispatchEvent(
+          new CustomEvent("setNormalize", {
+            detail: {
+              status: this.checked,
+            },
+          })
+        );
+      } 
+      
+      else {
+        this.checked = true;
+        checkbox.checked = true;
+        this.isOpen = true;
+
+        EventBus.dispatchEvent(
+          new CustomEvent("setNormalize", {
+            detail: {
+              status: this.checked,
+            },
+          })
+        );
+      }
+    };
   }
-  //
-  // end of method
 
   handleDocumentClick(event) {
     /*
-    method: Toolbar_Normalize::handleDocumentClick
+    method: DrawCheckBox::handleDocumentClick
 
     args:
-      event (Event): The click event that occurred in the document.
+     event (Event): The global click event to evaluate
 
     returns:
-      None
+     None
 
     description:
-      This method handles the global click event to check if the user clicked outside the toolbar button. If the button is
-      open and the click is outside, it closes the button by resetting the `isOpen` state.
+     Handles global document clicks to determine if the user clicked outside the component. 
+     If so, and the component is open, it updates internal state to reflect the closed state.
     */
     const button = this.shadowRoot.querySelector("#checkboxButton");
 

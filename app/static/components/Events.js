@@ -395,120 +395,115 @@ EventBus.addEventListener("saveModel", () => {
 //
 // end of event listener
 
+EventBus.addEventListener("normalize", (event) => {
+
+  // send the data to the server and get the response
+  //
+  fetch(NORMALIZE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      plotData: event.detail.plotData,
+      xrange: bounds.x,
+      yrange: bounds.y,
+    }),
+  })
+
+  // parse the response
+  //
+  .then((response) => {
+
+    // if the response is ok, return the json
+    //
+    if (response.ok) {
+      return response.json();
+    }
+
+    // otherwise, throw an error
+    //
+    else {
+      return response.json().then((errorData) => {
+        EventBus.dispatchEvent(new CustomEvent("continue"));
+        processLog.writeError(errorData);
+        throw new Error(errorData);
+      });
+    }
+  })
+
+  // get the data from the response
+  //
+  .then((data) => {
+
+    // set the bounds for the plot
+    //
+    if (event.detail.plotID == "train") {
+      trainPlot.plot(data, labelManager);
+    }
+    else if (event.detail.plotID == "eval") {
+      evalPlot.plot(data, labelManager);
+    }
+
+    // state change if decision surfaces were present
+    //
+    EventBus.dispatchEvent(new CustomEvent("stateChange"));
+
+    // continue the application
+    //
+    EventBus.dispatchEvent(new CustomEvent("continue"));
+  });
+
+});
+
 EventBus.addEventListener("setNormalize", (event) => {
   normalize = event.detail.status;
 
-  console.log(normalize);
-
   if (normalize) {
-    const trainData = trainPlot.getData();
-    if (trainData) {
+
+
+    if (trainPlot.getData()) {
+
       // suspend the application as loading
       //
       EventBus.dispatchEvent(new CustomEvent("suspend"));
 
-      // send the data to the server and get the response
+      // run the normalize event
       //
-      fetch(NORMALIZE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "train",
+          plotData: trainPlot.getData(),
         },
-        body: JSON.stringify({
-          plotData: trainData,
-        }),
-      })
-        // parse the response
-        //
-        .then((response) => {
-          // if the response is ok, return the json
-          //
-          if (response.ok) {
-            return response.json();
-          }
+      }));
 
-          // otherwise, throw an error
-          //
-          else {
-            return response.json().then((errorData) => {
-              EventBus.dispatchEvent(new CustomEvent("continue"));
-              processLog.writeError(errorData);
-              throw new Error(errorData);
-            });
-          }
-        })
-
-        // get the data from the response
-        //
-        .then((data) => {
-          // set the bounds for the plot
-          //
-          trainPlot.plot(data, labelManager);
-
-          // save the unnoramlized data to the cache
-          //
-          normalizeCache.train = trainData;
-
-          // continue the application
-          //
-          EventBus.dispatchEvent(new CustomEvent("continue"));
-        });
+      // continue the application
+      //
+      EventBus.dispatchEvent(new CustomEvent("continue"));
     }
 
-    const evalData = evalPlot.getData();
-    if (evalData) {
+    if (evalPlot.getData()) {
+
       // suspend the application as loading
       //
       EventBus.dispatchEvent(new CustomEvent("suspend"));
 
-      // send the data to the server and get the response
+      // run the normalize event
       //
-      fetch(NORMALIZE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "eval",
+          plotData: evalPlot.getData(),
         },
-        body: JSON.stringify({
-          plotData: evalData,
-        }),
-      })
-        // parse the response
-        //
-        .then((response) => {
-          // if the response is ok, return the json
-          //
-          if (response.ok) {
-            return response.json();
-          }
+      }));
 
-          // otherwise, throw an error
-          //
-          else {
-            return response.json().then((errorData) => {
-              EventBus.dispatchEvent(new CustomEvent("continue"));
-              processLog.writeError(errorData);
-              throw new Error(errorData);
-            });
-          }
-        })
-
-        // get the data from the response
-        //
-        .then((data) => {
-          // set the bounds for the plot
-          //
-          evalPlot.plot(data, labelManager);
-
-          // save the unnoramlized data to the cache
-          //
-          normalizeCache.eval = evalData;
-
-          // continue the application
-          //
-          EventBus.dispatchEvent(new CustomEvent("continue"));
-        });
-    }
-  } else {
+      // continue the application
+      //
+      EventBus.dispatchEvent(new CustomEvent("continue"));
+    } 
+  }
+  
+  else {
     if (normalizeCache.train) {
       trainPlot.plot(normalizeCache.train, labelManager);
       normalizeCache.train = null;
@@ -874,7 +869,7 @@ EventBus.addEventListener("dataGen", (event) => {
 
   // get the plot that the data is being generated for
   //
-  let plot;
+  let plot
   if (event.detail.plotID == "train") {
     plot = trainPlot;
   } else if (event.detail.plotID == "eval") {
@@ -895,10 +890,7 @@ EventBus.addEventListener("dataGen", (event) => {
       },
       body: JSON.stringify({
         method: event.detail.method,
-        params: event.detail.params,
-        normalize: normalize,
-        xrange: bounds.x,
-        yrange: bounds.y,
+        params: event.detail.params
       }),
     })
       // parse the response
@@ -938,12 +930,32 @@ EventBus.addEventListener("dataGen", (event) => {
           }
         }
 
+        if (normalize) {
+
+          // save the un-normalized data to the cache
+          //
+          if (event.detail.plotID == "train") {
+            normalizeCache.train = data;
+          }
+          else if (event.detail.plotID == "eval") {
+            normalizeCache.eval = data;
+          }
+        
+          // normalize the generated data
+          //
+          EventBus.dispatchEvent(new CustomEvent("normalize", {
+            detail: {
+              plotID: event.detail.plotID,
+              plotData: data,
+            },
+          }));
+        }
+
         // plot the response data on the plot
         //
-        plot.plot(data, labelManager);
-
-        // update plot shape name
-        // plot.updateShapeName(event.detail.name);
+        else {
+          plot.plot(data, labelManager);
+        }
 
         // Add a full-width separator
         processLog.addFullWidthSeparator();
@@ -970,9 +982,11 @@ EventBus.addEventListener("dataGen", (event) => {
         //
         EventBus.dispatchEvent(new CustomEvent("continue"));
       });
-  } catch {
-    // catch any errors and continue the application
-    //
+  } 
+  
+  // catch any errors and continue the application
+  //
+  catch {
     return response.json().then((errorData) => {
       EventBus.dispatchEvent(new CustomEvent("continue"));
       processLog.writeError(errorData);
@@ -1596,9 +1610,57 @@ EventBus.addEventListener("setRanges", (event) => {
   trainPlot.setBounds(bounds.x, bounds.y);
   evalPlot.setBounds(bounds.x, bounds.y);
 
+  // if the data is normalized, renormalize for the new bounds
+  //
+  if (normalize) {
+
+    if (trainPlot.getData()) {
+
+      console.log('normalizing train')
+
+      // suspend the application as loading
+      //
+      EventBus.dispatchEvent(new CustomEvent("suspend"));
+
+      // run the normalize event
+      //
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "train",
+          plotData: normalizeCache.train,
+        },
+      }));
+
+      // continue the application
+      //
+      EventBus.dispatchEvent(new CustomEvent("continue"));
+    }
+
+    if (evalPlot.getData()) {
+
+      // suspend the application as loading
+      //
+      EventBus.dispatchEvent(new CustomEvent("suspend"));
+
+      // run the normalize event
+      //
+      EventBus.dispatchEvent(new CustomEvent("normalize", {
+        detail: {
+          plotID: "eval",
+          plotData: normalizeCache.eval,
+        },
+      }));
+
+      // continue the application
+      //
+      EventBus.dispatchEvent(new CustomEvent("continue"));
+    } 
+  }
+
   // if the decision surface is already plotted, update the plot
   //
   if (trainPlot.getDecisionSurface() || evalPlot.getDecisionSurface()) {
+
     // suspend the application as loading
     //
     EventBus.dispatchEvent(new CustomEvent("suspend"));

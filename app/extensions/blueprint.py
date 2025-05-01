@@ -585,6 +585,57 @@ def rebound():
 #
 # end of method
     
+@main.route('/api/normalize/', methods=['POST'])
+def normalize():
+    '''
+    method: normalize
+
+    arguments:
+     None (input comes from POST request)
+
+    return:
+     JSON response containing normalized x and y values
+
+    description:
+     Accepts x and y values from the frontend, normalizes them to a specified
+     range, and returns the normalized x and y values. 
+    '''
+
+    try:
+
+        # get the data from the request
+        #
+        data = request.get_json()
+
+        # get the data
+        #
+        x = data['plotData']['x']
+        y = data['plotData']['y']
+        labels = data['plotData']['labels']
+        xrange = data['xrange']
+        yrange = data['yrange']
+
+        # normalize the data
+        #
+        x, y = imld.normalize_data(x, y, xrange, yrange)
+
+        # prepare the response data
+        #
+        response_data = {
+            "labels": labels,
+            "x": x,
+            "y": y
+        }
+            
+        # return the response in JSON format
+        #
+        return jsonify(response_data)
+    
+    # handle any exceptions and return an error message
+    #    
+    except Exception as e:
+        return jsonify(f'Failed to normalize data: {str(e)}'), 500
+
 @main.route('/api/data_gen/', methods=['POST'])
 def data_gen():
     """
@@ -610,22 +661,12 @@ def data_gen():
     if data:
         dist_name = data['method']
         paramsDict = data['params']
-        normalize = data['normalize']
-
-        if normalize:
-            xrange = data['xrange']
-            yrange = data['yrange']
 
     try:
 
         # generate values for labels, x, y
         #
         labels, x, y = imld.generate_data(dist_name, paramsDict)
-
-        # normalize the data if requested
-        #
-        if normalize:
-            x, y = imld.normalize_data(x, y, xrange, yrange)
 
         # Prepare the response data
         #
