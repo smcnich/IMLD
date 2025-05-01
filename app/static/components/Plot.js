@@ -62,6 +62,46 @@ class Plot extends HTMLElement {
     //
     this.innerHTML = `
       <style>
+
+        :host {
+          display: block;
+          height: 100%;  /* or whatever sizing you want externally */
+        }
+
+        .container {
+          display: flex;
+          flex-direction: column;
+          height: 100%;
+          width: 100%;
+        }
+
+        #legend {
+          width: 100%;
+          height: 50px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        #legend h3 {
+          flex: 1;
+          font-size: 0.8em;
+          padding: 0;
+        }
+
+        #legend-container {
+          flex: 1;
+          display: flex;
+          flex-direction: row;
+        }
+
+        .legend-item {
+          font-size: 0.8em;
+          font-family: "Inter", sans-serif;
+          font-weight: 700;
+          padding: 0 5px 0 5px;
+        }
+  
         .js-plotly-plot .plotly .cursor-crosshair {
           cursor: default;
         }
@@ -72,7 +112,14 @@ class Plot extends HTMLElement {
         }
       </style>
 
-      <div id="plot"></div>
+      <div class="container">
+        <div id="plot"></div>
+        <div id="legend">
+          <h3>Legend</h3>
+          <div id="legend-container">
+          </div>
+        </div>
+      </div>
     `;
   }
   //
@@ -109,14 +156,25 @@ class Plot extends HTMLElement {
     this.data = null;
     this.ShapeName = null;
 
-    // Event listener for resizing the plot
+    // event listener for resizing the plot
     //
     window.addEventListener("resize", () => {
-      const update = {
-        width: this.parentElement.clientWidth - 50,
-        height: this.parentElement.clientHeight - 50,
-      };
-      Plotly.relayout(this.plotDiv, update);
+
+      // get the parent element of the plot div and remove 100 from the
+      // vertical size to leave room for the legend
+      //
+      this.plotDiv.style.height = `${this.parentElement.clientHeight - 100}px`;
+
+      // set the width of the plot div to be 31% of the window width
+      // this is done because the parentElement width would not shrink for
+      // some reason. instead base the size on the window width
+      //
+      this.plotDiv.style.width = `${window.innerWidth*0.31}px`;
+
+      // apply the changes
+      //
+      Plotly.Plots.resize(this.plotDiv);
+
     });
   }
   //
@@ -276,9 +334,9 @@ class Plot extends HTMLElement {
         "autoScale2d",
         "hoverCompareCartesian",
       ],
-      responsive: true,
       showLink: false,
       cursor: "pointer",
+      responsive: false,
     };
 
     // Set layout data for Plotly
@@ -286,6 +344,7 @@ class Plot extends HTMLElement {
     this.layout = {
       autosize: true,
       dragmode: false,
+      showlegend: false,
       xaxis: {
         zeroline: false,
         showline: true,
@@ -296,27 +355,51 @@ class Plot extends HTMLElement {
         showline: true,
         range: [-1, 1],
       },
-      legend: {
-        x: 0.5,
-        y: -0.3,
-        xanchor: "center",
-        yanchor: "bottom",
-        orientation: "h",
-      },
       margin: {
         t: 10,
-        b: 10,
-        l: 40,
+        b: 20,
+        l: 30,
         r: 10,
       },
-      width: this.parentElement.clientWidth - 50,
-      height: this.parentElement.clientHeight - 50,
     };
 
     this.plot_empty();
   }
   //
   // end of method
+
+  createLegend() {
+    /*
+    method: Plot::createLegend
+
+    args:
+     None
+
+    return:
+     None
+
+    description:
+     This method creates a legend for the plot using the data provided.
+    */
+
+    // Get the legend container element
+    //
+    const legendContainer = this.querySelector("#legend-container");
+
+    // Clear any existing legend items
+    //
+    legendContainer.innerHTML = "";
+
+    // Create a new legend item for each label in the plot data
+    //
+    this.plotData.forEach((trace) => {
+      const legendItem = document.createElement("div");
+      legendItem.classList.add("legend-item");
+      legendItem.style.color = trace.marker.color;
+      legendItem.innerText = trace.name;
+      legendContainer.appendChild(legendItem);
+    });
+  }
 
   getDecisionSurface() {
     /*
@@ -456,10 +539,13 @@ class Plot extends HTMLElement {
     const layout = this.layout;
     layout.margin = {
       t: 10,
-      b: 62,
-      l: 40,
+      b: 20,
+      l: 30,
       r: 10,
     };
+
+    this.plotDiv.style.height = `${this.parentElement.clientHeight - 100}px`;
+    this.plotDiv.style.width = `${window.innerWidth*0.31}px`;
 
     // Create the empty plot
     //
@@ -521,6 +607,10 @@ class Plot extends HTMLElement {
     // Create the plot with data
     //
     Plotly.newPlot(plotDiv, this.plotData, this.layout, this.config);
+
+    // create the legend for the plot
+    //
+    this.createLegend();
 
     // dispatch an event to the algoTool to update the plot status
     // of the current plot. this will effect which buttons are enabled

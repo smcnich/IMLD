@@ -119,7 +119,7 @@
         </div>
 
         <!---------------------- define a row for the process log -------------------->
-        <div class="card">
+        <div class="card log">
           <div class="card-title-container">
             <h3 class="card-title">Process Log</h3>
             <info-icon title="Process Log"></info-icon>
