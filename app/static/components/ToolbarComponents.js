@@ -889,7 +889,7 @@ class Toolbar_OpenFileButton extends HTMLElement {
           padding: 5px 30px;
           border: none;
           cursor: pointer;
-          min-width: 220px;
+          min-width: 232px;
           white-space: nowrap;
           text-align: left;
         }
@@ -960,7 +960,7 @@ class Toolbar_OpenFileButton extends HTMLElement {
             detail: formData,
           })
         );
-      } else if (label == "Load Parameters") {
+      } else if (label == "Load Model Parameters") {
         // dispatch the loadParameters event to the EventBus
         // the event listener is in Events.js
         //
@@ -1081,7 +1081,7 @@ class Toolbar_SaveFileButton extends HTMLElement {
           padding: 5px 30px;
           border: none;
           cursor: pointer;
-          min-width: 220px;
+          min-width: 232px;
           white-space: nowrap;
           text-align: left;
         }
@@ -1128,7 +1128,7 @@ class Toolbar_SaveFileButton extends HTMLElement {
       // Check the label to determine the action
       //
       switch (label) {
-        case "Save Train As...":
+        case "Save Train Data":
           EventBus.dispatchEvent(
             new CustomEvent("saveData", {
               detail: {
@@ -1138,7 +1138,7 @@ class Toolbar_SaveFileButton extends HTMLElement {
           );
           break;
 
-        case "Save Eval As...":
+        case "Save Eval Data":
           EventBus.dispatchEvent(
             new CustomEvent("saveData", {
               detail: {
@@ -1148,11 +1148,11 @@ class Toolbar_SaveFileButton extends HTMLElement {
           );
           break;
 
-        case "Save Parameters As...":
+        case "Save Model Parameters":
           EventBus.dispatchEvent(new CustomEvent("saveAlgParams"));
           break;
 
-        case "Save Model As...":
+        case "Save Model":
           EventBus.dispatchEvent(new CustomEvent("saveModel"));
           break;
 
