@@ -27,7 +27,7 @@ LIST = [
 #------------------------------------------------------------------------------
 
 [two_gaussian]
-    name = "Two Gaussian"
+    name = "Two Gaussians"
     dist_name = "two_gaussian"
     method = "gaussian"
     [two_gaussian.params]
@@ -71,7 +71,7 @@ LIST = [
                     default = [[0.025, 0.0], [0.0, 0.025]]
 
 [four_gaussian]
-    name = "Four Gaussian"
+    name = "Four Gaussians"
     dist_name = "four_gaussian"
     method = "gaussian"
     [four_gaussian.params]
@@ -153,7 +153,7 @@ LIST = [
                     default = [[0.025, 0.0], [0.0, 0.025]]
 
 [overlapping_gaussian]
-    name = "Overlapping Gaussian"
+    name = "Overlapping Gaussians"
     dist_name = "overlapping_gaussian"
     method = "gaussian"
     [overlapping_gaussian.params]

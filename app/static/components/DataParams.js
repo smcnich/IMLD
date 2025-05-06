@@ -594,7 +594,7 @@ class DataButton extends HTMLElement {
           padding: 5px 30px;
           border: none;
           cursor: pointer;
-          min-width: 220px;
+          min-width: 230px;
           width: 100%;
           white-space: nowrap;
           text-align: left;
