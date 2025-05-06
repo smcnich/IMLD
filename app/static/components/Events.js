@@ -539,6 +539,19 @@ EventBus.addEventListener("loadModel", (event) => {
   // if the file is valid
   //
   if (file) {
+
+    // get file type
+    //
+    const isPKL = file.name && file.name.toLowerCase().endsWith('.pkl');
+
+    // stop processing if not pkl
+    //
+    if (!isPKL) {
+      processLog.writeError("Incorrect file type: must be pkl.");
+      EventBus.dispatchEvent(new CustomEvent("continue"));
+      return;
+    }
+    
     try {
       // write to the process log
       //
@@ -678,6 +691,19 @@ EventBus.addEventListener("loadAlgParams", (event) => {
   // if the file is valid
   //
   if (file) {
+
+    // get file type
+    //
+    const isTOML = file.name && file.name.toLowerCase().endsWith('.toml');
+
+    // stop processing if not toml
+    //
+    if (!isTOML) {
+      processLog.writeError("Incorrect file type: must be toml.");
+      EventBus.dispatchEvent(new CustomEvent("continue"));
+      return;
+    }
+
     try {
       // write to the process log
       //
@@ -1145,6 +1171,19 @@ EventBus.addEventListener("loadData", (event) => {
 
   try {
     if (file) {
+
+      // get file type
+      //
+      const isCSV = file.name && file.name.toLowerCase().endsWith('.csv');
+
+      // stop processing if not csv
+      //
+      if (!isCSV) {
+        processLog.writeError("Incorrect file type: must be csv.");
+        EventBus.dispatchEvent(new CustomEvent("continue"));
+        return;
+      }
+
       // suspend the application as loading
       //
       EventBus.dispatchEvent(new CustomEvent("suspend"));
