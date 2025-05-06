@@ -158,7 +158,56 @@ export const InfoDescriptions = {
   "MLP Dimension":
     "This sets the size of the intermediate representation within the model's internal layers. It influences how much information can be processed at each step and affects both the model’s complexity and capacity to learn from the data.",
   "Dropout":
-    "This adds regularization by randomly disabling a portion of the model’s connections during training. It helps prevent overfitting by encouraging the model to rely on a distributed set of features instead of memorizing specific patterns."
+    "This adds regularization by randomly disabling a portion of the model’s connections during training. It helps prevent overfitting by encouraging the model to rely on a distributed set of features instead of memorizing specific patterns.",
+  "Tolerance":
+    "This sets the threshold for determining when the model's improvement has become too small to continue training. Once the changes in performance drop below this level, the training process may stop early to save time and prevent overfitting.",
+  "Earling Stopping":
+    "This enables a check during training that monitors how well the model is learning over time. If performance stops improving for a certain number of steps, the training halts early to avoid unnecessary computation or overfitting to the training data.",
+  "Max Iterations":
+    "This limits how many times the model can update itself during training. Setting a maximum ensures that the training process doesn't run indefinitely and helps manage how long and how much computation is used.",
+
+  // QSVM
+  //
+  "Provider Name":
+    "This specifies which quantum computing service will be used to run the algorithm. Different providers may offer access to different hardware configurations, affecting the speed, reliability, and accuracy of quantum computations.",
+  "Hardware":
+    "This selects the quantum device or simulator on which the algorithm will run. The choice of hardware can influence execution time, noise levels, and whether the computation is performed on real quantum systems or emulated environments.",
+  "Encoder Name":
+    "This defines how input data is transformed into quantum states before processing. Different encoders can capture various features or structures in the data, which may affect the model's ability to learn and distinguish patterns.",
+  "Number of Qubits":
+    "This sets how many quantum bits are available for the algorithm to use. The number of qubits determines how much information the model can represent at once, impacting the overall capacity and complexity of the quantum computation.",
+  "Feature Map Repetitions":
+    "This controls how many times the input encoding and quantum circuit operations are repeated. More repetitions can enhance the model’s ability to capture intricate relationships in the data, but may also increase computation time.",
+  "Entanglement":
+    "This determines how qubits are interconnected during the computation. Entanglement affects how information is shared across the system and plays a key role in enabling quantum models to capture complex, non-linear relationships in the data.",
+  "Number of Shots":
+    "This specifies how many times a quantum circuit is executed to estimate measurement outcomes. A higher number of shots leads to more stable and reliable results by reducing randomness and noise in the output.",
+
+  // QNN
+  //
+  "Implementation Name":
+    "This identifies the specific approach or library used to construct and run the quantum model. Different implementations may handle computation, optimization, or circuit design in unique ways, which can affect training behavior and performance.",
+  "Number Qubits":
+    "This sets how many quantum bits are used during the computation. The number of qubits determines how much information the network can process at once, which directly affects its capacity to learn and represent complex patterns in the data.",
+  "Ansatz Repetitions":
+    "This controls how many times the core building blocks of the quantum circuit are repeated. More repetitions can increase the expressiveness of the model, allowing it to capture deeper or more subtle relationships in the data.",
+  "Ansatz Name":
+    "This specifies the structure of the quantum circuit used in the model. Different ansatz designs influence how well the network can approximate the underlying patterns in the data by shaping the way information flows and transforms.",
+  "Optimizer Name":
+    "This selects the algorithm used to adjust the model's parameters during training. The optimizer impacts how quickly and effectively the model learns from data, influencing convergence speed and overall performance.",
+  "Optimizer Maximum Steps":
+    "This sets the limit on how many training steps the optimizer can take. It ensures the training process doesn't run indefinitely and can affect both the accuracy of the final model and the time it takes to train.",
+  "Measurement Type":
+    "This defines how information is extracted from the quantum system at the end of computation. Different measurement strategies influence how outputs are interpreted and can impact the quality of the model’s predictions.",
+
+  // QRBM
+  //
+  "Number Hidden Units":
+    "This sets the size of the hidden layer that learns internal features from the input data. A larger number of hidden units allows the model to represent more complex patterns, while fewer units lead to simpler representations.",
+  "Chain Strength":
+    "This determines how strongly connected the elements in a quantum system are during the embedding process. The strength affects how well logical connections are preserved when the model is mapped onto physical hardware.",
+  "KNN Neighbors":
+    "This defines how many nearby data points are considered when evaluating similarity. It influences how the model groups and interprets input data based on local structure, affecting both learning quality and generalization."
 
 };
 //
