@@ -258,13 +258,13 @@ class DataPopup extends HTMLElement {
     }
 
     /* Label styling for input fields */
-    .num-container label {
+    label {
       padding-left: 0.5vw;
+      padding-right: 0.3vw;
+      padding-top: 0.05vh;
       font-family: 'Inter', sans-serif;
-      font-size: 0.9em;
+      font-size: 0.85em;
       font-weight: bold;
-      margin-bottom: 0.3vw;
-      display: block;
     }
 
     /* Grid layout for input fields */

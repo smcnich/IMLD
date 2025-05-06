@@ -523,11 +523,16 @@ class AlgoTool extends HTMLElement {
           /* Label styling for input fields */
           label {
             padding-left: 0.5vw;
-            padding-right: 0.5vw;
-            padding-top: 0.30vw;
+            padding-right: 0.3vw;
+            padding-top: 0.2vh;
             font-family: 'Inter', sans-serif;
             font-size: 0.85em;
             font-weight: bold;
+          }
+
+          /* Label styling for info icons */
+          info-icon {
+            padding-top: 0.2vh;
           }
 
           /* Input field styling */
