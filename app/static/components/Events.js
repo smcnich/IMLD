@@ -406,9 +406,12 @@ EventBus.addEventListener("normalize", (event) => {
     },
     body: JSON.stringify({
       plotData: event.detail.plotData,
-      xrange: bounds.x,
-      yrange: bounds.y,
-      denormalize: event.detail.denormalize,
+      bounds: {
+        xrange: bounds.x,
+        yrange: bounds.y,
+      },
+      oldBounds: event.detail.oldBounds || null,
+      method: event.detail.method,
     }),
   })
 
@@ -453,16 +456,25 @@ EventBus.addEventListener("normalize", (event) => {
     // continue the application
     //
     EventBus.dispatchEvent(new CustomEvent("continue"));
+
+    // write to the process log
+    //
+    processLog.writePlain(`Data ${event.detail.method}d successfully.`);
   });
 
 });
 
 EventBus.addEventListener("setNormalize", (event) => {
+  
+  // get the normalization status from the event
+  //
   normalize = event.detail.status;
 
-  let denormalize;
-  if (normalize) { denormalize = false; }
-  else { denormalize = true; }
+  // set the proper normalization method
+  // 
+  let method;
+  if (normalize) { method = "normalize"; }
+  else { method = "denormalize"; }
 
   if (trainPlot.getData()) {
 
@@ -476,7 +488,7 @@ EventBus.addEventListener("setNormalize", (event) => {
       detail: {
         plotID: "train",
         plotData: trainPlot.getData(),
-        denormalize: denormalize,
+        method: method,
       },
     }));
 
@@ -958,7 +970,7 @@ EventBus.addEventListener("dataGen", (event) => {
             detail: {
               plotID: event.detail.plotID,
               plotData: data,
-              denormalize: false
+              method: "normalize"
             },
           }));
         }
@@ -1301,6 +1313,18 @@ EventBus.addEventListener("loadData", (event) => {
         // log the time taken to load the data
         //
         console.log(`Load Data Time: ${end - start} ms`);
+
+        // normalize the loaded data
+        //
+        if (normalize) {
+          EventBus.dispatchEvent(new CustomEvent("normalize", {
+            detail: {
+              plotID: plotID,
+              plotData: data,
+              method: "normalize"
+            },
+          }));
+        }
       };
 
       // Read the file as text, this will trigger the onload event
@@ -1625,27 +1649,11 @@ EventBus.addEventListener("setRanges", (event) => {
     return;
   }
 
-  // if the data is normalized, denormalize before changing bounds
+  // save the bounds if needed during normalization
   //
-  if (normalize) {
-    if (trainPlot.getData()) {
-      EventBus.dispatchEvent(new CustomEvent("normalize", {
-        detail: {
-          plotID: "train",
-          plotData: trainPlot.getData(),
-          denormalize: true,
-        },
-      }));
-    }
-    if (evalPlot.getData()) {
-      EventBus.dispatchEvent(new CustomEvent("normalize", {
-        detail: {
-          plotID: "eval",
-          plotData: evalPlot.getData(),
-          denormalize: true,
-        },
-      }));
-    }
+  const oldBounds = {
+    xrange: bounds.x,
+    yrange: bounds.y,
   }
 
   // set the bounds to the global var
@@ -1667,7 +1675,8 @@ EventBus.addEventListener("setRanges", (event) => {
         detail: {
           plotID: "train",
           plotData: trainPlot.getData(),
-          denormalize: false,
+          method: "renormalize",
+          oldBounds: oldBounds
         },
       }));
     }
@@ -1676,11 +1685,22 @@ EventBus.addEventListener("setRanges", (event) => {
         detail: {
           plotID: "eval",
           plotData: evalPlot.getData(),
-          denormalize: false,
+          method: "renormalize",
+          oldBounds: oldBounds
         },
       }));
     } 
   }
+
+  // set the bounds to the global var
+  //
+  bounds.x = x;
+  bounds.y = y;
+
+  // set the ranges of the plot
+  //
+  trainPlot.setBounds(bounds.x, bounds.y);
+  evalPlot.setBounds(bounds.x, bounds.y);
 
   // if the decision surface is already plotted, update the plot
   //

@@ -612,14 +612,20 @@ def normalize():
         x = data['plotData']['x']
         y = data['plotData']['y']
         labels = data['plotData']['labels']
-        xrange = data['xrange']
-        yrange = data['yrange']
-        denormalize = data['denormalize']
+        xrange = data['bounds']['xrange']
+        yrange = data['bounds']['yrange']
+        method = data['method']
 
-        # normalize or denormalize the data
+        # normalize, denormalize, or renormalize the data
         #
-        if denormalize: x, y = imld.denormalize_data(x, y, xrange, yrange)
-        else: x, y = imld.normalize_data(x, y, xrange, yrange)
+        if method == "denormalize": x, y = imld.denormalize_data(x, y, xrange, yrange)
+        elif method == "normalize": x, y = imld.normalize_data(x, y, xrange, yrange)
+        elif method == "renormalize":
+            old_xrange = data['oldBounds']['xrange']
+            old_yrange = data['oldBounds']['yrange']
+            x, y = imld.denormalize_data(x, y, old_xrange, old_yrange)
+            x, y = imld.normalize_data(x, y, xrange, yrange)
+
 
         # prepare the response data
         #
