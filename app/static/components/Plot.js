@@ -401,6 +401,29 @@ class Plot extends HTMLElement {
     });
   }
 
+  clearLegend() {
+    /*
+    method: Plot::clearLegend
+
+    args:
+     None
+
+    return:
+     None
+
+    description:
+     This method cleares the legend for the plot.
+    */
+
+    // Get the legend container element
+    //
+    const legendContainer = this.querySelector("#legend-container");
+
+    // Clear any existing legend items
+    //
+    legendContainer.innerHTML = "";
+  }
+
   getDecisionSurface() {
     /*
     method: Plot::get_decision_surface
@@ -478,6 +501,7 @@ class Plot extends HTMLElement {
     //
     let traces = {};
     for (let i = 0; i < data.labels.length; i++) {
+
       // get the Label object from the label manager
       // using the numeric mapping present in the data
       //

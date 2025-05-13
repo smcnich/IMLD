@@ -1851,6 +1851,7 @@ EventBus.addEventListener("clearPlot", (event) => {
   } else if (plotID === "eval") {
     plot = evalPlot;
   } else if (plotID === "all") {
+
     // clear the necessary components
     //
     evalPlot.plot_empty();
@@ -1862,6 +1863,12 @@ EventBus.addEventListener("clearPlot", (event) => {
     //
     labelManager.clear();
     mainToolbar.updateClassList(labelManager.getLabels());
+    evalPlot.clearLegend();
+    trainPlot.clearLegend();
+
+    // disable normalize
+    //
+    mainToolbar.setNormalize(false);
 
     // dispatch event to disable drawing
     //

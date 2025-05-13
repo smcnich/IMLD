@@ -344,6 +344,23 @@ class MainToolbar extends HTMLElement {
   //
   // end of method
 
+  setNormalize(status) { 
+    /*
+    method: MainToolbar::setNormalize
+
+    args:
+     Boolean: whether normalization should be set or not
+
+    return:
+     None
+
+    description:
+     this method sets the normalization status of the toolbar
+    */
+
+    this.shadowRoot.querySelector("toolbar-dropdown-settings").setNormalize(status); 
+  }
+
   render() {
     /*
     method: ToolbarBtn::render

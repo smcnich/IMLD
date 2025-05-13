@@ -724,6 +724,24 @@ class Toolbar_DropdownSettings extends HTMLElement {
   //
   // end of method
 
+  setNormalize(status) {
+    /*
+    method: Toolbar_DropdownSettings::setNormalize
+
+    args:
+      status (boolean): The status of the normalize button.
+
+    returns:
+      None
+
+    description:
+      This method sets the normalize button's state based on the provided status. 
+      It updates the button's appearance and functionality accordingly.
+    */
+
+    this.shadowRoot.querySelector("toolbar-normalize").setNormalize(status);
+  }
+
   addHoverListeners() {
     /*
     method: Toolbar_DropdownSettings::addHoverListeners
@@ -2425,6 +2443,20 @@ class Toolbar_Normalize extends HTMLElement {
   //
   // end of method
 
+  setNormalize(status) {
+    this.checked = status;
+    this.shadowRoot.querySelector("#checkbox").checked = status;
+    this.isOpen = status;
+
+    EventBus.dispatchEvent(
+      new CustomEvent("setNormalize", {
+        detail: {
+          status: status,
+        },
+      })
+    );
+  }
+
   render() {
     const label = this.getAttribute("label") || "Button";
 
@@ -2463,8 +2495,6 @@ class Toolbar_Normalize extends HTMLElement {
     `;
 
     const button = this.shadowRoot.querySelector("#checkboxButton");
-    const checkbox = this.shadowRoot.querySelector("#checkbox");
-
 
     button.onclick = (event) => {
 
@@ -2472,33 +2502,7 @@ class Toolbar_Normalize extends HTMLElement {
       //
       event.stopPropagation();
 
-      if (this.checked) {
-        this.checked = false;
-        checkbox.checked = false;
-        this.isOpen = false;
-
-        EventBus.dispatchEvent(
-          new CustomEvent("setNormalize", {
-            detail: {
-              status: this.checked,
-            },
-          })
-        );
-      } 
-      
-      else {
-        this.checked = true;
-        checkbox.checked = true;
-        this.isOpen = true;
-
-        EventBus.dispatchEvent(
-          new CustomEvent("setNormalize", {
-            detail: {
-              status: this.checked,
-            },
-          })
-        );
-      }
+      this.setNormalize(!this.checked);
     };
   }
 
