@@ -314,8 +314,9 @@ class Plot extends HTMLElement {
      None
 
     description:
-     This method initializes the plot by setting up the configuration and layout data for Plotly.
-     It also creates an empty plot initially by calling the plot_empty method.
+     This method initializes the plot by setting up the configuration and 
+     layout data for Plotly. It also creates an empty plot initially by 
+     calling the plot_empty method.
     */
 
     // Set configuration data for Plotly
@@ -368,18 +369,20 @@ class Plot extends HTMLElement {
   //
   // end of method
 
-  createLegend() {
+  createLegend(labels=null) {
     /*
     method: Plot::createLegend
 
     args:
-     None
+     labels (Array): an array of Label objects that contain the name and 
+                     color. (optional)
 
     return:
      None
 
     description:
      This method creates a legend for the plot using the data provided.
+      If no labels are provided, it uses the labels from the plot data.
     */
 
     // Get the legend container element
@@ -392,13 +395,29 @@ class Plot extends HTMLElement {
 
     // Create a new legend item for each label in the plot data
     //
-    this.plotData.forEach((trace) => {
-      const legendItem = document.createElement("div");
-      legendItem.classList.add("legend-item");
-      legendItem.style.color = trace.marker.color;
-      legendItem.innerText = trace.name;
-      legendContainer.appendChild(legendItem);
-    });
+    if (labels === null) { 
+      this.plotData.forEach((trace) => {
+        const legendItem = document.createElement("div");
+        legendItem.classList.add("legend-item");
+        legendItem.style.color = trace.marker.color;
+        legendItem.innerText = trace.name;
+        legendContainer.appendChild(legendItem);
+      });
+    }
+
+    // iterate over each label and create a legend item
+    // if the labels are provided
+    //
+    else {
+
+      labels.forEach((label) => {
+        const legendItem = document.createElement("div");
+        legendItem.classList.add("legend-item");
+        legendItem.style.color = label.color;
+        legendItem.innerText = label.name;
+        legendContainer.appendChild(legendItem);
+      });
+    }
   }
 
   clearLegend() {
@@ -550,7 +569,7 @@ class Plot extends HTMLElement {
      None
 
     desciption:
-     creates an empty plotly plot.
+     creates an empty plotly plot. this also clears the legend
     */
 
     // save the data to as null because the plot is empty
@@ -568,8 +587,19 @@ class Plot extends HTMLElement {
       r: 10,
     };
 
+    // set the plot height to be 100 pixels less than the parent element
+    //
     this.plotDiv.style.height = `${this.parentElement.clientHeight - 100}px`;
+    
+    // set the plot width to be 31% of the window width
+    // this is done because the parentElement width would not shrink for
+    // some reason. instead base the size on the window width
+    //
     this.plotDiv.style.width = `${window.innerWidth*0.31}px`;
+
+    // clear the legend
+    //
+    this.clearLegend();
 
     // Create the empty plot
     //
@@ -671,6 +701,14 @@ class Plot extends HTMLElement {
     // update the plot to remove the decision surface
     //
     Plotly.react(plotDiv, this.plotData, this.layout, this.config);
+
+    // clear the legend
+    // leave the legend if there is still the decision surface
+    // trace on the plot
+    //
+    if (this.plotData.length === 0) {
+      this.clearLegend();
+    }
 
     // dispatch an event to the algoTool to update the plot status
     //
@@ -846,6 +884,14 @@ class Plot extends HTMLElement {
     // update the plot to remove the decision surface
     //
     Plotly.react(plotDiv, this.plotData, this.layout, this.config);
+
+    // clear the legend
+    // leave the legend if there is still a decision surface
+    // or if there are still points on the plot
+    //
+    if (this.plotData.length === 0) {
+      this.clearLegend();
+    }
 
     // dispatch an event to the algoTool to update the plot status
     //

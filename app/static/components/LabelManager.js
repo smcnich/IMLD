@@ -30,7 +30,7 @@ export class Label {
 
     if (isNumber(labelName)) {
       this.name = `Class ${labelName}`;
-      this.mapping = labelName;
+      this.mapping = Number(labelName);
     } else {
       this.name = labelName;
       this.mapping = null;
@@ -74,7 +74,7 @@ export class Label {
      Sets the numeric mapping for the label. This is used to associate a number with the label.
     */
 
-    this.mapping = mapping;
+    this.mapping = Number(mapping);
   }
   //
   // end of method
@@ -106,8 +106,8 @@ export class LabelManager {
   class: LabelManager
 
   description:
-   This class manages a collection of Label objects. It provides methods for adding labels,
-   retrieving labels by name or mapping, and updating mappings and colors.
+   This class manages a collection of Label objects. It provides methods for 
+   adding labels, retrieving labels by name or mapping, and updating mappings and colors.
   */
 
   constructor() {
@@ -121,16 +121,45 @@ export class LabelManager {
      LabelManager instance
 
     description:
-     Initializes the LabelManager with empty arrays for labels, names, mappings, and a map.
+     Initializes the LabelManager with empty arrays for labels, names, mappings, 
+     and a map.
     */
 
+    // this is an array of all the label objects
+    //
     this.labels = [];
+    
+    // this is an array of all the label names (strings)
+    //
     this.names = [];
+    
+    // this is an array of all the label mappings (numbers)
+    //
     this.mappings = [];
+    
+    // this is the map of class names to numeric mappings
+    //
     this.map = {};
   }
   //
   // end of method
+
+  getMap() {
+    /*
+    method: LabelManager::getMap
+
+    args:
+     None
+
+    returns:
+     Object: the mapping of class names to numeric mappings
+
+    description:
+     Returns the mapping of class names to their numeric mappings.
+    */
+
+    return this.map;
+  }
 
   getLabels() {
     /*
@@ -298,11 +327,27 @@ export class LabelManager {
   // end of function
 
   setMappings(mappings) {
+    /*
+    method: LabelManager::setMappings
+
+    args:
+     mappings (Object): the mapping of classes to numerics. keys are the 
+                        class names, values are the numeric mappings
+
+    return:
+     None
+
+    description:
+     sets the mapping of classes to numerics. this is used to map the
+     classes to their numeric mappings
+    */
+
     // convert the keys of the mappings object to lowercase
     // and save it
     //
     this.mappings = Object.fromEntries(
-      Object.entries(mappings).map(([key, value]) => [key.toLowerCase(), value])
+      Object.entries(mappings).map(
+        ([key, value]) => [key.toLowerCase(), Number(value)])
     );
 
     // set the mapping for each label
@@ -364,6 +409,8 @@ export class LabelManager {
         labelObj.mapping = Math.max(...this.mappings) + 1;
       }
     }
+
+    console.log(this.mappings)
 
     // add the label to the internal data structures
     //

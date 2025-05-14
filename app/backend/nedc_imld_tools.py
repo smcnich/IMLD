@@ -5,10 +5,11 @@
 
 # import required system modules
 #
-from io import StringIO
+from io import StringIO, BytesIO
 from contextlib import redirect_stdout
 import numpy as np
 from math import floor, ceil
+import pickle
 
 # import required NEDC modules
 #
@@ -23,7 +24,6 @@ class MLToolsError(Exception):
         self.message = message
 
     def __str__(self):
-        # return self.message.split(':')[-1].strip().capitalize()
         return self.message
 
 #------------------------------------------------------------------------------
@@ -462,14 +462,18 @@ def load_params(pfile:str) -> dict:
     #
     return params
 
-def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
-                              xrange:list=None, yrange:list=None):
+def generate_decision_surface(model:mlt.Alg,
+                              xrange:list=[-1, 1], 
+                              yrange:list=[-1, 1]):
     """
     function: generate_decision_surface
 
     args:
-     data (mltd.MLToolsData): the data to generate the decision surface from
-     model (mlt.Alg)        : the trained model to use to generate the decision surface
+     model (mlt.Alg): the trained model to use to generate the decision surface
+     xrange (list)  : the x range of the data to use to generate the decision 
+                      surface. default = [-1, 1]
+     yrange (list)  : the y range of the data to use to generate the decision
+                     surface. default = [-1, 1]
 
     return:
      x (list) : the x values of the decision surface
@@ -484,18 +488,10 @@ def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
      meshgrid. return the x, y, and z (class) values of the decision surface
     """
 
-    # get the raw data from the ML Tools data object
+    # get the x and y bounds of the data
     #
-    X = data.data
-
-    # get the x and y bounds of the data. if the x and y ranges are given,
-    # use them. otherwise, get the min and max of the x and y values
-    #
-    if (xrange): x_min, x_max = xrange
-    else: x_min, x_max = floor(X[:, 0].min()), ceil(X[:, 0].max())
-
-    if (yrange): y_min, y_max = yrange
-    else: y_min, y_max = floor(X[:, 1].min()), ceil(X[:, 1].max())
+    x_min, x_max = xrange
+    y_min, y_max = yrange
 
     # create a meshgrid of the data. use this meshgrid to predict the labels
     # at each point in the grid. this will allow us to plot the decision surface
@@ -522,7 +518,6 @@ def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
     # flattened for each sample in the meshgrid
     #
     labels, _ = check_return(model.predict, meshgrid)
-    # labels, _ = model.predict(meshgrid)
 
     # get the x and y values. x and y values should be 1D arrays
     # acting as the axis values of the grid. take a row from the xx
@@ -539,17 +534,99 @@ def generate_decision_surface(data:mltd.MLToolsData, model:mlt.Alg, *,
     # if there are strings in the z array, convert them to numbers
     # as the contour plot in Plotly.js will not work with strings
     #
-    if np.issubdtype(z.dtype, np.integer):
+    # if np.issubdtype(z.dtype, np.integer):
 
-        # vectorize the lambda function to convert the labels to numbers
-        # based on the reversed mapping labels
-        #
-        z = np.vectorize(lambda val: data.mapping_label[val])(z)
+    #     # vectorize the lambda function to convert the labels to numbers
+    #     # based on the reversed mapping labels
+    #     #
+    #     z = np.vectorize(lambda val: data.mapping_label[val])(z)
 
     # return the x, y, and z values of the decision surface. 
     # x and y should be a 1D array, so get a row from the xx array and
     # a column from the yy array.
     #
     return x, y, z
+#
+# end of function
+
+def save_model(model:mlt.Alg, mapping_label:dict):
+    """
+    function: save_model
+
+    args:
+     model (mlt.Alg) : the ML Tools model to save
+     mapping_label (dict): the mapping labels for the model
+
+    return:
+     None
+
+    description:
+     save a ML Tools model to a file
+    """
+
+    # Serialize the model using pickle and store it in a BytesIO stream
+    #
+    model_bytes = BytesIO()
+
+    save_model_args = {
+        'fname': '',
+        'fp': model_bytes
+    }
+
+    # save the mapping labels to the model
+    #
+    model.alg_d.model_d['mapping_label'] = mapping_label
+
+    # use the ML Tools save_model method by passing in the BytesIO stream
+    # as the fp. check the return because it is a ML Tools function
+    #
+    check_return(model.save_model, **save_model_args)
+    
+    # move the cursor to the beginning of the BytesIO stream
+    # this is required to send file as a response
+    #
+    model_bytes.seek(0)
+
+    # exit gracefully
+    #
+    return model_bytes
+#
+# end of function
+
+def load_model(model_bytes:bytes):
+    """
+    function: load_model
+
+    args:
+     model_bytes (BytesIO): the BytesIO stream containing the model
+
+    return:
+     model (mlt.Alg)      : the loaded ML Tools model
+     mapping_label (dict) : the mapping labels for the model
+
+    description:
+     load a ML Tools model from a file
+    """
+
+    # load the model from the BytesIO stream
+    #
+    model = mlt.Alg()
+
+    # load the model from the BytesIO stream
+    # check its return value because it is a ML Tools function
+    #
+    check_return(model.load_model, **{'fp': BytesIO(model_bytes)})
+
+    # if a mapping label is in the model, get it
+    # else, set it to None to be processed with the DS
+    #
+    if 'mapping_label' in model.alg_d.model_d: 
+        mapping_label = model.alg_d.model_d['mapping_label']
+    else:
+        mapping_label = None
+
+    # exit gracefully
+    #
+    return model, mapping_label
 #
 # end of function

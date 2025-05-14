@@ -7,7 +7,6 @@
 #
 import os
 import json
-import io
 import pickle
 from collections import OrderedDict
 from datetime import datetime
@@ -211,8 +210,6 @@ def load_model():
         #
         file = request.files['model']
         user_ID = request.form.get('userID')
-        x = json.loads(request.form.get('x'))
-        y = json.loads(request.form.get('y'))
         xrange = json.loads(request.form.get('xrange'))
         yrange = json.loads(request.form.get('yrange'))
 
@@ -220,9 +217,9 @@ def load_model():
         #
         model_bytes = file.read()
 
-        # unpickle the model as BytesIO stream
+        # load the model
         #
-        model = pickle.loads(model_bytes)
+        model, mapping_label = imld.load_model(model_bytes)
 
         # save the model to the corresponding userID
         #
@@ -231,23 +228,17 @@ def load_model():
             'timestamp': datetime.now()
         }
 
-        # create the data object
-        # this should only have a single x and y value
-        # representing the bounds of the plot
-        # no labels are needed
-        #
-        data = imld.create_data(x, y, [])
-
-        # set the mapping label
-        # make sure to flip the mapping label so it is {numeric : name}
-        #
-        data.mapping_label = {value: key for key, value in model.mapping_label.items()}
-
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
         #
-        x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
-                                                yrange=yrange)
+        x, y, z = imld.generate_decision_surface(model, 
+                                                 xrange=xrange,
+                                                 yrange=yrange)
+
+        # if no mapping label is provided, create a default one
+        #
+        if mapping_label is None:
+            mapping_label = {i: f'Class {i+1}' for i in set(z.flatten())}
 
         # format the response
         #
@@ -257,7 +248,7 @@ def load_model():
                 'y': y.tolist(), 
                 'z': z.tolist()
             },
-            'mapping_label': model.mapping_label
+            'mapping_label': mapping_label
         }
 
         # return the jsonified response
@@ -265,9 +256,10 @@ def load_model():
         return jsonify(response)
 
     except Exception as e:
-        return f'Failed to load model: {e}', 500
+        response = {'error': str(e)}
+        return jsonify(response), 500
 #
-# end of method
+# end of function
 
 @main.route('/api/save_alg_params/', methods=['POST'])
 def save_alg_params():
@@ -358,22 +350,26 @@ def save_model():
         #
         userID = data['userID']
 
+        # check if the model is in the cache
+        #
         if userID not in model_cache or not model_cache[userID]:
-            raise ValueError(f'Model Cache missing.')
+            raise ValueError(\
+    f'User ID {userID} not found in cache or model is empty. Please refresh.')
 
+        # get the model from the cache
+        #
         model = model_cache[userID]['model']
 
-        model.mapping_label = data['label_mappings']
+        model_bytes = imld.save_model(model, data['label_mappings'])
 
-        # Serialize the model using pickle and store it in a BytesIO stream
-        #
-        model_bytes = io.BytesIO()
-        pickle.dump(model, model_bytes)
-        model_bytes.seek(0)  # Reset the pointer to the beginning of the stream
-        
         # Send the pickled model as a response, without writing to a file
+        # reopen the bytes before sending because ML Tools save_model() closes
+        # the file pointer
         #
-        return send_file(model_bytes, as_attachment=True, download_name=f'model.pkl', mimetype='application/octet-stream')
+        return send_file(model_bytes, 
+                         as_attachment=True, 
+                         download_name=f'model.pkl', 
+                         mimetype='application/octet-stream')
 
     except Exception as e:
         response = {'error': str(e)}
@@ -429,7 +425,8 @@ def train():
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
         #
-        x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
+        x, y, z = imld.generate_decision_surface(model, 
+                                                 xrange=xrange,
                                                  yrange=yrange)
 
         # format the response
@@ -541,9 +538,6 @@ def rebound():
     # get the data and algorithm parameters
     #
     userID = data['userID']
-    x = data['plotData']['x']
-    y = data['plotData']['y']
-    labels = data['plotData']['labels']
     xrange = data['xrange']
     yrange = data['yrange']
 
@@ -553,14 +547,11 @@ def rebound():
         #
         model = model_cache[userID]['model']
 
-        # create the data object
-        #
-        data = imld.create_data(x, y, labels)
-
         # get the x y and z values from the decision surface
         # x and y will be 1D and z will be 2D
         #
-        x, y, z = imld.generate_decision_surface(data, model, xrange=xrange,
+        x, y, z = imld.generate_decision_surface(model, 
+                                                 xrange=xrange,
                                                  yrange=yrange)
         
         # format the response
@@ -625,7 +616,6 @@ def normalize():
             old_yrange = data['oldBounds']['yrange']
             x, y = imld.denormalize_data(x, y, old_xrange, old_yrange)
             x, y = imld.normalize_data(x, y, xrange, yrange)
-
 
         # prepare the response data
         #

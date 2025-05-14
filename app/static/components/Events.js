@@ -151,8 +151,8 @@ EventBus.addEventListener("train", (event) => {
       else {
         return response.json().then((errorData) => {
           EventBus.dispatchEvent(new CustomEvent("continue"));
-          processLog.writeError(errorData);
-          throw new Error(errorData);
+          processLog.writeError(`Could not train: ${errorData.error}`);
+          throw new Error(errorData.error);
         });
       }
     })
@@ -279,8 +279,8 @@ EventBus.addEventListener("eval", (event) => {
       else {
         return response.json().then((errorData) => {
           EventBus.dispatchEvent(new CustomEvent("continue"));
-          processLog.writeError(errorData);
-          throw new Error(errorData);
+          processLog.writeError(`Could not evaluate: ${errorData.error}`);
+          throw new Error(errorData.error);
         });
       }
     })
@@ -288,10 +288,6 @@ EventBus.addEventListener("eval", (event) => {
     // get the data from the response
     //
     .then((data) => {
-      // //  write the estimated parameters to the process log
-      // //
-      // processLog.writePlain('');
-      // processLog.writeEstimatedParams(data.parameter_output);
 
       // write the metrics to the process log
       //
@@ -314,9 +310,16 @@ EventBus.addEventListener("eval", (event) => {
 // end of event listener
 
 EventBus.addEventListener("saveModel", () => {
+
+  if (trainPlot.getDecisionSurface() === null) {
+    processLog.writePlain('No model to save. Please train a model first.');
+    return;
+  }
+
   EventBus.dispatchEvent(new CustomEvent("suspend"));
 
   try {
+
     // fetch for a response
     //
     fetch(SAVEMODEL_URL, {
@@ -326,67 +329,68 @@ EventBus.addEventListener("saveModel", () => {
       },
       body: JSON.stringify({
         userID: userID,
-        label_mappings: labelManager.getMappings(),
+        label_mappings: labelManager.getMap(),
       }),
     })
-      // parse the response
-      //
-      .then((response) => {
-        // if the response is ok, return the json
-        //
-        if (response.ok) {
-          return response.blob();
-        }
 
-        // otherwise, throw an error
-        //
-        else {
-          return response.json().then((errorData) => {
-            EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError("Could not save model.");
-            throw new Error(errorData);
-          });
-        }
-      })
-
+    // parse the response
+    //
+    .then((response) => {
       // if the response is ok, return the json
       //
-      .then((blob) => {
-        // If we are replacing a previously generated file we need to
-        // manually revoke the object URL to avoid memory leaks.
-        //
-        if (textFile !== null) {
-          window.URL.revokeObjectURL(textFile);
-        }
+      if (response.ok) {
+        return response.blob();
+      }
 
-        // create a download URL for the blob (csv file)
-        //
-        textFile = window.URL.createObjectURL(blob);
-
-        // create a link element and add a download attribute
-        // connect the href to the download URL
-        // append the link to the document body
-        // this link is never displayed on the page.
-        // it acts as a dummy link that starts a download
-        //
-        var link = document.createElement("a");
-        link.setAttribute("download", `model.pkl`);
-        link.href = textFile;
-        document.body.appendChild(link);
-
-        // wait for the link to be added to the document
-        // then simulate a click event on the link
-        // the dummy link created above will start the download
-        // when a click event is dispatched
-        //
-        window.requestAnimationFrame(function () {
-          var event = new MouseEvent("click");
-          link.dispatchEvent(event);
-          document.body.removeChild(link);
+      // otherwise, throw an error
+      //
+      else {
+        return response.json().then((errorData) => {
+          EventBus.dispatchEvent(new CustomEvent("continue"));
+          processLog.writeError(`Could not save model: ${errorData.error}`);
+          throw new Error(errorData.error);
         });
+      }
+  })
 
-        EventBus.dispatchEvent(new CustomEvent("continue"));
-      });
+  // if the response is ok, return the json
+  //
+  .then((blob) => {
+    // If we are replacing a previously generated file we need to
+    // manually revoke the object URL to avoid memory leaks.
+    //
+    if (textFile !== null) {
+      window.URL.revokeObjectURL(textFile);
+    }
+
+    // create a download URL for the blob (csv file)
+    //
+    textFile = window.URL.createObjectURL(blob);
+
+    // create a link element and add a download attribute
+    // connect the href to the download URL
+    // append the link to the document body
+    // this link is never displayed on the page.
+    // it acts as a dummy link that starts a download
+    //
+    var link = document.createElement("a");
+    link.setAttribute("download", `model.pkl`);
+    link.href = textFile;
+    document.body.appendChild(link);
+
+    // wait for the link to be added to the document
+    // then simulate a click event on the link
+    // the dummy link created above will start the download
+    // when a click event is dispatched
+    //
+    window.requestAnimationFrame(function () {
+      var event = new MouseEvent("click");
+      link.dispatchEvent(event);
+      document.body.removeChild(link);
+    });
+
+    EventBus.dispatchEvent(new CustomEvent("continue"));
+  });
   } catch (error) {
     EventBus.dispatchEvent(new CustomEvent("continue"));
     processLog.writeError("Could not save model.");
@@ -411,7 +415,7 @@ EventBus.addEventListener("normalize", (event) => {
         yrange: bounds.y,
       },
       oldBounds: event.detail.oldBounds || null,
-      method: event.detail.method,
+      method: event.detail.method
     }),
   })
 
@@ -430,8 +434,8 @@ EventBus.addEventListener("normalize", (event) => {
     else {
       return response.json().then((errorData) => {
         EventBus.dispatchEvent(new CustomEvent("continue"));
-        processLog.writeError(errorData);
-        throw new Error(errorData);
+        processLog.writeError(`Could not normalize data: ${errorData.error}`);
+        throw new Error(errorData.error);
       });
     }
   })
@@ -440,13 +444,19 @@ EventBus.addEventListener("normalize", (event) => {
   //
   .then((data) => {
 
-    // set the bounds for the plot
+    // get the correct plot
     //
-    if (event.detail.plotID == "train") {
-      trainPlot.plot(data, labelManager);
-    }
-    else if (event.detail.plotID == "eval") {
-      evalPlot.plot(data, labelManager);
+    let plot;
+    if (event.detail.plotID == "train") { plot = trainPlot; }
+    else if (event.detail.plotID == "eval") { plot = evalPlot; }
+
+    // plot the normalized data and the decision surface if
+    // it already existed
+    //
+    const dsData = plot.getDecisionSurface();
+    plot.plot(data, labelManager);
+    if (dsData) {
+      plot.decision_surface(dsData, labelManager.getLabels());
     }
 
     // state change if decision surfaces were present
@@ -488,7 +498,7 @@ EventBus.addEventListener("setNormalize", (event) => {
       detail: {
         plotID: "train",
         plotData: trainPlot.getData(),
-        method: method,
+        method: method
       },
     }));
 
@@ -509,7 +519,7 @@ EventBus.addEventListener("setNormalize", (event) => {
       detail: {
         plotID: "eval",
         plotData: evalPlot.getData(),
-        denormalize: denormalize,
+        method: method
       },
     }));
 
@@ -578,17 +588,10 @@ EventBus.addEventListener("loadModel", (event) => {
       //
       const request_body = new FormData();
 
-      // get the x and y bounds of the plot
-      //
-      //
-      const { x, y } = trainPlot.getBounds();
-
       // add the file, userID, and plot bounds to the request form
       //
       request_body.append("model", file);
       request_body.append("userID", userID);
-      request_body.append("x", JSON.stringify(x));
-      request_body.append("y", JSON.stringify(y));
       request_body.append("xrange", JSON.stringify(bounds.x));
       request_body.append("yrange", JSON.stringify(bounds.y));
 
@@ -598,76 +601,75 @@ EventBus.addEventListener("loadModel", (event) => {
         method: "POST",
         body: request_body,
       })
-        // parse the response to make sure it is ok
-        //
-        .then((response) => {
-          if (response.ok) {
-            return response.json();
-          } 
-          
-          else {
-            return response.json().then((errorData) => {
-              EventBus.dispatchEvent(new CustomEvent("continue"));
-              processLog.writeError(errorData);
-              throw new Error(errorData);
-            });
-          }
-        })
 
-        // if the response is ok, plot the decision surface
-        //
-        .then((data) => {
-          Object.keys(data.mapping_label).forEach((label, idx) => {
-            // add the class to the label manager
-            //
-            const labelObj = new Label(label, defaultColors[idx]);
-
-            // try to add the class to the manager
-            // if it already exists, it is ok
-            //
-            if (labelManager.addLabel(labelObj)) {
-              processLog.writePlain(`Added class: ${label}`);
-            }
+      // parse the response to make sure it is ok
+      //
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        } 
+        
+        else {
+          return response.json().then((errorData) => {
+            EventBus.dispatchEvent(new CustomEvent("continue"));
+            processLog.writeError(`Could not load model: ${errorData.error}`);
+            throw new Error(errorData.error);
           });
+        }
+      })
 
-          // set the label mappings in the label manager
-          //
-          labelManager.setMappings(data.mapping_label);
+      // if the response is ok, plot the decision surface
+      //
+      .then((data) => {
 
-          // change the z values to numerics based on the mapping
-          // labels
-          //
-          data.decision_surface.z = labelManager.mapLabels(
-            data.decision_surface.z
-          );
+        Object.keys(data.mapping_label).forEach((label, idx) => {
 
-          // plot the decision surface on the training plot
+          // add the class to the label manager
           //
-          trainPlot.decision_surface(
-            data.decision_surface,
-            labelManager.getLabels()
-          );
+          const labelObj = new Label(label, defaultColors[idx]);
 
-          // update the class list in the main toolbar
+          // try to add the class to the manager
+          // if it already exists, it is ok
           //
-          mainToolbar.updateClassList(labelManager.getLabels());
-
-          // write to the process log
-          //
-          processLog.writePlain("Model loaded successfully.");
-
-          // capture the time for benchmarking purposes
-          //
-          const end = Date.now();
-
-          // log the time taken to train the model
-          //
-          console.log(`Load Model Time: ${end - start} ms`);
-
-          // continue the application
-          //
-          EventBus.dispatchEvent(new CustomEvent("continue"));
+          if (labelManager.addLabel(labelObj)) {
+            processLog.writePlain(`Added class: ${label}`);
+          }
         });
+
+        // set the label mappings in the label manager
+        //
+        labelManager.setMappings(data.mapping_label);
+
+        // plot the decision surface on the training plot
+        //
+        trainPlot.decision_surface(
+          data.decision_surface,
+          labelManager.getLabels()
+        );
+
+        trainPlot.createLegend(labelManager.getLabels());
+
+        // update the class list in the main toolbar
+        //
+        mainToolbar.updateClassList(labelManager.getLabels());
+
+        // write to the process log
+        //
+        processLog.writePlain("Model loaded successfully.");
+
+        // capture the time for benchmarking purposes
+        //
+        const end = Date.now();
+
+        // log the time taken to train the model
+        //
+        console.log(`Load Model Time: ${end - start} ms`);
+
+        // continue the application
+        //
+        EventBus.dispatchEvent(new CustomEvent("continue"));
+      });
+
     } catch (error) {
       // catch any errors
       //
@@ -742,8 +744,9 @@ EventBus.addEventListener("loadAlgParams", (event) => {
           } else {
             return response.json().then((errorData) => {
               EventBus.dispatchEvent(new CustomEvent("continue"));
-              processLog.writeError(errorData);
-              throw new Error(errorData);
+              processLog.writeError(
+                `Could not load algorithm parameters: ${errorData.error}`);
+              throw new Error(errorData.error);
             });
           }
         })
@@ -826,8 +829,9 @@ EventBus.addEventListener("saveAlgParams", () => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(errorData);
-            throw new Error(errorData);
+            processLog.writeError(
+              `Could not save algorithm parameters: ${errorData.error}`);
+            throw new Error(errorData.error);
           });
         }
       })
@@ -933,8 +937,8 @@ EventBus.addEventListener("dataGen", (event) => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(errorData);
-            throw new Error(errorData);
+            processLog.writeError(`Could not generate data: ${errorData.error}`);
+            throw new Error(errorData.error);
           });
         }
       })
@@ -942,6 +946,11 @@ EventBus.addEventListener("dataGen", (event) => {
       // get the data from the response
       //
       .then((data) => {
+
+        // clear the plot before plotting the new data
+        //
+        plot.clear_plot();
+
         // get the unique labels from the data
         //
         const uniqLabels = Array.from(new Set(data.labels));
@@ -1011,11 +1020,8 @@ EventBus.addEventListener("dataGen", (event) => {
   // catch any errors and continue the application
   //
   catch {
-    return response.json().then((errorData) => {
-      EventBus.dispatchEvent(new CustomEvent("continue"));
-      processLog.writeError(errorData);
-      throw new Error(errorData);
-    });
+    EventBus.dispatchEvent(new CustomEvent("continue"));
+    processLog.writeError("Could not generate data.");
   }
 });
 //
@@ -1228,11 +1234,6 @@ EventBus.addEventListener("loadData", (event) => {
           ? commentLine.split(":")[1].trim().slice(1, -1).split(",").map(Number)
           : [];
 
-        // Assign to xaxis and yaxis
-        //
-        const xaxis = limits.slice(0, 2);
-        const yaxis = limits.slice(2);
-
         // split the text into rows, filter out comments, and split the rows into columns
         //
         const rows = text
@@ -1251,7 +1252,7 @@ EventBus.addEventListener("loadData", (event) => {
           if (row[0] != "") {
             // get the label, x value, and y value from the row
             //
-            labels.push(row[0]);
+            labels.push(Number(row[0]));
             x.push(parseFloat(row[1]));
             y.push(parseFloat(row[2]));
           }
@@ -1293,6 +1294,10 @@ EventBus.addEventListener("loadData", (event) => {
             processLog.writePlain(`Added class: ${uniqLabels[i]}`);
           }
         }
+
+        // clear the plot before plotting the new data
+        //
+        plot.clear_plot();
 
         // plot the response data on the plot
         //
@@ -1710,10 +1715,6 @@ EventBus.addEventListener("setRanges", (event) => {
     //
     EventBus.dispatchEvent(new CustomEvent("suspend"));
 
-    // get the training data from the training plot
-    //
-    const plotData = trainPlot.getData();
-
     // send the data to the server and get the response
     //
     fetch(SETBOUNDS_URL, {
@@ -1723,7 +1724,6 @@ EventBus.addEventListener("setRanges", (event) => {
       },
       body: JSON.stringify({
         userID: userID,
-        plotData: plotData,
         xrange: bounds.x,
         yrange: bounds.y,
       }),
@@ -1742,8 +1742,8 @@ EventBus.addEventListener("setRanges", (event) => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(errorData);
-            throw new Error(errorData);
+            processLog.writeError(`Could not change bounds: ${errorData.error}`);
+            throw new Error(errorData.error);
           });
         }
       })
@@ -1863,8 +1863,6 @@ EventBus.addEventListener("clearPlot", (event) => {
     //
     labelManager.clear();
     mainToolbar.updateClassList(labelManager.getLabels());
-    evalPlot.clearLegend();
-    trainPlot.clearLegend();
 
     // disable normalize
     //

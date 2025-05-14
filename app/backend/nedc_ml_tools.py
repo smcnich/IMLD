@@ -1018,24 +1018,34 @@ class Alg:
     #
     #--------------------------------------------------------------------------
 
-    def load_model(self, fname):
+    def load_model(self, fname=None, fp=None):
         """
         method: load_model
 
         arguments:
-         fname: a filename containing a model
+         fname: a filename containing a model [default = None]
+         fp: a file pointer to load the bytes from. [default = None]
 
         return:
          a dictionary containing the model
 
         description:
-         This method loads a compatible picked model
+         This method loads a compatible picked model. One of the arguments
+         must be provided.
         """
+
+        # check to make sure that a file name or file pointer is provided
+        #
+        if ((fname is None) and (fp is None)) or (fname and fp):
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
+                   "only one of fname or fp must be provided"))
+            return None
 
         # unpickle the model file
         #
         try:
-            fp = open(fname, nft.MODE_READ_BINARY)
+            if fname: fp = open(fname, nft.MODE_READ_BINARY)
             model = pickle.load(fp)
         except:
             print("Error: %s (line: %s) %s::%s: %s (%s)" %
@@ -1054,12 +1064,20 @@ class Alg:
         # check model file key length: it should only contain 3 keys
         # ('algorithm_name', 'implementation_name', 'model')
         #
-        if len(model) != int(3):
+        required_keys = ['algorithm_name', 'implementation_name', 'model']
+        if not all(key in model for key in required_keys):
             print("Error: %s (line: %s) %s::%s: %s" %
                   (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "unknown model format"))
             return None
 
+        # if the algorithm name is not set yet, set it according
+        # to the model name
+        #
+        if self.alg_d is None: self.set(model[ALG_NAME_ALG])
+
+        # check to make sure the algorithm name matches the model name
+        #
         if model[ALG_NAME_ALG] != self.alg_d.__class__.__name__:
             print("Error: %s (line: %s) %s::%s: %s, "
                   "Model Name: %s, Set Algorithm: %s" %
@@ -1140,12 +1158,14 @@ class Alg:
     #
     # end of method
 
-    def save_model(self, fname):
+    def save_model(self, fname, fp=None):
         """
         method: save_model
 
         arguments:
          fname: a filename to be written
+         fp: a file pointer to save the bytes to. when None, it will create a
+             new file pointer with the supplied name. (optional)
 
         return:
          a boolean value indicating status
@@ -1168,13 +1188,25 @@ class Alg:
                   (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
                    "invalid model"))
             return False
-
+        
         # pickle it to a file and trap for errors
         #
         try:
-            fp = open(fname, nft.MODE_WRITE_BINARY)
-            pickle.dump(self.alg_d.model_d, fp)
-            fp.close()
+
+            # if no file pointer is given, create a new file with the given name
+            # and close it automatically
+            #
+            if fp is None: 
+                with open(fname, nft.MODE_WRITE_BINARY) as fp:
+                    pickle.dump(self.alg_d.model_d, fp)
+                    fp.close()
+            
+            # if a file pointer is given, write the model to it, and do not close
+            #
+            else: pickle.dump(self.alg_d.model_d, fp)
+
+        # catch and print any errors
+        # 
         except:
             print("Error: %s (line: %s) %s::%s: %s (%s)" %
                   (__FILE__, ndt.__LINE__, Alg.__CLASS_NAME__, ndt.__NAME__,
