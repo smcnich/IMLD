@@ -13,10 +13,10 @@ from datetime import datetime
 from flask import Blueprint, render_template, request, jsonify, current_app, send_file
 import numpy as np
 import toml
+import subprocess
 
 # import required NEDC modules
 #
-import nedc_ml_tools_data as mltd
 import nedc_imld_tools as imld
 import nedc_ml_tools as mlt
 
@@ -694,10 +694,10 @@ def write_issue():
      None (input comes from POST request)
 
     return:
-     JSON response indicating the success or failure of the log writing process
+     None
 
     description:
-     Logs an issue message along with its title and date to a log file for tracking and debugging purposes.
+     Logs an issue message along with its title and date and sends it through email.
     """
     try:
         # Get JSON data from the request
@@ -706,34 +706,37 @@ def write_issue():
 
         # Extract title and message from the data
         #
-        title = data.get('title', 'No Title')
-        message = data.get('message', 'No Message')
+        title = data.get('title')
+        message = data.get('message')
 
-        # Get the current date in the format month/day/year
+        # define email recipients
         #
-        current_date = datetime.now().strftime('%m/%d/%Y')
+        recipient = "isip.nedc@gmail.com" # change recipients if needed
 
-        # Format the log entry
+        # Send the mail
         #
-        log_entry = f"Date: {current_date}\nTitle: {title}\nIssue: {message}\n\n"
+        process = subprocess.run(
+            ['mail', '-s', f'Issue: {title}', recipient],
+            input=message,
+            text=True,
+            capture_output=True  # capture stdout and stderr
+        )
 
-        # Debug line to check if the file exists in the target folder
+        # Check mail status
         #
-        if os.path.exists(current_app.config['LOG_FILE_PATH']):
-            print(f"{current_app.config['LOG_FILE_PATH']} exists.")
+        if process.returncode == 0:
+            return {'status': 'success', 'message': 'Issue logged successfully'}, 200
         else:
-            print(f"{current_app.config['LOG_FILE_PATH']} does not exist, creating a new file.")
-
-        # Write to the file
-        #
-        with open(current_app.config['LOG_FILE_PATH'], 'a') as file:
-            file.write(log_entry)
-
-        # Return a success response
-        #
-        return {'status': 'success', 'message': 'Issue logged successfully'}, 200
+            return {
+                'status': 'error',
+                'message': 'Failed to send email',
+                'stderr': process.stderr
+            }, 500
 
     except Exception as e:
-        return jsonify(str(e)), 500
+        return {
+            'status': 'error',
+            'message': f'An error occurred: {str(e)}'
+        }, 500
 #
 # end of method
