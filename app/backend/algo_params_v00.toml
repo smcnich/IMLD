@@ -3,7 +3,42 @@
 # A parameter file that defines key paramaters for algorithms.
 #
 
-# set version "inf"ormation
+# this parameter file houses all of the palgorithms in ML Tools
+# and shows how to define them in a way the IMLD GUI can read them.
+# please follow the following format to ensure the GUI can properly
+# process the algorithms:
+#
+# [ALGORITHM_NAME]
+#   name = "Algorithm Name"
+#   [ALGORITHM_NAME.params]
+#       [ALGORITHM_NAME.params.PARAM_NAME]
+#           name = "Parameter Name"
+#           type = "select" or "int" or "float" or "class-based"
+#           range = [0, 1] # only for int or float
+#           options = ["option1", "option2", ...] # only for select
+#           default = "option1" or 0.0 or 1
+#           description = "This is a description of the parameter."
+#       ...
+#
+# make sure the ALGORITHM_NAME matches up to the algorithm name in
+# ML Tools. also, make sure to include the algorithm name in the
+# LIST variable at the top of this file.
+#
+# the parameter values of 'name', 'type', 'default', and 'description'
+# are all required. depending on the type of parameter, the following
+# attributes are required:
+#
+# - 'options' is required for type "select"
+#   - if you would like to have parameter that the user cannot change,
+#     simply set the options to a single value
+# - 'range' is required for type "int" or "float"
+#   - if you would like an infinite range, use "inf" as the upper bound
+# - if the type is 'classed-based', there is no need for a 'range' or 'select'.
+#   the parser will generate a integer input for each of the classes present
+#   in the data. the default value will show for each of these integer inputs.
+#   (please see 'EUCLIDEAN' for an example)
+
+# set version information
 #
 version = "param_v1.0.0"
 
@@ -22,11 +57,12 @@ LIST = [
     "RNF",
     "SVM",
     "MLP",
+    "RBM",
     "TRANSFORMER",
     "QSVM",
     "QNN",
     "QRBM"
-] # does not include "RBM"
+]
 
 #------------------------------------------------------------------------------
 #
@@ -459,61 +495,57 @@ LIST = [
             default = false
             description = "This halts training if the model stops improving on validation data. It's a safeguard against overfitting, ensuring the model learns just enough without memorizing the training set."
 
-# commented out because does not work currently
-# there is no way to add the parameters of the classifier through
-# the GUI
-#
-# [RBM]
-#     name = "Restricted Boltzmann Machine (RBM)"
-#     [RBM.params]
-#         [RBM.params.implementation_name]
-#             name = "Implementation"
-#             type = "select"
-#             options = ["sklearn"]
-#             default = "sklearn"
-#             description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
-#         [RBM.params.classifier]
-#             name = "Classifier"
-#             type = "select"
-#             options = ["KNN"]
-#             default = "KNN"
-#             description = "This specifies whether the model should be used as a standalone feature extractor or also perform classification. When enabled, the model not only learns to represent the input data but also outputs predictions based on the learned features."
-#         [RBM.params.learning_rate]
-#             name = "Learning Rate"
-#             type = "float"
-#             range = [0, 1]
-#             default = 0.1
-#             description = "This controls how quickly the model adjusts in response to errors during training. A high rate can speed up learning but may overshoot good solutions, while a low rate results in slower, more precise updates."
-#         [RBM.params.batch_size]
-#             name = "Batch Size"
-#             type = "int"
-#             range = [1, "inf"]
-#             default = 0
-#             description = "This specifies how many training samples are used in one update cycle. Smaller batches lead to more frequent updates and potentially faster convergence, while larger ones offer more stable learning."
-#         [RBM.params.verbose]
-#             name = "Verbose"
-#             type = "select"
-#             options = [0]
-#             default = 0
-#             description = "This controls the amount of feedback shown during training. Higher verbosity levels provide more insight into the model’s progress, which can help with debugging or understanding how the training evolves over time."
-#         [RBM.params.random_state]
-#             name = "Random State"
-#             type = "int"
-#             range = [0, "inf"]
-#             default = 0
-#             description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
-#         [RBM.params.n_components]
-#             name = "Number of Components"
-#             type = "int"
-#             range = [1, "inf"]
-#             default = 2
-#             description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
-#         [RBM.params.max_iters]
-#             name = "Maximum Iterations"
-#             type = "int"
-#             range = [1, "inf"]
-#             default = 100
-#             description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
+[RBM]
+    name = "Restricted Boltzmann Machine (RBM)"
+    [RBM.params]
+        [RBM.params.implementation_name]
+            name = "Implementation"
+            type = "select"
+            options = ["sklearn"]
+            default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
+        [RBM.params.classifier]
+            name = "Classifier"
+            type = "select"
+            options = ["KNN"]
+            default = "KNN"
+            description = "This specifies whether the model should be used as a standalone feature extractor or also perform classification. When enabled, the model not only learns to represent the input data but also outputs predictions based on the learned features."
+        [RBM.params.learning_rate]
+            name = "Learning Rate"
+            type = "float"
+            range = [0, 1]
+            default = 0.1
+            description = "This controls how quickly the model adjusts in response to errors during training. A high rate can speed up learning but may overshoot good solutions, while a low rate results in slower, more precise updates."
+        [RBM.params.batch_size]
+            name = "Batch Size"
+            type = "int"
+            range = [1, "inf"]
+            default = 0
+            description = "This specifies how many training samples are used in one update cycle. Smaller batches lead to more frequent updates and potentially faster convergence, while larger ones offer more stable learning."
+        [RBM.params.verbose]
+            name = "Verbose"
+            type = "select"
+            options = [0]
+            default = 0
+            description = "This controls the amount of feedback shown during training. Higher verbosity levels provide more insight into the model’s progress, which can help with debugging or understanding how the training evolves over time."
+        [RBM.params.random_state]
+            name = "Random State"
+            type = "int"
+            range = [0, "inf"]
+            default = 0
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
+        [RBM.params.n_components]
+            name = "Number of Components"
+            type = "int"
+            range = [1, "inf"]
+            default = 2
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
+        [RBM.params.max_iters]
+            name = "Maximum Iterations"
+            type = "int"
+            range = [1, "inf"]
+            default = 100
+            description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
 
 [TRANSFORMER]
     name = "Transformer"

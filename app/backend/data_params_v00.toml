@@ -3,7 +3,62 @@
 # A parameter file that defines key paramters for data generation.
 #
 
-# set version "inf"ormation
+# this parameter file is meant to create default data distributions for the
+# user to us. this is driven using ML Tools Data, and the defined dataset
+# generators in that module.
+#
+# this parameter file allows the IMLD GUI to create a UI for the user to
+# create these datasets. please follow the following format to ensure the
+# GUI can properly process the algorithms:
+#
+# [distribution_name]
+#     name = "Distribution Name"
+#     dist_name = "distribution_name"
+#     method = "distribution_method"
+#     [distribution_name.params]
+#         [distribution_name.params.param1]
+#             name = "Parameter Name"
+#             type = "int" or "float" or "matrix" or "group"
+#             range = [0, "inf"] or [0, 1] # int/float/matrix
+#             dimensions = [2, 1] # matrix
+#             default = 0
+#             description = "This is a description of the parameter."
+#           
+#             # if the parameter is a group, then it should be defined as:
+#             [distribution_name.params.param1.params]
+#                 [distribution_name.params.param1.params.param1]
+#                     name = "Parameter Name"
+#                     type = "int" or "float" or "matrix"
+#                     range = [0, "inf"] or [0, 1] # int/float/matrix
+#                     dimensions = [2, 1] # matrix
+#                     default = 0
+#                     description = "This is a description of the parameter."
+#
+#         ...
+#
+# make sure that the method is the same as the generation type that is used
+# in ML Tools Data. also, make sure to include the algorithm name in the LIST
+# variable at the top of the file. distribution_name can be anything, as long
+# as the method for that distribution points back to an existing method.
+#
+# the parameter values of 'name', 'dist_name', 'method', 'type', 'default', and 
+# 'description' are all required. depending on the type of parameter, the
+# following attributes are required:
+#
+# - 'range' is required for int, float, and matrix types
+# - 'dimensions' is required for matrix types
+# - another parameter group is required for group types
+#
+# groups are used to group like-parameters together, primarily if they
+# pertain to the same class. for example, if you have a dataset with two
+# gaussians, you can group the covariance and mean parameters together for each
+# class.
+#
+# matrices can be created using a format similiar to Python. for example:
+# - [[0.0, 0.0], [0.0, 0.0]] is a 2x2 matrix
+# - [1, -1] is a 1x2 matrix
+
+# set version information
 #
 version = "param_v1.0.0"
 
