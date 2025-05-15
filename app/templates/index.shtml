@@ -103,7 +103,7 @@
           <div class="card plot">
             <div class="card-title-container">
               <h3 class="card-title">Train</h3>
-              <info-icon title="Train Plot"></info-icon>
+              <info-icon title="Train Plot" description="This shows a visual representation of the data you've trained your model on. Each point is a data sample, and the colored regions (decision boundaries) show how the model has learned to separate different categories or classes. You can see how the model “understands” the training data."></info-icon>
             </div>
             <plot-card plotId="train" id="train-plot"></plot-card>
           </div>
@@ -112,7 +112,7 @@
           <div class="card plot">
             <div class="card-title-container">
               <h3 class="card-title">Eval</h3>
-              <info-icon title="Eval Plot"></info-icon>
+              <info-icon title="Eval Plot" description="This plot shows how well your trained model works on new, unseen data. It's used to test if the model can make accurate predictions outside of what it was trained on. Like the Train Plot, it displays decision boundaries, but using evaluation data instead."></info-icon>
             </div>
             <plot-card plotId="eval" id="eval-plot"></plot-card>
           </div>
@@ -122,7 +122,7 @@
         <div class="card log">
           <div class="card-title-container">
             <h3 class="card-title">Process Log</h3>
-            <info-icon title="Process Log"></info-icon>
+            <info-icon title="Process Log" description="This is a step-by-step log of everything happening in the tool. It keeps track of when you create datasets, which algorithms you choose, what parameters you use, and the results of training and evaluation. It's a helpful way to see a summary of your actions and the model's performance."></info-icon>
           </div>
           <process-log id="process-log"></process-log>
         </div>
@@ -134,7 +134,7 @@
         <div class="card" id="alg-card">
           <div class="card-title-container">
             <h3>Algorithms</h3>
-            <info-icon title="Algorithms"></info-icon>
+            <info-icon title="Algorithms" description="This is where you pick a machine learning algorithm to use, like Naive Bayes or Principal Components Analysis. Each algorithm has its own settings you can adjust, which control how the model learns from the data. You can experiment with different options to see how they affect the results."></info-icon>
           </div>
           <algorithm-toolbar id="algo-tool"></algorithm-toolbar>
         </div>

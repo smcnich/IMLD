@@ -40,16 +40,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [two_gaussian.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [two_gaussian.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [two_gaussian.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -59,16 +62,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [two_gaussian.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [two_gaussian.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [four_gaussian]
     name = "Four Gaussians"
@@ -84,16 +90,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_gaussian.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_gaussian.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_gaussian.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -103,16 +112,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_gaussian.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_gaussian.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_gaussian.params.meancov3]
             name = "Mean & Covariance 3"
             type = "group"
@@ -122,16 +134,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_gaussian.params.meancov3.params.mean3]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_gaussian.params.meancov3.params.cov3]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_gaussian.params.meancov4]
             name = "Mean & Covariance 4"
             type = "group"
@@ -141,16 +156,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_gaussian.params.meancov4.params.mean4]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_gaussian.params.meancov4.params.cov4]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [overlapping_gaussian]
     name = "Overlapping Gaussians"
@@ -166,16 +184,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [overlapping_gaussian.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.0], [0.0]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [overlapping_gaussian.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [overlapping_gaussian.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -185,16 +206,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [overlapping_gaussian.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.0], [0.0]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [overlapping_gaussian.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.025, 0.0], [0.0, 0.025]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [two_ellipses]
     name = "Two Ellipses"
@@ -210,16 +234,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [two_ellipses.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [two_ellipses.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [two_ellipses.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -229,16 +256,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [two_ellipses.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [two_ellipses.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [four_ellipses]
     name = "Four Ellipses"
@@ -254,16 +284,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_ellipses.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_ellipses.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_ellipses.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -273,16 +306,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                     description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_ellipses.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_ellipses.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_ellipses.params.meancov3]
             name = "Mean & Covariance 3"
             type = "group"
@@ -292,16 +328,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_ellipses.params.meancov3.params.mean3]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_ellipses.params.meancov3.params.cov3]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [four_ellipses.params.meancov4]
             name = "Mean & Covariance 4"
             type = "group"
@@ -311,16 +350,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [four_ellipses.params.meancov4.params.mean4]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [four_ellipses.params.meancov4.params.cov4]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [rotated_ellipses]
     name = "Rotated Ellipses"
@@ -336,16 +378,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [rotated_ellipses.params.meancov1.params.mean1]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[-0.5], [0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [rotated_ellipses.params.meancov1.params.cov1]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0333, 0], [0, 0.0043]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
         [rotated_ellipses.params.meancov2]
             name = "Mean & Covariance 2"
             type = "group"
@@ -355,16 +400,19 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 10000
+                    description = "This controls how many data samples will be generated for the dataset. More points can help algorithms learn patterns more effectively, while fewer points might make it harder for the model to understand the structure of the data. It's useful for exploring how the amount of data affects learning."
                 [rotated_ellipses.params.meancov2.params.mean2]
                     name = "Mean"
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.5], [-0.5]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [rotated_ellipses.params.meancov2.params.cov2]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0043, 0], [0,0.0333]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 #------------------------------------------------------------------------------
 #
@@ -386,11 +434,13 @@ LIST = [
                     type = "int"
                     range = [0, "inf"]
                     default = 2000
+                    description = "This controls how many data points will be generated along the outer ring of the toroidal structure. The more points you add, the more detailed and densely packed the ring will appear. This parameter helps define how distributed the data is along the ring's circumference."
                 [toroidal.params.npts.params.npts_mass]
                     name = "Number of Points (Mass)"
                     type = "int"
                     range = [0, "inf"]
                     default = 2000
+                    description = "This specifies how many data points will be distributed in the central mass of the toroid. These points will form the inner region of the structure, where the density and shape of the data can be adjusted based on how you set this value."
         [toroidal.params.inner_outer_rad]
             name = "Inner and Outer Radius"
             type = "group"
@@ -400,11 +450,13 @@ LIST = [
                     type = "float"
                     range = [0, "inf"]
                     default = 0.650
+                    description = "This defines the distance from the center of the toroidal structure to the inner boundary of the outer ring. It determines how close the ring of data points is to the core of the toroid, impacting the spacing between points along the outer perimeter."
                 [toroidal.params.inner_outer_rad.params.outer_rad]
                     name = "Outer Radius (Ring)"
                     type = "float"
                     range = [0, "inf"]
                     default = 0.850
+                    description = "This determines the distance from the center to the outer boundary of the toroidal ring. By adjusting this, you control how far apart the points will be spread along the circumference of the ring, affecting the shape and size of the data structure."
         [toroidal.params.meancov1]
             name = "Mean & Covariance (Mass)"
             type = "group"
@@ -414,11 +466,13 @@ LIST = [
                     type = "matrix"
                     dimensions = [2, 1]
                     default = [[0.0], [0.0]]
+                    description = "This defines the center point of the data distribution. It determines where the majority of the samples will appear in the plot. Adjusting the mean lets you control the position of the data cluster, which can help visualize how different classes might overlap or stay separate."
                 [toroidal.params.meancov1.params.cov]
                     name = "Covariance"
                     type = "matrix"
                     dimensions = [2, 2]
                     default = [[0.0083, 0], [0, 0.0083]]
+                    description = "This sets the spread and orientation of the data. It controls whether the points form a tight cluster or stretch out in certain directions. Covariance also defines how the variables are related — changing it affects the shape and angle of the data cloud."
 
 [yin_yang]
     name = "Yin-Yang"
@@ -430,24 +484,29 @@ LIST = [
             type = "matrix"
             dimensions = [2, 1]
             default = [[0.0], [0.0]]
+            description = "This defines the central position of both the Yin and Yang components in the dataset. The means determine where the data clusters will be placed, with each component having its own center that helps shape the distribution of the points."
         [yin_yang.params.radius]
             name = "Radius"
             type = "float"
             range = [0, "inf"]
             default = 1.5
+            description = "This controls the size of each component in the Yin-Yang structure. The radius affects how far out the points are distributed from the central mean, defining the overall spread and shape of the Yin and Yang regions."
         [yin_yang.params.npts_yin]
             name = "Number of Points (Yin)"
             type = "int"
             range = [0, "inf"]
             default = 5000
+            description = "This specifies how many data points will be generated for the Yin part of the dataset. Adjusting this number controls the density and distribution of the points in one of the two regions, influencing the overall balance of the Yin-Yang structure."
         [yin_yang.params.npts_yang]
             name = "Number of Points (Yang)"
             type = "int"
             range = [0, "inf"]
             default = 5000
+            description = "This determines how many data points will be created for the Yang part of the dataset. It works alongside the Yin points to shape the dual nature of the structure, balancing the distribution and ensuring that the two components have the desired amount of data."
         [yin_yang.params.overlap]
             name = "Overlap"
             type = "float"
             range = [0, 1]
             default = 0
+            description = "This defines how much the Yin and Yang regions will intersect or overlap with each other. Adjusting the overlap alters how the components blend, affecting the boundaries between them and potentially creating more challenging separations for machine learning algorithms."
         
