@@ -4545,6 +4545,28 @@ class KNN:
         return p_labels, posteriors
     #
     # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns important attributes of the algorithm.
+         there are no important attributes exposed by the SKLearn
+         KNN implementation.
+        """
+
+        # exit gracefully
+        #
+        return None
+    #
+    # end of method
 #
 # end of class (KNN)
 
@@ -4713,6 +4735,42 @@ class KMEANS:
         return p_labels, posteriors
     #
     # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the cluster centers and intertia of the algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format priors for log output
+        #
+        cluster_centers = np.round(self.model_d[ALG_NAME_MDL].cluster_centers_,
+                                   decimals=4)
+        log_output.append(\
+            f"Cluster Centers: {cluster_centers[0].tolist()}")
+        log_output.extend(\
+            f"                 {r.tolist()}" for r in cluster_centers[1:])
+
+        inertia = self.model_d[ALG_NAME_MDL].inertia_
+        log_output.append(f"Inertia: {inertia:.4f}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
+    #
+    # end of method
 #
 # end of class (KMEANS)
 
@@ -4878,6 +4936,40 @@ class RNF:
         return p_labels, posteriors
     #
     # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the number of outputs seen during fit
+         and the impurity-based feature importances.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        # format priors for log output
+        #
+        n_outputs = self.model_d[ALG_NAME_MDL].n_outputs_
+        log_output.append(f"Number of Outputs: {n_outputs}")
+
+        feature_importances = self.model_d[ALG_NAME_MDL].feature_importances_
+        for idx, imp in enumerate(feature_importances):
+            log_output.append(f"Feature {idx} Importance: {imp:.4f}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
+    #
+    # end of method
 #
 # end of class (RNF)
 
@@ -5037,6 +5129,52 @@ class SVM:
         # exit gracefully
         #
         return p_labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns the important attributes of SVM
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        class_weight = self.model_d[ALG_NAME_MDL].class_weight_
+        for idx, weight in enumerate(class_weight):
+            log_output.append(f"Class {idx} Weight: {weight:.4f}")
+
+        intercept = np.round(self.model_d[ALG_NAME_MDL].intercept_,
+                             decimals=4)
+        log_output.append(f"Constants in Decision Function: {intercept}")
+
+        n_iter = np.round(self.model_d[ALG_NAME_MDL].n_iter_,
+                          decimals=4)
+        log_output.append(f"Number of Iterations for each Model: {n_iter}")
+
+        class_weight = self.model_d[ALG_NAME_MDL].n_support_
+        for idx, n in enumerate(class_weight):
+            log_output.append(f"Class {idx} Number Support Vectors: {n}")
+
+        probA = self.model_d[ALG_NAME_MDL].probA_
+        log_output.append(f"ProbA: {probA[0]:.4f}")
+
+        probB = self.model_d[ALG_NAME_MDL].probB_
+        log_output.append(f"ProbB: {probB[0]:.4f}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #
@@ -5226,6 +5364,41 @@ class MLP:
     #
     # end of method
 
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns important attributes of the MLP algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        loss = self.model_d[ALG_NAME_MDL].loss_
+        log_output.append(f"Loss: {loss:.4f}")
+
+        n_layers = self.model_d[ALG_NAME_MDL].n_layers_
+        log_output.append(f"Number of Layers: {n_layers}")
+
+        n_iter = self.model_d[ALG_NAME_MDL].n_iter_
+        log_output.append(f"Number of Iterations: {n_iter}")
+
+        n_outputs = self.model_d[ALG_NAME_MDL].n_outputs_
+        log_output.append(f"Number of Outputs: {n_outputs}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
+    #
+    # end of method
 #
 # end of class (MLP)
 
@@ -5407,6 +5580,44 @@ class RBM:
         # exit gracefully
         #
         return p_labels, posteriors
+    #
+    # end of method
+
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns important attributes of the RBM algorithm.
+        """
+  
+        # get the rbm algorithm from the pipeline
+        #
+        rbm = self.model_d[ALG_NAME_MDL].named_steps['rbm']
+
+        # create empty log output
+        #
+        log_output = []
+
+        intercepts_hidden = rbm.intercept_hidden_
+        for idx, intercept in enumerate(intercepts_hidden):
+            log_output.append(\
+                f"Intercepts for Hidden Layer {idx}: {intercept:.4f}")
+            
+        intercepts_visible = rbm.intercept_visible_
+        for idx, intercept in enumerate(intercepts_visible):
+            log_output.append(\
+                f"Intercepts for Visible Layer {idx}: {intercept:.4f}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
     #
     # end of method
 #

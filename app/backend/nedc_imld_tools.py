@@ -359,8 +359,9 @@ def predict(model:mlt.Alg, data:mltd.MLToolsData):
     metrics = score(model, data, hyp_labels)
 
     # get the parameter outcomes
+    # check the return because it is a ML Tools function
     #
-    parameter_output = model.get_info()
+    parameter_output = check_return(model.get_info)
     
     # exit gracefully
     #
