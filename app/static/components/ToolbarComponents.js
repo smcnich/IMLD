@@ -2537,6 +2537,155 @@ class Toolbar_Normalize extends HTMLElement {
 //
 // end of class
 
+class Toolbar_DownloadButton extends HTMLElement {
+  /*
+  class: Toolbar_DownloadButton 
+
+  description:
+   This class represents a custom toolbar download button element. It allows for creating a button with a label
+   and some basic styling. It also provides the functionality of adding an event listener to the button
+   so that when clicked, it can dispatch a custom event to the window, to download a file.
+  */
+
+  constructor() {
+    /*
+    method: Toolbar_DownloadButton::constructor
+
+    args:
+     None
+
+    returns:
+     Toolbar_DownloadButton instance
+
+    description:
+     This is the constructor for the Toolbar_DownloadButton class. It is called when a new instance of the class is created.
+     The constructor attaches a shadow DOM to the element with the "open" mode, which allows styling and structure 
+     to be encapsulated within the component.
+    */
+
+    // Call the parent constructor
+    //
+    super();
+
+    // Create a shadow root for the component
+    //
+    this.attachShadow({ mode: "open" });
+  }
+  //
+  // end of method
+
+  connectedCallback() {
+    /*
+    method: Toolbar_DownloadButton::connectedCallback
+
+    args:
+      None
+
+    returns:
+      None
+
+    description:
+     This method is called when the Toolbar_DownloadButton element is added to the DOM. It triggers the rendering of the button 
+     and adds a click event listener to it. This lifecycle method ensures that the button is properly initialized 
+     when the component is inserted into the DOM.
+    */
+
+    // render the component
+    //
+    this.render();
+    this.addClickListener();
+  }
+  //
+  // end of method
+
+  render() {
+    /*
+    method: Toolbar_DownloadButton::render
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     This method is responsible for rendering the button element in the shadow DOM. It defines the button's 
+     HTML structure, style, and the label that appears on the button. The label is fetched from the "label" 
+     attribute of the element, with a fallback value of "Button" if the attribute is not provided.
+    */
+
+    const label = this.getAttribute("label") || "Button"; // Get the label from the attribute
+
+    this.shadowRoot.innerHTML = `
+      <style>
+        .toolbar-button {
+          background-color: white;
+          color: black;
+          font-family: 'Inter', sans-serif;
+          font-weight: 100;
+          font-size: 1em;
+          padding: 5px 30px;
+          border: none;
+          cursor: pointer;
+          min-width: 220px;
+          white-space: nowrap;
+          text-align: left;
+        }
+
+        .toolbar-button:hover {
+          background-color: #c9c9c9;
+        }
+
+      </style>
+
+      <button class="toolbar-button">${label}</button>
+    `;
+  }
+
+  addClickListener() {
+    /*
+    method: Toolbar_DownloadButton::addClickListener
+
+    args:
+     None
+
+    returns:
+     None
+
+    description:
+     This method adds a click event listener to the button. When the button is clicked, it dispatches a custom 
+     event to download a file to the user's downloads.
+    */
+
+    // Get the button element from the shadow DOM
+    //
+    const button = this.shadowRoot.querySelector(".toolbar-button");
+
+    // Get the download type attribute value for conditional logic
+    //
+    const download_type = this.getAttribute("download");
+
+    // Add an event listener to handle the button click event
+    //
+    button.addEventListener("click", () => {
+      // send a custom event to the window which will 
+      // download a file based on the download type atrribute
+      //
+      EventBus.dispatchEvent(
+        new CustomEvent("download", {
+          detail: {
+            type: download_type
+          },
+        })
+      );
+    });
+  }
+  //
+  // end of method
+}
+//
+// end of class
+
 // Register the custom element for dropdown buttons
 customElements.define("toolbar-button", Toolbar_Button);
 customElements.define("toolbar-checkbox-button", Toolbar_CheckboxButton);
@@ -2548,3 +2697,4 @@ customElements.define("toolbar-popup-button", Toolbar_PopupButton);
 customElements.define("toolbar-set-gaussian", Toolbar_SetGaussian);
 customElements.define("toolbar-set-ranges", Toolbar_SetRanges);
 customElements.define("toolbar-normalize", Toolbar_Normalize);
+customElements.define("toolbar-download-button", Toolbar_DownloadButton);

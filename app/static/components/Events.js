@@ -1027,6 +1027,84 @@ EventBus.addEventListener("dataGen", (event) => {
 //
 // end of event listener
 
+EventBus.addEventListener("download", (event) => {
+  /*
+  eventListener: download
+
+  dispatcher: UI component that triggers a file download (e.g., button)
+
+  args:
+   event.detail.type: the type of file to download ("User Guide" or "Run Locally")
+
+  description:
+   this event listener is triggered when the user initiates a file download.
+   based on the selected type, it determines the appropriate file path and name,
+   creates a temporary link element, and programmatically triggers a download
+   by simulating a click. The application is suspended before the download starts
+   and resumed immediately after.
+  */
+
+  // retrieve the download type
+  //
+  const download_type = event.detail.type;
+  
+  // create empty variables for url and name of file to be downloaded
+  //
+  let fileUrl = "";
+  let fileName = "";
+
+  // cases for each download type (user guide or local download)
+  //
+  switch (download_type) {
+    case "User Guide":
+      fileUrl = "/static/downloads/user_guide.docx";
+      fileName = "user_guide.docx";
+      break;
+    
+    case "Run Locally":
+      fileUrl = "/static/downloads/imld.tar.gz";
+      fileName = "imld.tar.gz";
+      break;
+
+    default:
+      console.warn("Unknown download type.");
+      break;
+  }
+
+  // suspend the application
+  //
+  EventBus.dispatchEvent(new CustomEvent("suspend"));
+
+  // create a link element and add a download attribute
+  // connect the href to the download URL
+  // append the link to the document body
+  // this link is never displayed on the page.
+  // it acts as a dummy link that starts a download
+  //
+  var link = document.createElement("a");
+  link.setAttribute("href", fileUrl);
+  link.setAttribute("download", fileName);
+  document.body.appendChild(link);
+
+  // wait for the link to be added to the document
+  // then simulate a click event on the link
+  // the dummy link created above will start the download
+  // when a click event is dispatched
+  //
+  window.requestAnimationFrame(function () {
+    var event = new MouseEvent("click");
+    link.dispatchEvent(event);
+    document.body.removeChild(link);
+  });
+
+  // continue the application
+  //
+  EventBus.dispatchEvent(new CustomEvent("continue"));
+
+});
+//
+// end of event listener
+
 EventBus.addEventListener("updateLabels", (event) => {
   /*
   eventListener: updateLabels
