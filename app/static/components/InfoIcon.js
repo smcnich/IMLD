@@ -69,9 +69,9 @@ class InfoIcon extends HTMLElement {
     //
     this.title = this.getAttribute("title") || "No Title";
 
-    // Look up corresponding description from InfoDescriptions
+    // get the description attribute
     //
-    this.description = InfoDescriptions[this.title] || "No Description";
+    this.description = this.getAttribute("description") || "No Description";
 
     // Render the component to the webpage
     //

@@ -337,7 +337,8 @@ class FormContainer extends HTMLElement {
     // create an info icon for the input
     //
     const info = document.createElement("info-icon");
-    info.title = params.name;
+    info.setAttribute("title", params.name);
+    info.setAttribute("description", params.description);
 
     // create a wrapper to contain both the label and info icon
     //
@@ -445,7 +446,8 @@ class FormContainer extends HTMLElement {
     // create an info icon for the input
     //
     const info = document.createElement("info-icon");
-    info.title = params.name;
+    info.setAttribute("title", params.name);
+    info.setAttribute("description", params.description);
 
     // create a wrapper to contain both the label and info icon
     //
@@ -583,7 +585,8 @@ class FormContainer extends HTMLElement {
     // create an info icon for the input
     //
     const info = document.createElement("info-icon");
-    info.title = params.name;
+    info.setAttribute("title", params.name);
+    info.setAttribute("description", params.description);
 
     // create a wrapper to contain both the label and info icon
     //
@@ -674,7 +677,8 @@ class FormContainer extends HTMLElement {
     // create an info icon for the input
     //
     const info = document.createElement("info-icon");
-    info.title = params.name;
+    info.setAttribute("title", params.name);
+    info.setAttribute("description", params.description);
 
     // create a wrapper to contain both the label and info icon
     //

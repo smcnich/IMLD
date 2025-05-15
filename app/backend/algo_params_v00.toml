@@ -43,10 +43,12 @@ LIST = [
             type = "select"
             options = ["discriminant"]
             default = "discriminant"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [EUCLIDEAN.params.weights]
             name = "Weights"
             type = "class-based"
             default = 1
+            description = "This parameter defines how much influence each class has on the model's decision-making process. By adjusting the weights, you can prioritize certain classes over others, helping the model account for imbalanced data or emphasize specific areas in the decision-making process."
 
 [PCA]
     name = "Principle Component Analysis (PCA)"
@@ -56,31 +58,37 @@ LIST = [
             type = "select"
             options = ["discriminant"]
             default = "discriminant"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [PCA.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
         [PCA.params.ctype]
             name = "Covariance Type"
             type = "select"
             options = ["full", "diagonal"]
             default = "full"
+            description = "This controls the way the algorithm models the spread or correlation of the data. By selecting different covariance types, you can adjust how much the model accounts for relationships between features, affecting the flexibility of the model in capturing data patterns."
         [PCA.params.center]
             name = "Center"
             type = "select"
             options = ["none", "tied", "untied"]
             default = "none"
+            description = "This defines how the data is centered before analysis. Centering affects the starting point of the algorithm's calculations, helping to shift or align the data for better accuracy. It also influences how the model interprets the relationships between features."
         [PCA.params.scale]
             name = "Scale"
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+            description = "This determines how the data is scaled, which can influence the sensitivity of the model to differences between features. By adjusting the scale, you can control whether the algorithm treats features equally or emphasizes certain aspects of the data more."
         [PCA.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [0, 2] # range for IMLD since its 2D
             default = 2 # default value for IMLD since its 2D
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
 
 [LDA]
     name = "Linear Discriminant Analysis (LDA)"
@@ -90,31 +98,37 @@ LIST = [
             type = "select"
             options = ["discriminant"]
             default = "discriminant"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [LDA.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
         [LDA.params.ctype]
             name = "Covariance Type"
             type = "select"
             options = ["full", "diagonal"]
             default = "full"
+            description = "This controls the way the algorithm models the spread or correlation of the data. By selecting different covariance types, you can adjust how much the model accounts for relationships between features, affecting the flexibility of the model in capturing data patterns."
         [LDA.params.center]
             name = "Center"
             type = "select"
             options = ["none", "tied", "untied"]
             default = "none"
+            description = "This defines how the data is centered before analysis. Centering affects the starting point of the algorithm's calculations, helping to shift or align the data for better accuracy. It also influences how the model interprets the relationships between features."
         [LDA.params.scale]
             name = "Scale"
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+            description = "This determines how the data is scaled, which can influence the sensitivity of the model to differences between features. By adjusting the scale, you can control whether the algorithm treats features equally or emphasizes certain aspects of the data more."
         [LDA.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [0, 2] # range for IMLD since its 2D
             default = 2 # default value for IMLD since its 2D
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
 
 [QDA]
     name = "Quadratic Components Analysis (QDA)"
@@ -124,31 +138,37 @@ LIST = [
             type = "select"
             options = ["discriminant"]
             default = "discriminant"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [QDA.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
         [QDA.params.ctype]
             name = "Covariance Type"
             type = "select"
             options = ["full", "diagonal"]
             default = "full"
+            description = "This controls the way the algorithm models the spread or correlation of the data. By selecting different covariance types, you can adjust how much the model accounts for relationships between features, affecting the flexibility of the model in capturing data patterns."
         [QDA.params.center]
             name = "Center"
             type = "select"
             options = ["none", "tied", "untied"]
             default = "none"
+            description = "This defines how the data is centered before analysis. Centering affects the starting point of the algorithm's calculations, helping to shift or align the data for better accuracy. It also influences how the model interprets the relationships between features."
         [QDA.params.scale]
             name = "Scale"
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+            description = "This determines how the data is scaled, which can influence the sensitivity of the model to differences between features. By adjusting the scale, you can control whether the algorithm treats features equally or emphasizes certain aspects of the data more."
         [QDA.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [0, 2] # range for IMLD since its 2D
             default = 2 # default value for IMLD since its 2D
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
 
 [QLDA]
     name = "Quadratic Linear Discriminant Analysis (QLDA)"
@@ -158,31 +178,37 @@ LIST = [
             type = "select"
             options = ["discriminant"]
             default = "discriminant"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [QLDA.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
         [QLDA.params.ctype]
             name = "Covariance Type"
             type = "select"
             options = ["full", "diagonal"]
             default = "full"
+            description = "This controls the way the algorithm models the spread or correlation of the data. By selecting different covariance types, you can adjust how much the model accounts for relationships between features, affecting the flexibility of the model in capturing data patterns."
         [QLDA.params.center]
             name = "Center"
             type = "select"
             options = ["none", "tied", "untied"]
             default = "none"
+            description = "This defines how the data is centered before analysis. Centering affects the starting point of the algorithm's calculations, helping to shift or align the data for better accuracy. It also influences how the model interprets the relationships between features."
         [QLDA.params.scale]
             name = "Scale"
             type = "select"
             options = ["none", "biased", "unbiased", "empirical"]
             default = "none"
+            description = "This determines how the data is scaled, which can influence the sensitivity of the model to differences between features. By adjusting the scale, you can control whether the algorithm treats features equally or emphasizes certain aspects of the data more."
         [QLDA.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [0, 2] # range for IMLD since its 2D
             default = 2 # default value for IMLD since its 2D
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
 
 [NB]
     name = "Naive Bayes (NB)"
@@ -192,11 +218,13 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [NB.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
 
 [GMM]
     name = "Gaussian Mixture Model (GMM)"
@@ -206,21 +234,25 @@ LIST = [
             type = "select"
             options = ["em"]
             default = "em"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [GMM.params.priors]
             name = "Prior Probability"
             type = "select"
             options = ["ml", "map"]
             default = "ml"
+            description = "This specifies how much weight or importance is given to each class before seeing the data. It can be set to reflect prior knowledge or assumptions about the distribution of the classes, influencing how the algorithm learns from the data."
         [GMM.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [1, 10]
             default = 1
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
         [GMM.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 27
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
 
 #------------------------------------------------------------------------------
 #
@@ -236,11 +268,13 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [KNN.params.k_nearest_neighbors]
             name = "Number of Neighbors"
             type = "int"
             range = [1, "inf"]
             default = 5
+            description = "This parameter defines how many nearby data points are considered when making a prediction. A smaller number focuses more on local patterns, while a larger number captures broader trends in the data. The choice of neighbors affects the model's sensitivity to outliers and generalization to unseen data."
 
 [KMEANS]
     name = "K-Means (KMEANS)"
@@ -250,26 +284,31 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [KMEANS.params.n_clusters]
             name = "Number of Clusters"
             type = "int"
             range = [1, "inf"]
             default = 2
+            description = "This defines how many groups the algorithm should try to identify in the data. Choosing the right number of clusters helps the model find meaningful patterns, but selecting too few or too many can lead to poor or overly complex groupings that don't reflect the underlying structure."
         [KMEANS.params.n_init]
             name = "Number of Initializations"
             type = "int"
             range = [1, "inf"]
             default = 3
+            description = "This controls how many times the algorithm will try to find an optimal solution by running the clustering process with different starting conditions. Multiple initializations help ensure the model avoids local minima and improves the likelihood of finding the best solution for the data."
         [KMEANS.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 27
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
         [KMEANS.params.max_iters]
             name = "Maximum Iterations"
             type = "int"
             range = [1, "inf"]
             default = 100
+            description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
 
 [RNF]
     name = "Random Forest (RNF)"
@@ -279,26 +318,31 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [RNF.params.n_estimators]
             name = "Number of Estimators"
             type = "int"
             range = [1, "inf"]
             default = 100
+            description = "This controls how many models are combined together to make a final prediction. Using more estimators can lead to better performance by reducing variability and improving accuracy, but may also increase the time it takes to train and evaluate the model."
         [RNF.params.max_depth]
             name = "Maximum Depth"
             type = "int"
             range = [1, "inf"]
             default = 5
+            description = "This sets a limit on how complex the model is allowed to become when learning from the data. By restricting how deep the model can grow, it helps prevent overfitting and keeps the structure more general, which can improve performance on unseen data."
         [RNF.params.criterion]
             name = "Criterion"
             type = "select"
             options = ["gini", "entropy", "log_loss"]
             default = "gini"
+            description = "This defines the rule the algorithm uses to decide how to split or group data during training. Different criteria measure the quality of these decisions in different ways, which can impact how the model structures its understanding of the data."
         [RNF.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 27
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
 
 [SVM]
     name = "Support Vector Machines (SVM)"
@@ -308,21 +352,25 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [SVM.params.c]
             name = "Regularization Parameter (c)"
             type = "float"
             range = [0, 10000]
             default = 1.0
+            description = "This controls the balance between fitting the training data closely and keeping the model simple enough to generalize well. A strong regularization encourages the model to focus on the overall trend, while weaker regularization allows it to capture more specific patterns in the data."
         [SVM.params.gamma]
             name = "Kernel Coefficient (gamma)"
             type = "float"
             range = [0, 10000]
             default = 0.1
+            description = "This adjusts how much influence each training sample has on shaping the model's decision boundaries. It affects the flexibility of the model—smaller values create smoother, more generalized boundaries, while larger ones allow for more complex, detailed structures."
         [SVM.params.kernel]
             name = "Kernel"
             type = "select"
             options = ["linear", "poly", "rbf", "sigmoid", "precomputed"]
             default = "linear"
+            description = "This defines the type of transformation applied to the data before learning begins. By projecting the data into a higher-dimensional space, the kernel helps the model find patterns that aren't obvious in the original input, especially when the data isn’t linearly separable."
 
 #------------------------------------------------------------------------------
 #
@@ -338,66 +386,79 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [MLP.params.hidden_size]
             name = "Hidden Size"
             type = "int"
             range = [1, "inf"]
             default = 3
+            description = "This determines the structure of the model's internal layers, which process the data between input and output. Adjusting this can help the model learn more complex patterns, but larger sizes may increase the risk of overfitting."
         [MLP.params.activation]
             name = "Activation"
             type = "select"
             options = ["relu", "identity", "logistic", "tanh"]
             default = "relu"
+            description = "This defines how signals are passed between layers in the model. Different activation functions affect the model’s ability to learn nonlinear patterns and can impact training speed and performance."
         [MLP.params.solver]
             name = "Solver"
             type = "select"
             options = ["adam", "lbfgs", "sgd"]
             default = "adam"
+            description = "This sets the algorithm used to optimize the model during training. Each option follows a different strategy to minimize error, influencing how quickly and effectively the model converges to a solution."
         [MLP.params.batch_size]
             name = "Batch Size"
             type = "select"
             options = ["auto"]
             default = "auto"
+            description = "This specifies how many training samples are used in one update cycle. Smaller batches lead to more frequent updates and potentially faster convergence, while larger ones offer more stable learning."
         [MLP.params.learning_rate]
             name = "Learning Rate"
             type = "select"
             options = ["constant", "invscaling", "adaptive"]
             default = "constant"
+            description = "This controls how quickly the model adjusts in response to errors during training. A high rate can speed up learning but may overshoot good solutions, while a low rate results in slower, more precise updates."
         [MLP.params.learning_rate_init]
             name = "Initial Learning Rate"
             type = "float"
             range = [0, 1]
             default = 0.001
+            description = "This sets the starting value for the learning rate when training begins. It may be adjusted over time, helping the model start with broad updates and gradually settle into more fine-tuned adjustments."
         [MLP.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 27
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
         [MLP.params.momentum]
             name = "Momentum"
             type = "float"
             range = [0, 1]
             default = 0.9
+            description = "This helps the model build up speed in directions that consistently reduce error, allowing it to bypass shallow local minima. It can lead to faster convergence and smoother learning."
         [MLP.params.validation_fraction]
             name = "Validation Fraction"
             type = "float"
             range = [0, 1]
             default = 0.1
+            description = "This defines how much of the data is set aside to monitor performance during training. It helps detect overfitting by checking how well the model generalizes beyond the training data."
         [MLP.params.max_iters]
             name = "Maximum Iterations"
             type = "int"
             range = [1, "inf"]
             default = 100
+            description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
         [MLP.params.shuffle]
             name = "Shuffle"
             type = "select"
             options = [true, false]
             default = true
+            description = "This determines whether the training data is randomly reordered before each training cycle. Shuffling improves generalization by preventing the model from learning patterns based on the order of the data."
         [MLP.params.early_stopping]
             name = "Early Stopping"
             type = "select"
             options = [true, false]
             default = false
+            description = "This halts training if the model stops improving on validation data. It's a safeguard against overfitting, ensuring the model learns just enough without memorizing the training set."
 
 [RBM]
     name = "Restricted Boltzmann Machine (RBM)"
@@ -407,41 +468,49 @@ LIST = [
             type = "select"
             options = ["sklearn"]
             default = "sklearn"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [RBM.params.classifier]
             name = "Classifier"
             type = "select"
             options = ["KNN"]
             default = "KNN"
+            description = "This specifies whether the model should be used as a standalone feature extractor or also perform classification. When enabled, the model not only learns to represent the input data but also outputs predictions based on the learned features."
         [RBM.params.learning_rate]
             name = "Learning Rate"
             type = "float"
             range = [0, 1]
             default = 0.1
+            description = "This controls how quickly the model adjusts in response to errors during training. A high rate can speed up learning but may overshoot good solutions, while a low rate results in slower, more precise updates."
         [RBM.params.batch_size]
             name = "Batch Size"
             type = "int"
             range = [1, "inf"]
             default = 0
+            description = "This specifies how many training samples are used in one update cycle. Smaller batches lead to more frequent updates and potentially faster convergence, while larger ones offer more stable learning."
         [RBM.params.verbose]
             name = "Verbose"
             type = "select"
             options = [0]
             default = 0
+            description = "This controls the amount of feedback shown during training. Higher verbosity levels provide more insight into the model’s progress, which can help with debugging or understanding how the training evolves over time."
         [RBM.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 0
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
         [RBM.params.n_components]
             name = "Number of Components"
             type = "int"
             range = [1, "inf"]
             default = 2
+            description = "This specifies how many principal components or factors the algorithm will consider. It controls the dimensionality of the data being analyzed, allowing you to reduce the complexity of the data or focus on the most important features for the model."
         [RBM.params.max_iters]
             name = "Maximum Iterations"
             type = "int"
             range = [1, "inf"]
             default = 100
+            description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
 
 [TRANSFORMER]
     name = "Transformer"
@@ -451,71 +520,85 @@ LIST = [
             type = "select"
             options = ["pytorch"]
             default = "pytorch"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [TRANSFORMER.params.epoch]
             name = "Epoch"
             type = "int"
             range = [1, "inf"]
             default = 50
+            description = "This determines how many full passes the training process makes over the entire dataset. More epochs allow the model to refine its understanding of the data, but excessive training can lead to overfitting where the model memorizes patterns instead of learning general trends."
         [TRANSFORMER.params.learning_rate]
             name = "Learning Rate"
             type = "float"
             range = [0, 1]
             default = 0.001
+            description = "This controls how quickly the model adjusts in response to errors during training. A high rate can speed up learning but may overshoot good solutions, while a low rate results in slower, more precise updates."
         [TRANSFORMER.params.batch_size]
             name = "Batch Size"
             type = "int"
             range = [1, "inf"]
             default = 32
+            description = "This specifies how many training samples are used in one update cycle. Smaller batches lead to more frequent updates and potentially faster convergence, while larger ones offer more stable learning."
         [TRANSFORMER.params.embed_size]
             name = "Embed Size"
             type = "int"
             range = [1, "inf"]
             default = 32
+            description = "This sets the dimensionality of the internal representation used for each input element. A larger size allows for more detailed feature capture, while a smaller size can lead to simpler and more efficient models that generalize well on limited data."
         [TRANSFORMER.params.nheads]
             name = "Number of Heads"
             type = "int"
             range = [1, "inf"]
             default = 2
+            description = "This defines how many attention mechanisms are used in parallel during training. Each head captures different aspects of the data, and using multiple heads enables the model to process information from various perspectives simultaneously."
         [TRANSFORMER.params.num_layers]
             name = "Number of Layers"
             type = "int"
             range = [1, "inf"]
             default = 2
+            description = "This controls the depth of the model's architecture by specifying how many times data is transformed during training. Deeper models can learn more abstract patterns but may require more data and regularization to prevent overfitting."
         [TRANSFORMER.params.mlp_dim]
             name = "MLP Dimension"
             type = "int"
             range = [1, "inf"]
             default = 64
+            description = "This sets the size of the intermediate representation within the model's internal layers. It influences how much information can be processed at each step and affects both the model’s complexity and capacity to learn from the data."
         [TRANSFORMER.params.dropout]
             name = "Dropout"
             type = "float"
             range = [0, 1]
             default = 0.1
+            description = "This adds regularization by randomly disabling a portion of the model’s connections during training. It helps prevent overfitting by encouraging the model to rely on a distributed set of features instead of memorizing specific patterns."
         [TRANSFORMER.params.random_state]
             name = "Random State"
             type = "int"
             range = [0, "inf"]
             default = 27
+            description = "This parameter controls the randomness in the algorithm's initialization process. By setting a specific random state, you ensure reproducibility of the results. This is useful for consistency across multiple runs, allowing you to compare performance and behavior in a controlled manner."
         [TRANSFORMER.params.tolerance]
             name = "Tolerance"
             type = "float"
             range = [0, 1]
             default = 0.0001
+            description = "This sets the threshold for determining when the model's improvement has become too small to continue training. Once the changes in performance drop below this level, the training process may stop early to save time and prevent overfitting."
         [TRANSFORMER.params.validation_fraction]
             name = "Validation Fraction"
             type = "float"
             range = [0, 1]
             default = 0.1
+            description = "This defines how much of the data is set aside to monitor performance during training. It helps detect overfitting by checking how well the model generalizes beyond the training data."
         [TRANSFORMER.params.early_stopping]
             name = "Earling Stopping"
             type = "select"
             options = [true, false]
             default = true
+            description = "This enables a check during training that monitors how well the model is learning over time. If performance stops improving for a certain number of steps, the training halts early to avoid unnecessary computation or overfitting to the training data."
         [TRANSFORMER.params.max_iters]
             name = "Max Iterations"
             type = "int"
             range = [0, 100]
             default = 5
+            description = "This parameter sets the limit on how many times the algorithm will repeat its calculations before stopping. It prevents the process from running indefinitely and ensures that the algorithm converges within a reasonable amount of time while still having the chance to refine its clusters."
 
 #------------------------------------------------------------------------------
 #
@@ -531,46 +614,55 @@ LIST = [
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
+            description = "This defines the method used to compute the algorithm's solution. Different implementations may focus on optimizing speed, accuracy, or handling specific data types. Choosing the right implementation can affect both the performance and behavior of the algorithm."
         [QSVM.params.provider_name]
             name = "Provider Name"
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
+            description = "This specifies which quantum computing service will be used to run the algorithm. Different providers may offer access to different hardware configurations, affecting the speed, reliability, and accuracy of quantum computations."
         [QSVM.params.hardware]
             name = "Hardware"
             type = "select"
             options = ["cpu"]
             default = "cpu"
+            description = "This selects the quantum device or simulator on which the algorithm will run. The choice of hardware can influence execution time, noise levels, and whether the computation is performed on real quantum systems or emulated environments."
         [QSVM.params.encoder_name]
             name = "Encoder Name"
             type = "select"
             options = ["zz"]
             default = "zz"
+            description = "This defines how input data is transformed into quantum states before processing. Different encoders can capture various features or structures in the data, which may affect the model's ability to learn and distinguish patterns."
         [QSVM.params.n_qubits]
             name = "Number of Qubits"
             type = "int"
             range = [2, 4]
             default = 4
+            description = "This sets how many quantum bits are available for the algorithm to use. The number of qubits determines how much information the model can represent at once, impacting the overall capacity and complexity of the quantum computation."
         [QSVM.params.featuremap_reps]
             name = "Feature Map Repetitions"
             type = "int"
             range = [1, 2]
             default = 2
+            description = "This controls how many times the input encoding and quantum circuit operations are repeated. More repetitions can enhance the model’s ability to capture intricate relationships in the data, but may also increase computation time."
         [QSVM.params.entanglement]
             name = "Entanglement"
             type = "select"
             options = ["full"]
             default = "full"
+            description = "This determines how qubits are interconnected during the computation. Entanglement affects how information is shared across the system and plays a key role in enabling quantum models to capture complex, non-linear relationships in the data."
         [QSVM.params.kernel]
             name = "Kernel"
             type = "select"
             options = ["fidelity"]
             default = "fidelity"
+            description = "This defines the type of transformation applied to the data before learning begins. By projecting the data into a higher-dimensional space, the kernel helps the model find patterns that aren't obvious in the original input, especially when the data isn’t linearly separable."
         [QSVM.params.shots]
             name = "Number of Shots"
             type = "int"
             range = [1, 1024]
             default = 1024
+            description = "This specifies how many times a quantum circuit is executed to estimate measurement outcomes. A higher number of shots leads to more stable and reliable results by reducing randomness and noise in the output."
 
 [QNN]
     name = "Quantum Nueral Network (QNN)"
@@ -580,61 +672,73 @@ LIST = [
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
+            description = "This identifies the specific approach or library used to construct and run the quantum model. Different implementations may handle computation, optimization, or circuit design in unique ways, which can affect training behavior and performance."
         [QNN.params.provider_name]
             name = "Provider Name"
             type = "select"
             options = ["qiskit"]
             default = "qiskit"
+            description = "This specifies which quantum computing service will be used to run the algorithm. Different providers may offer access to different hardware configurations, affecting the speed, reliability, and accuracy of quantum computations."
         [QNN.params.hardware]
             name = "Hardware"
             type = "select"
             options = ["cpu", "gpu"]
             default = "cpu"
+            description = "This selects the quantum device or simulator on which the algorithm will run. The choice of hardware can influence execution time, noise levels, and whether the computation is performed on real quantum systems or emulated environments."
         [QNN.params.encoder_name]
             name = "Encoder Name"
             type = "select"
             options = ["zz"]
             default = "zz"
+            description = "This defines how input data is transformed into quantum states before processing. Different encoders can capture various features or structures in the data, which may affect the model's ability to learn and distinguish patterns."
         [QNN.params.n_qubits]
             name = "Number Qubits"
             type = "int"
             range = [2, 4]
             default = 2
+            description = "This sets how many quantum bits are used during the computation. The number of qubits determines how much information the network can process at once, which directly affects its capacity to learn and represent complex patterns in the data."
         [QNN.params.entanglement]
             name = "Entanglement"
             type = "select"
             options = ["full"]
             default = "full"
+            description = "This determines how qubits are interconnected during the computation. Entanglement affects how information is shared across the system and plays a key role in enabling quantum models to capture complex, non-linear relationships in the data."
         [QNN.params.featuremap_reps]
             name = "Feature Map Repetitions"
             type = "int"
             range = [1, 2]
             default = 2
+            description = "This controls how many times the input encoding and quantum circuit operations are repeated. More repetitions can enhance the model’s ability to capture intricate relationships in the data, but may also increase computation time."
         [QNN.params.ansatz_reps]
             name = "Ansatz Repetitions"
             type = "int"
             range = [1, 2]
             default = 2
+            description = "This controls how many times the core building blocks of the quantum circuit are repeated. More repetitions can increase the expressiveness of the model, allowing it to capture deeper or more subtle relationships in the data."
         [QNN.params.ansatz_name]
             name = "Ansatz Name"
             type = "select"
             options = ["real_amplitudes"]
             default = "real_amplitudes"
+            description = "This specifies the structure of the quantum circuit used in the model. Different ansatz designs influence how well the network can approximate the underlying patterns in the data by shaping the way information flows and transforms."
         [QNN.params.optim_name]
             name = "Optimizer Name"
             type = "select"
             options = ["cobyla"]
             default = "cobyla"
+            description = "This selects the algorithm used to adjust the model's parameters during training. The optimizer impacts how quickly and effectively the model learns from data, influencing convergence speed and overall performance."
         [QNN.params.optim_max_steps]
             name = "Optimizer Maximum Steps"
             type = "int"
             range = [1, 100]
             default = 50
+            description = "This sets the limit on how many training steps the optimizer can take. It ensures the training process doesn't run indefinitely and can affect both the accuracy of the final model and the time it takes to train."
         [QNN.params.meas_type]
             name = "Measurement Type"
             type = "select"
             options = ["sampler"]
             default = "sampler"
+            description = "This defines how information is extracted from the quantum system at the end of computation. Different measurement strategies influence how outputs are interpreted and can impact the quality of the model’s predictions."
         
 [QRBM]
     name = "Quantum Restricted Boltzmann Machine (QRBM)"
@@ -644,36 +748,43 @@ LIST = [
             type = "select"
             options = ["dwave"]
             default = "dwave"
+            description = "This identifies the specific approach or library used to construct and run the quantum model. Different implementations may handle computation, optimization, or circuit design in unique ways, which can affect training behavior and performance."
         [QRBM.params.provider_name]
             name = "Provider Name"
             type = "select"
             options = ["dwave"]
             default = "dwave"
+            description = "This specifies which quantum computing service will be used to run the algorithm. Different providers may offer access to different hardware configurations, affecting the speed, reliability, and accuracy of quantum computations."
         [QRBM.params.encoder_name]
             name = "Encoder Name"
             type = "select"
             options = ["bqm"]
             default = "bqm"
+            description = "This defines how input data is transformed into quantum states before processing. Different encoders can capture various features or structures in the data, which may affect the model's ability to learn and distinguish patterns."
         [QRBM.params.n_hidden]
             name = "Number Hidden Units"
             type = "int"
             range = [1, 2]
             default = 2
+            description = "This sets the size of the hidden layer that learns internal features from the input data. A larger number of hidden units allows the model to represent more complex patterns, while fewer units lead to simpler representations."
         [QRBM.params.shots]
             name = "Number of Shots"
             type = "int"
             range = [1, 2]
             default = 2
+            description = "This specifies how many times a quantum circuit is executed to estimate measurement outcomes. A higher number of shots leads to more stable and reliable results by reducing randomness and noise in the output."
         [QRBM.params.chain_strength]
             name = "Chain Strength"
             type = "float"
             range = [0, 10]
             default = 2.0
+            description = "This determines how strongly connected the elements in a quantum system are during the embedding process. The strength affects how well logical connections are preserved when the model is mapped onto physical hardware."
         [QRBM.params.knn_n_neighbors]
             name = "KNN Neighbors"
             type = "int"
             range = [1, 10]
             default = 2
+            description = "This defines how many nearby data points are considered when evaluating similarity. It influences how the model groups and interprets input data based on local structure, affecting both learning quality and generalization."
 
 #------------------------------------------------------------------------------
 #
