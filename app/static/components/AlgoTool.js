@@ -524,7 +524,7 @@ class AlgoTool extends HTMLElement {
           label {
             padding-left: 0.5vw;
             padding-right: 0.3vw;
-            padding-top: 0.2vh;
+            padding-top: 0.6vh;
             font-family: 'Inter', sans-serif;
             font-size: 0.85em;
             font-weight: bold;
@@ -532,7 +532,7 @@ class AlgoTool extends HTMLElement {
 
           /* Label styling for info icons */
           info-icon {
-            padding-top: 0.2vh;
+            padding-top: 0.5vh;
           }
 
           /* Input field styling */
