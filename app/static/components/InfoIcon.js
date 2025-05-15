@@ -1,7 +1,3 @@
-// import info descriptions for info icon text
-//
-import { InfoDescriptions } from './InfoDescriptions.js';
-
 class InfoIcon extends HTMLElement {
   /*
   class: InfoIcon
