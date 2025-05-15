@@ -345,7 +345,7 @@ export class LabelManager {
     // convert the keys of the mappings object to lowercase
     // and save it
     //
-    this.mappings = Object.fromEntries(
+    this.map = Object.fromEntries(
       Object.entries(mappings).map(
         ([key, value]) => [key.toLowerCase(), Number(value)])
     );
@@ -356,7 +356,7 @@ export class LabelManager {
       // get the lowercase version of the class name
       // if the class name is not a string, do not make lowercase
       //
-      label.setMapping(this.mappings[label.name?.toLowerCase?.()]);
+      label.setMapping(this.map[label.name?.toLowerCase?.()]);
     });
   }
   //
@@ -409,8 +409,6 @@ export class LabelManager {
         labelObj.mapping = Math.max(...this.mappings) + 1;
       }
     }
-
-    console.log(this.mappings)
 
     // add the label to the internal data structures
     //
