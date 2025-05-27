@@ -152,8 +152,8 @@ EventBus.addEventListener("train", (event) => {
       else {
         return response.json().then((errorData) => {
           EventBus.dispatchEvent(new CustomEvent("continue"));
-          processLog.writeError(`Could not train: ${errorData.error}`);
-          throw new Error(errorData.error);
+          processLog.writeError(`Could not train: ${errorData}`);
+          throw new Error(errorData);
         });
       }
     })
@@ -280,8 +280,8 @@ EventBus.addEventListener("eval", (event) => {
       else {
         return response.json().then((errorData) => {
           EventBus.dispatchEvent(new CustomEvent("continue"));
-          processLog.writeError(`Could not evaluate: ${errorData.error}`);
-          throw new Error(errorData.error);
+          processLog.writeError(`Could not evaluate: ${errorData}`);
+          throw new Error(errorData);
         });
       }
     })
@@ -348,8 +348,8 @@ EventBus.addEventListener("saveModel", () => {
       else {
         return response.json().then((errorData) => {
           EventBus.dispatchEvent(new CustomEvent("continue"));
-          processLog.writeError(`Could not save model: ${errorData.error}`);
-          throw new Error(errorData.error);
+          processLog.writeError(`Could not save model: ${errorData}`);
+          throw new Error(errorData);
         });
       }
   })
@@ -435,8 +435,8 @@ EventBus.addEventListener("normalize", (event) => {
     else {
       return response.json().then((errorData) => {
         EventBus.dispatchEvent(new CustomEvent("continue"));
-        processLog.writeError(`Could not normalize data: ${errorData.error}`);
-        throw new Error(errorData.error);
+        processLog.writeError(`Could not normalize data: ${errorData}`);
+        throw new Error(errorData);
       });
     }
   })
@@ -613,8 +613,8 @@ EventBus.addEventListener("loadModel", (event) => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(`Could not load model: ${errorData.error}`);
-            throw new Error(errorData.error);
+            processLog.writeError(`Could not load model: ${errorData}`);
+            throw new Error(errorData);
           });
         }
       })
@@ -746,8 +746,8 @@ EventBus.addEventListener("loadAlgParams", (event) => {
             return response.json().then((errorData) => {
               EventBus.dispatchEvent(new CustomEvent("continue"));
               processLog.writeError(
-                `Could not load algorithm parameters: ${errorData.error}`);
-              throw new Error(errorData.error);
+                `Could not load algorithm parameters: ${errorData}`);
+              throw new Error(errorData);
             });
           }
         })
@@ -831,8 +831,8 @@ EventBus.addEventListener("saveAlgParams", () => {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
             processLog.writeError(
-              `Could not save algorithm parameters: ${errorData.error}`);
-            throw new Error(errorData.error);
+              `Could not save algorithm parameters: ${errorData}`);
+            throw new Error(errorData);
           });
         }
       })
@@ -938,8 +938,8 @@ EventBus.addEventListener("dataGen", (event) => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(`Could not generate data: ${errorData.error}`);
-            throw new Error(errorData.error);
+            processLog.writeError(`Could not generate data: ${errorData}`);
+            throw new Error(errorData);
           });
         }
       })
@@ -1736,11 +1736,12 @@ EventBus.addEventListener("reportIssue", (event) => {
   .then((response) => {
     if (response.ok) {
       return response.json();
-    } else {
+    } 
+    else {
       return response.json().then((errorData) => {
         EventBus.dispatchEvent(new CustomEvent("continue"));
-        processLog.writeError(`Could not report issue: ${errorData.error}`);
-        throw new Error(errorData.error);
+        processLog.writeError(`Could not report issue: ${errorData}`);
+        throw new Error(errorData);
       });
     }
   })
@@ -1883,8 +1884,8 @@ EventBus.addEventListener("setRanges", (event) => {
         else {
           return response.json().then((errorData) => {
             EventBus.dispatchEvent(new CustomEvent("continue"));
-            processLog.writeError(`Could not change bounds: ${errorData.error}`);
-            throw new Error(errorData.error);
+            processLog.writeError(`Could not change bounds: ${errorData}`);
+            throw new Error(errorData);
           });
         }
       })

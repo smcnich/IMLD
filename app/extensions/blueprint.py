@@ -703,7 +703,7 @@ def write_issue():
         # Get JSON data from the request
         #
         data = request.get_json()
-        
+
         # Extract title and message from the data
         #
         title = data['title']
@@ -711,7 +711,7 @@ def write_issue():
 
         # define email recipients
         #
-        help_email = "help_isip@listserv.temple.edu"
+        help_email = "help@nedcdata.org"
         sd_email = "ece_sd_2024f_imld@listserve.temple.edu"
 
         # get the issue number from a environment variable that is stored
@@ -738,12 +738,11 @@ def write_issue():
 
 	        # return a successful message
 	        #
-            return {'status': 'success', 'message': 'Issue logged successfully'}, 200
+            return 200
         else:
-            return jsonify('Failed to log issue: ' + process.stderr), 500
+            return jsonify(process.stderr), 500
 
     except Exception as e:
-        print(e)
-        return jsonify(f'Failed to log issue: {str(e)}'), 500
+        return jsonify(str(e)), 500
 #
 # end of method
