@@ -64,15 +64,11 @@ def check_return(func, *args, **kwargs):
     #
     with redirect_stdout(capture):
         res = func(*args, **kwargs)
-
-    # if the return value is invalid, raise an exception with the std output
-    # reformat the std output, such as removing line number and other
-    # unnecessary information. simply take the root cause of the error
-    # i.e. "Singluar matrix is none"
+    
+    # determine if the cpature has a substring that indicates an error
     #
-    if res is None or \
-    (isinstance(res, (list, tuple)) and any(x is None for x in res)):
-        raise MLToolsError(capture.getvalue())
+    if 'Error:' in capture.getvalue():
+        raise MLToolsError(capture.getvalue().strip())
 
     # exit gracefully
     #
