@@ -703,24 +703,21 @@ def write_issue():
         # Get JSON data from the request
         #
         data = request.get_json()
-
+        
         # Extract title and message from the data
         #
-        title = data.get('title')
-        message = data.get('message')
+        title = data['title']
+        message = data['message']
 
         # define email recipients
         #
         help_email = "help_isip@listserv.temple.edu"
         sd_email = "ece_sd_2024f_imld@listserve.temple.edu"
 
-	# get the issue number from a environment variable that is stored
-	# in the nedc_imld conda environment
-	#
+        # get the issue number from a environment variable that is stored
+        # in the nedc_imld conda environment
+        #
         issue_num = os.getenv("IMLD_ISSUE_NUM")
-
-	# get the issue number from the file
-	#
 
         # Send the mail
         #
@@ -736,23 +733,17 @@ def write_issue():
         if process.returncode == 0:
 
             # increment the issue number
-	    #
+	        #
             os.environ["IMLD_ISSUE_NUM"] = f"{int(issue_num) + 1:03d}"
 
-	    # return a successful message
-	    #
+	        # return a successful message
+	        #
             return {'status': 'success', 'message': 'Issue logged successfully'}, 200
         else:
-            return {
-                'status': 'error',
-                'message': 'Failed to send email',
-                'stderr': process.stderr
-            }, 500
+            return jsonify('Failed to log issue: ' + process.stderr), 500
 
     except Exception as e:
-        return {
-            'status': 'error',
-            'message': f'An error occurred: {str(e)}'
-        }, 500
+        print(e)
+        return jsonify(f'Failed to log issue: {str(e)}'), 500
 #
 # end of method

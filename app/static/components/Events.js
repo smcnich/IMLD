@@ -1714,11 +1714,6 @@ EventBus.addEventListener("reportIssue", (event) => {
     to be reported
     */
 
-  // get the issue and email from the event
-  //
-  const issue = event.detail.issue;
-  const email = event.detail.email;
-
   // suspend the application as loading
   //
   EventBus.dispatchEvent(new CustomEvent("suspend"));
@@ -1731,8 +1726,8 @@ EventBus.addEventListener("reportIssue", (event) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      issue: issue,
-      email: email,
+      title: event.detail.title,
+      message: event.detail.message
     }),
   })
 
