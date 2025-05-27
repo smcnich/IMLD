@@ -685,7 +685,7 @@ def data_gen():
 #
 # end of method
 
-@main.route('/api/issue_log/', methods=['POST'])
+@main.route('/api/report_issue/', methods=['POST'])
 def write_issue():
     """
     method: write_issue
