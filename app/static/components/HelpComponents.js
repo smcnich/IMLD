@@ -1,3 +1,7 @@
+// import Event Bus to handle events
+//
+import { EventBus } from "./Events.js";
+
 class AboutPopup extends HTMLElement {
   /*
   class: AboutPopup
@@ -673,34 +677,12 @@ class ReportPopup extends HTMLElement {
       const textarea =
         this.shadowRoot.getElementById("issue-description").value;
 
-      try {
-        // fetch the data to the issue log route in the backend
-        //
-        const response = await fetch(`${baseURL}/api/issue_log/`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            title: issuetitle,
-            message: textarea,
-          }),
-        });
-
-        // send an error if the response is not received from fetch
-        //
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+      EventBus.dispatchEvent(new CustomEvent('reportIssue', {
+        detail: {
+          title: issuetitle,
+          message: textarea
         }
-
-        // close the popup if submitted successfully
-        //
-        this.closePopup();
-      } catch (error) {
-        // send an error message if cannot send to backend
-        //
-        console.error("Error sending data to backend:", error);
-      }
+      }));
     });
 
     // Word count functionality

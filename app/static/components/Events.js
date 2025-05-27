@@ -17,6 +17,7 @@ const LOADALGPARAMS_URL = `${baseURL}api/load_alg_params/`;
 const SAVEALGPARAMS_URL = `${baseURL}api/save_alg_params/`;
 const SETBOUNDS_URL = `${baseURL}api/set_bounds/`;
 const NORMALIZE_URL = `${baseURL}api/normalize/`;
+const REPORTISSUE_URL = `${baseURL}api/report_issue/`;
 
 // get the component instances from the HTML document
 //
@@ -1693,6 +1694,73 @@ EventBus.addEventListener("setGaussianParams", (event) => {
       })
     );
   }
+});
+//
+// end of event listener
+
+EventBus.addEventListener("reportIssue", (event) => {
+  /*
+  eventListener: reportIssue
+
+  dispatcher: HelpComponents::ReportPopup
+
+  args:
+    event.detail.issue (String): the issue to report
+    event.detail.email (String): the email of the user reporting the issue
+
+  description:
+    this event listener is triggered when the user clicks the report issue
+    button in the help popup. the event listener sends the issue to the server
+    to be reported
+    */
+
+  // get the issue and email from the event
+  //
+  const issue = event.detail.issue;
+  const email = event.detail.email;
+
+  // suspend the application as loading
+  //
+  EventBus.dispatchEvent(new CustomEvent("suspend"));
+
+  // send the data to the server and get the response
+  //
+  fetch(REPORTISSUE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      issue: issue,
+      email: email,
+    }),
+  })
+
+  // parse the response
+  //
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      return response.json().then((errorData) => {
+        EventBus.dispatchEvent(new CustomEvent("continue"));
+        processLog.writeError(`Could not report issue: ${errorData.error}`);
+        throw new Error(errorData.error);
+      });
+    }
+  })
+
+  // get the data from the response
+  //
+  .then((data) => {
+    // write to the process log
+    //
+    processLog.writePlain("Issue reported successfully.");
+
+    // continue the application
+    //
+    EventBus.dispatchEvent(new CustomEvent("continue"));
+  });
 });
 //
 // end of event listener

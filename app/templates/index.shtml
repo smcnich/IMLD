@@ -50,7 +50,7 @@
     <script type="module" src="static/components/ToolbarComponents.js"></script>
     <script type="module" src="static/components/DataParams.js"></script>
     <script src="static/components/FormContainer.js"></script>
-    <script src="static/components/HelpComponents.js"></script>
+    <script type="module" src="static/components/HelpComponents.js"></script>
     <script type="module" src="static/components/ClassesComponents.js"></script>
   </head>
   <style>
