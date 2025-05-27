@@ -3,7 +3,7 @@
 # file: $NEDC_NFC/class/python/nedc_ml_tools/nedc_ml_tools.py
 #
 # revision history:
-#
+# 20250522 (ST): Begun an implementation of the XGBoost algoritm 
 # 20250411 (SP): added early stopping to Transformer
 # 20250322 (SP): fixed model_d format issue
 # 20250322 (JP): fixed error messages
@@ -73,9 +73,12 @@
 
 # import required system modules (basic)
 #
+import argparse
 from collections import defaultdict
 import datetime as dt
+import json
 import numpy as np
+import pandas as pd
 import pickle
 import os
 import sys
@@ -96,6 +99,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.neural_network import (MLPClassifier, BernoulliRBM)
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
+import xgboost as xgb
 
 import torch
 
@@ -132,6 +136,7 @@ IMP_NAME_EM = "em"
 IMP_NAME_PYTORCH = "pytorch"
 IMP_NAME_QISKIT = "qiskit"
 IMP_NAME_SKLEARN = "sklearn"
+IMP_NAME_XGBOOST = "xgboost"
 
 # define common names that appear in many, but not all,
 # algorithms (listed alphabetically)
@@ -147,6 +152,7 @@ ALG_NAME_CRITERION = "criterion"
 ALG_NAME_DSCR = "discriminant"
 ALG_NAME_EIGV = "eigenvalue"
 ALG_NAME_ESTOP = "early_stopping"
+ALG_NAME_EMET = "eval_metric"
 ALG_NAME_GAMMA = "gamma"
 ALG_NAME_HDW = "hardware"
 ALG_NAME_HSIZE = "hidden_size"
@@ -163,6 +169,7 @@ ALG_NAME_NEST = "n_estimators"
 ALG_NAME_NINIT = "n_init"
 ALG_NAME_NLAYERS = "num_layers"
 ALG_NAME_NNEARN = "k_nearest_neighbors"
+ALG_NAME_NTHREAD = "nthread"
 ALG_NAME_PRIORS = "priors"
 ALG_NAME_PRIORS_MAP = "map"
 ALG_NAME_PRIORS_ML = "ml"
@@ -175,6 +182,7 @@ ALG_NAME_TRANS = "transform"
 ALG_NAME_TOLERANCE = "tolerance"
 ALG_NAME_VALF = "validation_fraction"
 ALG_NAME_WEIGHTS = "weights"
+
 
 # define formats for generating a scoring report (listed alphabetically)
 #
@@ -572,6 +580,35 @@ SVM_IMPLS = [IMP_NAME_SKLEARN]
 #
 
 #------------------------------------------------------------------------------
+# Alg = XGBoost: define dictionary keys for parameters
+#------------------------------------------------------------------------------
+
+# define the algorithm name and the available implementations
+#
+XGBOOST_NAME = "XGBOOST"
+XGBOOST_IMPLS = [IMP_NAME_XGBOOST]
+
+# the parameter block (param_d) for XGBoost looks like this:
+#
+#  defaultdict(<class 'dict'>, {
+#    'implementation_name': 'xgboost',
+#    'solver': 'multi:softmax',
+#    'eval_metric': 'mlogloss',
+#    'max_depth': 6,
+#    'nthread': 4,
+#    'random_state': 21
+#   }
+#  })
+#
+# the model (model_d) for XGBoost contains:
+#  defaultdict(<class 'dict'>, {
+#   'algorithm_name': 'XGBOOST',
+#   'implementation_name': 'xgboost',
+#   'model': XGBoost Model
+#  })
+#
+
+#------------------------------------------------------------------------------
 # Alg = MLP: define dictionary keys for parameters
 #------------------------------------------------------------------------------
 
@@ -782,6 +819,10 @@ QRBM_IMPLS = [IMP_NAME_DWAVE]
 #   'model': QRBM(provider=DWaveProvider)
 #  })
 #
+
+
+
+
 
 #******************************************************************************
 #
@@ -5179,7 +5220,229 @@ class SVM:
 
 #******************************************************************************
 #
-# Section 3: neural network-based models
+# Section 3: gradient boosting models
+#
+#****************************************************************************
+
+#------------------------------------------------------------------------------
+# ML Tools Class: XGBoost
+#------------------------------------------------------------------------------
+
+class XGBoost:
+    """
+    class: XGBoost
+
+    description:
+     This is a class that implements XGBoost.
+    """
+
+    def __init__(self):
+        """
+        method: constructor
+
+        arguments:
+         none
+
+        return:
+         none
+
+        description:
+         This is the default constructor for the class.
+        """
+
+        # set the class name
+        #
+        XGBoost.__CLASS_NAME__ = self.__class__.__name__
+
+        # initialize variables for the parameter block and model
+        #
+        self.params_d = defaultdict(dict)
+        self.model_d = defaultdict()
+
+        # initialize a parameter dictionary
+        #
+        self.params_d = defaultdict(dict)
+
+        # set the model
+        #
+        self.model_d[ALG_NAME_ALG] = self.__class__.__name__
+        self.model_d[ALG_NAME_IMP] = IMP_NAME_XGBOOST
+        self.model_d[ALG_NAME_MDL] = {}
+    #
+    # end of method
+
+    #--------------------------------------------------------------------------
+    #
+    # computational methods: train/predict
+    #
+    #--------------------------------------------------------------------------
+
+    def train(self, data: MLToolsData,
+              write_train_labels: bool, fname_train_labels: str):
+        """
+        method: train
+
+        arguments:
+         data: a list of numpy float matrices of feature vectors
+         write_train_labels: a boolean to whether write the train data
+         fname_train_labels: the filename of the train file
+
+        return:
+         model: a dictionary of covariance, means and priors
+         score: f1 score
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s::%s: training a model" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__))
+
+        if self.model_d[ALG_NAME_MDL]:
+            print("Error: %s (line: %s) %s::%s: %s" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__,
+                   "doesn't support training on pre-trained model"))
+            return None, None
+
+        # making the final data
+        #
+        samples = np.array(data.data)
+
+        # getting the labels
+        #
+        labels = np.array(data.labels)
+
+        # fit the model
+        #
+        imp = self.params_d[ALG_NAME_IMP]
+        h_s = int(self.params_d[ALG_NAME_HSIZE])
+        act = self.params_d[ALG_NAME_ACT]
+        b_s = self.params_d[ALG_NAME_BSIZE]
+        sol = self.params_d[ALG_NAME_SOLVER]
+        lr = self.params_d[ALG_NAME_LR]
+        lr_init = float(self.params_d[ALG_NAME_LRINIT])
+        e_stop = bool(self.params_d[ALG_NAME_ESTOP])
+        sh = bool(self.params_d[ALG_NAME_SHUFFLE])
+        val= float(self.params_d[ALG_NAME_VALF])
+        m = float(self.params_d[ALG_NAME_MOMENTUM])
+        r_state = int(self.params_d[ALG_NAME_RANDOM])
+        m_iter = int(self.params_d[ALG_NAME_MAXITER])
+
+        self.model_d[ALG_NAME_MDL] = \
+            MLPClassifier(hidden_layer_sizes = (h_s,),
+                          activation = act,
+                          solver = sol,
+                          batch_size = b_s,
+                          learning_rate = lr,
+                          learning_rate_init = lr_init,
+                          shuffle = sh,
+                          random_state = r_state,
+                          momentum = m,
+                          early_stopping = e_stop,
+                          validation_fraction=val,
+                          max_iter=m_iter).fit(samples, labels)
+
+        # prediction
+        #
+        ypred = self.model_d[ALG_NAME_MDL].predict(samples)
+
+        # score calculation using auc ( f1 score )
+        #
+        score = f1_score(labels, ypred, average="macro")
+
+        if write_train_labels:
+            data.write(oname = fname_train_labels, label = ypred)
+
+        # exit gracefully
+        #
+        return self.model_d, score
+    #
+    # end of method
+
+    def predict(self, data: MLToolsData, model = None):
+        """
+        method: predict
+
+        arguments:
+         data: a numpy float matrix of feature vectors (each row is a vector)
+         model: an algorithm model (None = use the internal model)
+
+        return:
+         labels: a list of predicted labels
+
+        description:
+         none
+        """
+
+        # display an informational message
+        #
+        if dbgl_g == ndt.FULL:
+            print("%s (line: %s) %s::%s: entering predict" %
+                  (__FILE__, ndt.__LINE__, MLP.__CLASS_NAME__, ndt.__NAME__))
+
+        # check if model is none
+        #
+        if model is None:
+            model = self.model_d
+
+        samples = np.array(data.data)
+
+        p_labels = model[ALG_NAME_MDL].predict(samples)
+
+        # posterior calculation
+        #
+        posteriors = model[ALG_NAME_MDL].predict_proba(samples)
+
+        # exit gracefully
+        #
+        return p_labels, posteriors
+    #
+    # end of method
+    
+    def get_info(self):
+        """
+        method: get_info
+  
+        arguments:
+         none
+  
+        return:
+         a dictionary containing the algorithm information
+  
+        description:
+         this method returns important attributes of the MLP algorithm.
+        """
+  
+        # create empty log output
+        #
+        log_output = []
+
+        loss = self.model_d[ALG_NAME_MDL].loss_
+        log_output.append(f"Loss: {loss:.4f}")
+
+        n_layers = self.model_d[ALG_NAME_MDL].n_layers_
+        log_output.append(f"Number of Layers: {n_layers}")
+
+        n_iter = self.model_d[ALG_NAME_MDL].n_iter_
+        log_output.append(f"Number of Iterations: {n_iter}")
+
+        n_outputs = self.model_d[ALG_NAME_MDL].n_outputs_
+        log_output.append(f"Number of Outputs: {n_outputs}")
+
+        # exit gracefully
+        #
+        return "\n".join(log_output)
+    #
+    # end of method
+#
+# end of class (MLP)
+
+#******************************************************************************
+#
+# Section 4: neural network-based models
 #
 #******************************************************************************
 
@@ -6037,7 +6300,7 @@ class TRANSFORMER:
 
 #******************************************************************************
 #
-# Section 4: quantum computing-based models
+# Section 5: quantum computing-based models
 #
 #******************************************************************************
 
@@ -6567,7 +6830,7 @@ class QRBM:
 
 #******************************************************************************
 #
-# Section 5: definitions dependent on the above classes go here
+# Section 6: definitions dependent on the above classes go here
 #
 #******************************************************************************
 

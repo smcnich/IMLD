@@ -439,12 +439,11 @@ class AlgoTool extends HTMLElement {
           //
           let plot = button.getAttribute("id");
 
-          const [paramsDict, param_names] = this.form.submitForm();
-
           // if the plot is train, train the model
           // and set the trained flag to true
           //
           if (plot == "train") {
+	    const [paramsDict, param_names] = this.form.submitForm();
             EventBus.dispatchEvent(
               new CustomEvent("train", {
                 detail: {

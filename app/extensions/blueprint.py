@@ -711,12 +711,21 @@ def write_issue():
 
         # define email recipients
         #
-        recipient = "isip.nedc@gmail.com" # change recipients if needed
+        help_email = "help_isip@listserv.temple.edu"
+        sd_email = "ece_sd_2024f_imld@listserve.temple.edu"
+
+	# get the issue number from a environment variable that is stored
+	# in the nedc_imld conda environment
+	#
+        issue_num = os.getenv("IMLD_ISSUE_NUM")
+
+	# get the issue number from the file
+	#
 
         # Send the mail
         #
         process = subprocess.run(
-            ['mail', '-s', f'Issue: {title}', recipient],
+            ['mail', '-s', f'IMLD Issue No. {issue_num}: {title}', '-c', sd_email, help_email],
             input=message,
             text=True,
             capture_output=True  # capture stdout and stderr
@@ -725,6 +734,13 @@ def write_issue():
         # Check mail status
         #
         if process.returncode == 0:
+
+            # increment the issue number
+	    #
+            os.environ["IMLD_ISSUE_NUM"] = f"{int(issue_num) + 1:03d}"
+
+	    # return a successful message
+	    #
             return {'status': 'success', 'message': 'Issue logged successfully'}, 200
         else:
             return {
