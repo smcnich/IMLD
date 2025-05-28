@@ -685,10 +685,10 @@ def data_gen():
 #
 # end of method
 
-@main.route('/api/report_issue/', methods=['POST'])
+@main.route('/api/issue_number/', methods=['POST'])
 def write_issue():
     """
-    method: write_issue
+    method: issue_number
 
     arguments:
      None (input comes from POST request)
@@ -697,52 +697,30 @@ def write_issue():
      None
 
     description:
-     Logs an issue message along with its title and date and sends it through email.
+     get the issue number from the environment variable
+     and return it as a JSON response.
     """
     try:
-        # Get JSON data from the request
-        #
-        data = request.get_json()
-
-        # Extract title and message from the data
-        #
-        title = data['title']
-        message = data['message']
-
-        # define email recipients
-        #
-        help_email = "help@nedcdata.org"
-        sd_email = "ece_sd_2024f_imld@listserve.temple.edu"
 
         # get the issue number from a environment variable that is stored
         # in the nedc_imld conda environment
         #
         issue_num = os.getenv("IMLD_ISSUE_NUM")
 
-        # Send the mail
+        # if the issue number is not set, raise an error
         #
-        process = subprocess.run(
-            ['mail', '-s', f'IMLD Issue No. {issue_num}: {title}', '-c', sd_email, help_email],
-            input=message,
-            text=True,
-            capture_output=True  # capture stdout and stderr
-        )
-
-        # Check mail status
+        if not issue_num: issue_num = '000'
+        
+        # increment this issue number by 1 and store it back in the environment 
+        # variable
         #
-        if process.returncode == 0:
+        os.environ['IMLD_ISSUE_NUM'] = f'{int(issue_num)+1:03d}'
 
-            # increment the issue number
-	        #
-            os.environ["IMLD_ISSUE_NUM"] = f"{int(issue_num) + 1:03d}"
-
-	        # return a successful message
-	        #
-            return 200
-        else:
-            return jsonify(process.stderr), 500
-
-    except Exception as e:
+        # return the issue number
+        #
+        return jsonify({'issueNum': issue_num}), 200
+    
+    except Exception as e:  
         return jsonify(str(e)), 500
 #
 # end of method

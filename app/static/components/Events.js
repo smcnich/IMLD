@@ -17,7 +17,7 @@ const LOADALGPARAMS_URL = `${baseURL}api/load_alg_params/`;
 const SAVEALGPARAMS_URL = `${baseURL}api/save_alg_params/`;
 const SETBOUNDS_URL = `${baseURL}api/set_bounds/`;
 const NORMALIZE_URL = `${baseURL}api/normalize/`;
-const REPORTISSUE_URL = `${baseURL}api/report_issue/`;
+const ISSUENUM_URL = `${baseURL}api/issue_number/`;
 
 // get the component instances from the HTML document
 //
@@ -1720,15 +1720,11 @@ EventBus.addEventListener("reportIssue", (event) => {
 
   // send the data to the server and get the response
   //
-  fetch(REPORTISSUE_URL, {
+  fetch(ISSUENUM_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      title: event.detail.title,
-      message: event.detail.message
-    }),
+    }
   })
 
   // parse the response
@@ -1749,9 +1745,21 @@ EventBus.addEventListener("reportIssue", (event) => {
   // get the data from the response
   //
   .then((data) => {
-    // write to the process log
-    //
-    processLog.writePlain("Issue reported successfully.");
+
+    const subject = `IMLD Issue Num. ${data.issueNum}: ${event.detail.title}`;
+    const body = event.detail.message;
+    const email = 'help@nedcdata.org';
+    const cc = 'ece_sd_2024f_imld@listserv.temple.edu';
+
+    const mailtoLink = 
+      `mailto:${email}?` +
+      `cc=${encodeURIComponent(cc)}&` +
+      `subject=${encodeURIComponent(subject)}&` +
+      `body=${encodeURIComponent(body)}`;
+
+    const a = document.createElement("a");
+    a.href = mailtoLink;
+    a.click();
 
     // continue the application
     //
